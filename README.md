@@ -697,6 +697,8 @@ Bridge.client()
 
 **Note**: the buffer size is used in a few other places, such as pre-built `Pipe`'s (`Pipe#forUri`, `Pipe#forStream`, etc.).
 
+---
+
 ### Logging
 
 By default, logging is disabled. You can enable logging to see what the library is doing in your Logcat:
