@@ -25,7 +25,7 @@ public final class Request {
         return mBuilder;
     }
 
-    protected Request makeRequest() throws RequestException {
+    protected Request makeRequest() throws BridgeException {
         try {
             URL url = new URL(mBuilder.mUrl);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -107,16 +107,16 @@ public final class Request {
                 conn.disconnect();
             }
         } catch (Exception e) {
-            if (e instanceof RequestException)
-                throw (RequestException) e;
-            throw new RequestException(this, e);
+            if (e instanceof BridgeException)
+                throw (BridgeException) e;
+            throw new BridgeException(this, e);
         }
         return this;
     }
 
-    private void checkCancelled() throws RequestException {
+    private void checkCancelled() throws BridgeException {
         if (isCancelled) {
-            RequestException ex = new RequestException(this);
+            BridgeException ex = new BridgeException(this);
             Log.d(this, ex.getMessage());
             throw ex;
         }

@@ -52,7 +52,7 @@ public class Bridge {
         }
     }
 
-    protected void fireCallbacks(Request request, Response response, RequestException error) {
+    protected void fireCallbacks(Request request, Response response, BridgeException error) {
         synchronized (LOCK) {
             final String key = CallbackStack.createKey(request);
             Log.d(this, "Attempting to fire callbacks for %s", key);

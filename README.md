@@ -30,6 +30,7 @@ dependencies {
     2. [URL Format Args](https://github.com/afollestad/bridge#url-format-args)
     3. [Response Headers](https://github.com/afollestad/bridge#response-headers)
     4. [Response Bodies](https://github.com/afollestad/bridge#response-bodies)
+    5. [Error Handling](https://github.com/afollestad/bridge#error-handling)
 2. [Request Headers](https://github.com/afollestad/bridge#request-headers)
 3. [Request Bodies](https://github.com/afollestad/bridge#request-bodies)
     1. [Basics](https://github.com/afollestad/bridge#basics-1)
@@ -70,14 +71,13 @@ try {
         .response();
 
     if (!response.isSuccess()) {
-        // If response code was not 200 OK
-        throw new Exception(response.code() + " " + response.phrase());
+        // If response code was not 200-300
     } else {
         String responseContent = response.asString();
         // Do something with response
     }
-} catch (Exception e) {
-    // An error occurred
+} catch (BridgeException e) {
+    // See the 'Error Handling' section for information on how to process BridgeExceptions
 }
 ```
 
@@ -89,8 +89,9 @@ try {
         .get("http://www.google.com")
         .asString();
     // Do something with response
-} catch (Exception e) {
-    // An error occurred OR response code was not 200 OK
+} catch (BridgeException e) {
+    // See the 'Error Handling' section for information on how to process BridgeExceptions
+    int reason = e.reason();
 }
 ```
 
@@ -101,15 +102,17 @@ try {
     String content = Bridge.client()
         .get("http://www.google.com")
         .response()
-        .throwIfNotSuccessful()
+        .throwIfNotSuccess()
         .asString();
-} catch (Exception e) {
-    // An error occurred
+} catch (BridgeException e) {
+    // See the 'Error Handling' section for information on how to process BridgeExceptions
+    int reason = e.reason();
 }
 ```
 
-It just takes out the need to use `response()`, and it makes use of `throwIfNotSuccessful()` to automatically
-throw an `Exception` if the response code is not 200 OK.
+It just takes out the need to use `response()`, and it makes use of `throwIfNotSuccess()` to automatically
+throw a `BridgeException` with the reason `REASON_RESPONSE_UNSUCCESSFUL`
+(see the [Error Handling](https://github.com/afollestad/bridge#error-handling) section).
 
 ---
 
@@ -124,8 +127,9 @@ try {
         .get("http://www.google.com/search?q=%s", searchQuery)
         .asString();
     // Do something with response
-} catch (Exception e) {
-    // An error occurred OR response code was not 200 OK
+} catch (BridgeException e) {
+    // See the 'Error Handling' section for information on how to process BridgeExceptions
+    int reason = e.reason();
 }
 ```
 
@@ -190,6 +194,56 @@ Bitmap responseImage = response.asBitmap();
 response.asFile(new File("/sdcard/Download.extension"));
 ```
 
+---
+
+### Error Handling
+
+The `BridgeException` class is used throughout the library and acts as a single exception provider.
+This helps avoid the need for different exception classes, or very unspecific Exceptions.
+
+The `BridgeException#reason()` method returns one of a set of constants that indicate why the exception
+was thrown. If the Exception is for a request, you can retrieve the `Request` with `BridgeException#request()`. 
+If the Exception is for a response, you can retrieve the `Response` with `BridgeException#response()`.
+
+```java
+BridgeException e = // ...
+switch (e.reason()) {
+    case BridgeException.REASON_REQUEST_CANCELLED: {
+        Request request = e.request();
+        // Used in BridgeExceptions passed to async request callbacks
+        // when the associated request was cancelled.
+        break;
+    }
+    case BridgeException.REASON_REQUEST_FAILED: {
+        Request request = e.request();
+        // Thrown when a general networking error occurs during a request.
+        break;
+    }
+    case BridgeException.REASON_RESPONSE_UNSUCCESSFUL: {
+        Response response = e.response();
+        // Thrown by throwIfNotSuccess(), when you explicitly want an
+        // Exception be thrown if the status code was unsuccessful.
+        break;
+    }
+    case BridgeException.REASON_RESPONSE_UNPARSEABLE: {
+        Response response = e.response();
+        // Thrown by the response conversion methods (e.g. asJsonObject())
+        // When the response content can't be successfully returned in the
+        // requested format. E.g. a JSON error.
+        break;
+    }
+    case BridgeException.REASON_RESPONSE_IOERROR: {
+        Response response = e.response();
+        // Thrown by the asFile() response converter when the library
+        // is unable to save the content to a file.
+        break;
+    }
+}
+```
+
+**Note**: you do not need to handle all of these cases everywhere a `BridgeException` is thrown. The comments
+within the above example code indicate where those reasons are generally used.
+
 ------
 
 # Request Headers
@@ -205,8 +259,9 @@ try {
         .header("CustomHeader", "Hello")
         .asString();
     // Do something with response
-} catch (Exception e) {
-    // An error occurred OR response code was not 200 OK
+} catch (BridgeException e) {
+    // See the 'Error Handling' section for information on how to process BridgeExceptions
+    int reason = e.reason();
 }
 ```
 
@@ -228,8 +283,9 @@ try {
         .post("http://someurl.com/post")
         .body(postContent)
         .asString();
-} catch(Exception e) {
-    // An error occurred
+} catch (BridgeException e) {
+    // See the 'Error Handling' section for information on how to process BridgeExceptions
+    int reason = e.reason();
 }
 ```
 
@@ -266,8 +322,9 @@ try {
         .post("http://someurl.com/login")
         .body(form)
         .asString();
-} catch (Exception e) {
-    // An error occurred
+} catch (BridgeException e) {
+    // See the 'Error Handling' section for information on how to process BridgeExceptions
+    int reason = e.reason();
 }
 ```
 
@@ -295,8 +352,9 @@ try {
         .post("http://someurl.com/post")
         .body(form)
         .asString();
-} catch (Exception e) {
-    // An error occurred
+} catch (BridgeException e) {
+    // See the 'Error Handling' section for information on how to process BridgeExceptions
+    int reason = e.reason();
 }
 ```
 
@@ -330,8 +388,9 @@ try {
         .post("http://someurl.com/post")
         .body(pipe)
         .asString();
-} catch (Exception e) {
-    // An error occurred
+} catch (BridgeException e) {
+    // See the 'Error Handling' section for information on how to process BridgeExceptions
+    int reason = e.reason();
 }
 ```
 
@@ -369,9 +428,10 @@ Bridge.client()
     .get("http://www.google.com")
     .request(new Callback() {
         @Override
-        public void response(Request request, Response response, RequestException e) {
-            if (e != null || !response.isSuccess()) {
-                // An error occurred or response was not successful
+        public void response(Request request, Response response, BridgeException e) {
+            if (e != null) {
+                // See the 'Error Handling' section for information on how to process BridgeExceptions
+                int reason = e.reason();
             } else {
                 String content = response.asString();
             }
@@ -384,7 +444,27 @@ There's two major advantages to using async requests:
 1. Threads are not blocked. You can execute this code on UI thread (e.g. in an `Activity`) without freezing or errors.
 2. Duplicate avoidance (discussed below).
 
-You can replace `get()` with `post()`, `put()` or `delete()` too.
+**Note**: You can replace `get()` with `post()`, `put()` or `delete()` too.
+
+Like synchronous requests, you can use `throwIfNotSuccess` to receive a `BridgeException` with the
+reason `REASON_RESPONSE_UNSUCCESSFUL` if the status code is not successful:
+
+```java
+Bridge.client()
+    .get("http://www.google.com")
+    .throwIfNotSuccess()
+    .request(new Callback() {
+        @Override
+        public void response(Request request, Response response, BridgeException e) {
+            if (e != null) {
+                // See the 'Error Handling' section for information on how to process BridgeExceptions
+                int reason = e.reason();
+            } else {
+                String content = response.asString();
+            }
+        }
+    });
+```
 
 ---
 
@@ -398,9 +478,10 @@ Bridge.client()
     .get("http://www.google.com")
     .request(new Callback() {
         @Override
-        public void response(Request request, Response response, RequestException e) {
-            if (e != null || !response.isSuccess()) {
-                // An error occurred or the response was not successful
+        public void response(Request request, Response response, BridgeException e) {
+            if (e != null) {
+                // See the 'Error Handling' section for information on how to process BridgeExceptions
+                int reason = e.reason();
             } else {
                 // Use the Response object
             }
@@ -411,9 +492,10 @@ Bridge.client()
     .get("http://www.google.com")
     .request(new Callback() {
         @Override
-        public void response(Request request, Response response, RequestException e) {
-            if (e != null || !response.isSuccess()) {
-                // An error occurred or the response was not successful
+        public void response(Request request, Response response, BridgeException e) {
+            if (e != null) {
+                // See the 'Error Handling' section for information on how to process BridgeExceptions
+                int reason = e.reason();
             } else {
                 // Use the Response object
             }
@@ -440,9 +522,10 @@ Bridge.client()
     .get("http://someurl/bigfile.extension")
     .request(new Callback() {
         @Override
-        public void response(Request request, Response response, RequestException e) {
+        public void response(Request request, Response response, BridgeException e) {
             if (e != null || !response.isSuccess()) {
-                // An error occurred or the response was not successful
+                // See the 'Error Handling' section for information on how to process BridgeExceptions
+                int reason = e.reason();
             } else {
                 // Use the Response object
             }
@@ -472,13 +555,10 @@ Request request = Bridge.client()
     .get("http://www.google.com")
     .request(new Callback() {
         @Override
-        public void response(Request request, Response response, RequestException e) {
-            if (e != null || !response.isSuccess()) {
-                if (e.isCancelled()) {
-                    // Request was cancelled
-                } else {
-                    // Error occurred
-                }
+        public void response(Request request, Response response, BridgeException e) {
+            if (e != null) {
+                // See the 'Error Handling' section for information on how to process BridgeExceptions
+                int reason = e.reason();
             } else {
                 // Use the Response
             }
@@ -488,8 +568,8 @@ Request request = Bridge.client()
 request.cancel();
 ```
 
-When a request is cancelled, the `RequestException` will *not* be null (it will say the request was cancelled),
-and `RequestException#isCancelled()` will return true.
+When a request is cancelled, the `BridgeException` will *not* be null (it will say the request was cancelled),
+and `BridgeException#isCancelled()` will return true.
 
 ---
 
@@ -548,11 +628,12 @@ Bridge.client()
     .tag("Hello!")
     .request(new Callback() {
         @Override
-        public void response(Request request, Response response, RequestException e) {
-            if (e.isCancelled()) {
-                // Request was cancelled
+        public void response(Request request, Response response, BridgeException e) {
+            if (e != null) {
+                // See the 'Error Handling' section for information on how to process BridgeExceptions
+                int reason = e.reason();
             } else {
-                // Error occurred
+                // Use the Response
             }
         }
     });
@@ -583,9 +664,10 @@ Bridge.client()
     .cancellable(false)
     .request(new Callback() {
         @Override
-        public void response(Request request, Response response, RequestException e) {
-            if (e != null || !response.isSuccess()) {
-                // Error occurred
+        public void response(Request request, Response response, BridgeException e) {
+            if (e != null) {
+                // See the 'Error Handling' section for information on how to process BridgeExceptions
+                int reason = e.reason();
             } else {
                 // Use the Response
             }

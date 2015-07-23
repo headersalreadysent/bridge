@@ -29,6 +29,7 @@ public final class RequestBuilder implements AsResultsExceptions {
     private Request mRequest;
     protected boolean mCancellable = true;
     protected Object mTag;
+    private boolean throwIfNotSuccess = false;
 
     protected RequestBuilder(String url, Method method, Bridge context) {
         mContext = context;
@@ -126,7 +127,7 @@ public final class RequestBuilder implements AsResultsExceptions {
         return this;
     }
 
-    public RequestBuilder body(@Nullable MultipartForm form) throws Exception {
+    public RequestBuilder body(@Nullable MultipartForm form) {
         if (form == null) {
             mBody = null;
             return this;
@@ -156,8 +157,12 @@ public final class RequestBuilder implements AsResultsExceptions {
         return this;
     }
 
-    public Request request() throws RequestException {
+    public Request request() throws BridgeException {
         return new Request(this).makeRequest();
+    }
+
+    public void throwIfNotSuccess() {
+        throwIfNotSuccess = true;
     }
 
     public Request request(Callback callback) {
@@ -169,8 +174,10 @@ public final class RequestBuilder implements AsResultsExceptions {
                     try {
                         mRequest.makeRequest();
                         if (mRequest.mCancelCallbackFired) return;
-                        mContext.fireCallbacks(mRequest, mRequest.response(), null);
-                    } catch (final RequestException e) {
+                        final Response response = mRequest.response();
+                        if (throwIfNotSuccess) response.throwIfNotSuccess();
+                        mContext.fireCallbacks(mRequest, response, null);
+                    } catch (final BridgeException e) {
                         if (mRequest.mCancelCallbackFired) return;
                         mContext.fireCallbacks(mRequest, null, e);
                     }
@@ -182,37 +189,39 @@ public final class RequestBuilder implements AsResultsExceptions {
 
     // Shortcut methods
 
-    public Response response() throws RequestException {
-        return request().response();
+    public Response response() throws BridgeException {
+        Response response = request().response();
+        if (throwIfNotSuccess) response.throwIfNotSuccess();
+        return response;
     }
 
-    public byte[] asBytes() throws Exception {
-        return response().throwIfNotSuccess().asBytes();
+    public byte[] asBytes() throws BridgeException {
+        return response().asBytes();
     }
 
-    public String asString() throws Exception {
-        return response().throwIfNotSuccess().asString();
-    }
-
-    @Override
-    public Spanned asHtml() throws Exception {
-        return response().throwIfNotSuccess().asHtml();
+    public String asString() throws BridgeException {
+        return response().asString();
     }
 
     @Override
-    public Bitmap asBitmap() throws Exception {
-        return response().throwIfNotSuccess().asBitmap();
+    public Spanned asHtml() throws BridgeException {
+        return response().asHtml();
     }
 
-    public JSONObject asJsonObject() throws Exception {
-        return response().throwIfNotSuccess().asJsonObject();
+    @Override
+    public Bitmap asBitmap() throws BridgeException {
+        return response().asBitmap();
     }
 
-    public JSONArray asJsonArray() throws Exception {
-        return response().throwIfNotSuccess().asJsonArray();
+    public JSONObject asJsonObject() throws BridgeException {
+        return response().asJsonObject();
     }
 
-    public void asFile(File destination) throws Exception {
-        response().throwIfNotSuccess().asFile(destination);
+    public JSONArray asJsonArray() throws BridgeException {
+        return response().asJsonArray();
+    }
+
+    public void asFile(File destination) throws BridgeException {
+        response().asFile(destination);
     }
 }

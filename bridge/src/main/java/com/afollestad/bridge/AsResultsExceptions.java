@@ -15,17 +15,17 @@ import java.io.File;
  */
 interface AsResultsExceptions {
 
-    byte[] asBytes() throws Exception;
+    byte[] asBytes() throws BridgeException;
 
-    String asString() throws Exception;
+    String asString() throws BridgeException;
 
-    Spanned asHtml() throws Exception;
+    Spanned asHtml() throws BridgeException;
 
-    Bitmap asBitmap() throws Exception;
+    Bitmap asBitmap() throws BridgeException;
 
-    JSONObject asJsonObject() throws Exception;
+    JSONObject asJsonObject() throws BridgeException;
 
-    JSONArray asJsonArray() throws Exception;
+    JSONArray asJsonArray() throws BridgeException;
 
-    void asFile(File destination) throws Exception;
+    void asFile(File destination) throws BridgeException;
 }

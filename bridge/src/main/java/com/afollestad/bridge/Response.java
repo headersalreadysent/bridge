@@ -73,8 +73,9 @@ public final class Response implements AsResults {
         return mCode >= 200 && mCode < 300;
     }
 
-    public Response throwIfNotSuccess() throws ResponseException {
-        if (!isSuccess()) throw new ResponseException(this);
+    public Response throwIfNotSuccess() throws BridgeException {
+        if (!isSuccess())
+            throw new BridgeException(this, "Response status code was not successful.", BridgeException.REASON_RESPONSE_UNSUCCESSFUL);
         return this;
     }
 
@@ -111,34 +112,36 @@ public final class Response implements AsResults {
         return mBitmapCache;
     }
 
-    public JSONObject asJsonObject() throws ResponseException {
+    public JSONObject asJsonObject() throws BridgeException {
         final String content = asString();
         if (content == null)
-            throw new ResponseException("No content was returned in this response.");
+            throw new BridgeException(this, "No content was returned in this response.", BridgeException.REASON_RESPONSE_UNPARSEABLE);
         try {
             return new JSONObject(content);
         } catch (JSONException e) {
-            throw new ResponseException(this, e);
+            throw new BridgeException(this, e, BridgeException.REASON_RESPONSE_UNPARSEABLE);
         }
     }
 
-    public JSONArray asJsonArray() throws ResponseException {
+    public JSONArray asJsonArray() throws BridgeException {
         final String content = asString();
         if (content == null)
-            throw new ResponseException("No content was returned in this response.");
+            throw new BridgeException(this, "No content was returned in this response.", BridgeException.REASON_RESPONSE_UNPARSEABLE);
         try {
             return new JSONArray(content);
         } catch (JSONException e) {
-            throw new ResponseException(this, e);
+            throw new BridgeException(this, e, BridgeException.REASON_RESPONSE_UNPARSEABLE);
         }
     }
 
-    public void asFile(File destination) throws IOException {
+    public void asFile(File destination) throws BridgeException {
         FileOutputStream os = null;
         try {
             os = new FileOutputStream(destination);
             os.write(asBytes());
             os.flush();
+        } catch (IOException e) {
+            throw new BridgeException(this, e, BridgeException.REASON_RESPONSE_IOERROR);
         } finally {
             Util.closeQuietly(os);
         }

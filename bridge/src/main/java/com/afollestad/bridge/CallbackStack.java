@@ -46,7 +46,7 @@ final class CallbackStack {
         }
     }
 
-    public void fireAll(final Response response, final RequestException error) {
+    public void fireAll(final Response response, final BridgeException error) {
         synchronized (LOCK) {
             if (mCallbacks == null)
                 throw new IllegalStateException("This stack has already been fired.");
@@ -98,7 +98,7 @@ final class CallbackStack {
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            callback.response(mDriverRequest, null, new RequestException(mDriverRequest));
+                            callback.response(mDriverRequest, null, new BridgeException(mDriverRequest));
                         }
                     });
                 }

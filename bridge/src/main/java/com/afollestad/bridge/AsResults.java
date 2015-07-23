@@ -7,7 +7,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.IOException;
 
 /**
  * @author Aidan Follestad (afollestad)
@@ -22,9 +21,9 @@ interface AsResults {
 
     Bitmap asBitmap();
 
-    JSONObject asJsonObject() throws ResponseException;
+    JSONObject asJsonObject() throws BridgeException;
 
-    JSONArray asJsonArray() throws ResponseException;
+    JSONArray asJsonArray() throws BridgeException;
 
-    void asFile(File destination) throws IOException;
+    void asFile(File destination) throws BridgeException;
 }
