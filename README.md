@@ -111,6 +111,8 @@ try {
 It just takes out the need to use `response()`, and it makes use of `throwIfNotSuccessful()` to automatically
 throw an `Exception` if the response code is not 200 OK.
 
+---
+
 ### URL Format Args
 
 When passing query parameters in a URL, you can use format args:
@@ -130,6 +132,8 @@ try {
 This is using Java's `String.format()` method behind the scenes. The `searchQuery` variable replaces
 `%s` in your URL. You can have multiple format args, and they don't all have to be strings (e.g. `%d` for any number variable).
 Args that are strings will be automatically URL encoded for you.
+
+---
 
 ### Response Headers
 
@@ -155,6 +159,8 @@ Response response = // ...
 String contentType = response.contentType();
 int contentLength = response.contentLength();
 ```
+
+---
 
 ### Response Bodies
 
@@ -241,6 +247,8 @@ Byte arrays are obviously raw data. Passing a `JSONObject` or `JSONArray` will a
 to `application/json`. `Form`, `MultipartForm`, and `Pipe` will be discussed in the next few sections.
 `File` relies on the `Pipe` feature, it reads the file and sets the request body to the raw contents.
 
+---
+
 ### Forms
 
 `Form`'s are commonly used with PUT/POST requests. They're basically the same thing as query strings
@@ -264,6 +272,8 @@ try {
 ```
 
 This will automatically set the `Content-Type` header to `application/x-www-form-urlencoded`.
+
+---
 
 ### MultipartForms
 
@@ -295,6 +305,8 @@ This will automatically set the `Content-Type` header to `multipart/form-data`.
 **Note**: `MultipartForm` has an `add()` method that accepts a `Pipe`. This can be used to add parts
 from streams (see the section below on how `Pipe` is used). `add()` for `File` objects is actually using
 this indirectly for you.
+
+---
 
 ### Streaming (Pipe)
 
@@ -374,6 +386,8 @@ There's two major advantages to using async requests:
 
 You can replace `get()` with `post()`, `put()` or `delete()` too.
 
+---
+
 ### Duplicate Avoidance
 
 Duplicate avoidance is a feature in this library that allows you to avoid making multiple requests to
@@ -413,6 +427,8 @@ would be called at the same time with the same response data.
 This lets you be very efficient on bandwidth and resource usage. If this library was being used to load images
 into `ImageView`'s, you could display 100 `ImageView`'s in a list, make a single request, and immediately populate
 all 100 `ImageView`'s with the same image at the same time. Check out the sample project to see this in action.
+
+---
 
 ### Progress Callbacks
 
@@ -475,9 +491,13 @@ request.cancel();
 When a request is cancelled, the `RequestException` will *not* be null (it will say the request was cancelled),
 and `RequestException#isCancelled()` will return true.
 
+---
+
 ### Cancelling Multiple Requests
 
 The `Bridge` singleton allows you to cancel managed **async** requests.
+
+---
 
 ##### All Active
 
@@ -487,6 +507,8 @@ This code will cancel all active requests, regardless of method or URL:
 Bridge.client()
     .cancelAll();
 ```
+
+---
 
 ##### Method, URL/Regex
 
@@ -513,6 +535,8 @@ Bridge.client()
 **Note**: if you pass `null` for the first parameter (`Method`), it will ignore the HTTP method when
 looking for requests to cancel. In other words, you could cancel `GET`, `POST`, `PUT`, *and* `DELETE`
 requests to a specific URL.
+
+---
 
 ##### Tags
 
@@ -543,6 +567,8 @@ You can cancel all requests marked with a specific tag value:
 Bridge.client()
     .cancelAll("Hello!");
 ```
+
+---
 
 ### Preventing Cancellation
 
@@ -580,6 +606,8 @@ unless you pass `true` for the `force` parameter.
 
 Bridge allows you configure various functions globally.
 
+---
+
 ### Host
 
 You can set a host that is used as the base URL for every request.
@@ -600,6 +628,8 @@ Bridge.client()
 Basically, the URL you pass with each request is appended to the end of the host. If you were to pass a full
 URL (beginning with *HTTP*) in `get()` above, it would skip using the host for just that request.
 
+---
+
 ### Default Headers
 
 Default headers are headers that are automatically applied to every request. You don't have to do it
@@ -615,6 +645,7 @@ Bridge.client().config()
 Every request, regardless of the method, will include those headers. You can override them at the
 individual request level by setting the header as you normally would.
 
+---
 
 ### Timeouts
 
@@ -626,6 +657,8 @@ Bridge.client().config()
     .readTimeout(15000);
 ```
 
+---
+
 You can set timeouts at the request level too:
 
 ```java
@@ -635,6 +668,8 @@ Bridge.client()
     .readTimeout(15000)
     .asFile(new File("/sdcard/Download/bigVideo.mp4"));
 ```
+
+---
 
 ### Buffer Size
 
