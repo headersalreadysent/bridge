@@ -40,7 +40,9 @@ public class Util {
 
     protected static void throwIfNotSuccess(Response response) throws BridgeException {
         if (!response.isSuccess())
-            throw new BridgeException(response, "Response status code was not successful.", BridgeException.REASON_RESPONSE_UNSUCCESSFUL);
+            throw new BridgeException(response,
+                    String.format("Response was unsuccessful: %s %s", response.code(), response.phrase()),
+                    BridgeException.REASON_RESPONSE_UNSUCCESSFUL);
     }
 
     private Util() {

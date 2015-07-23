@@ -107,6 +107,8 @@ public final class Request {
                 } finally {
                     Util.closeQuietly(es);
                 }
+                if (mBuilder.mThrowIfNotSuccess)
+                    Util.throwIfNotSuccess(mResponse);
             } finally {
                 conn.disconnect();
             }

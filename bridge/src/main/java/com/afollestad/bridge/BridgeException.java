@@ -77,21 +77,4 @@ public class BridgeException extends Exception {
     public int reason() {
         return mReason;
     }
-
-    @Override
-    public String toString() {
-        switch (reason()) {
-            case BridgeException.REASON_REQUEST_CANCELLED:
-                return "Request cancelled";
-            case BridgeException.REASON_REQUEST_FAILED:
-                return "Request failed: " + toString();
-            case BridgeException.REASON_RESPONSE_UNSUCCESSFUL:
-                return "Response unsuccessful: " + toString();
-            case BridgeException.REASON_RESPONSE_UNPARSEABLE:
-                return "Response Unparseable: " + toString();
-            case BridgeException.REASON_RESPONSE_IOERROR:
-                return "Response I/O Error: " + toString();
-        }
-        return super.toString();
-    }
 }
