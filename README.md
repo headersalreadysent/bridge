@@ -191,6 +191,8 @@ Byte arrays are obviously raw data. Passing a `JSONObject` or `JSONArray` will a
 to `application/json`. `Form`, `MultipartForm`, and `Pipe` will be discussed in the next few sections.
 `File` relies on the `Pipe` feature, it reads the file and sets the request body to the raw contents.
 
+------
+
 ###### Forms
 
 `Form`'s are commonly used with PUT/POST requests. They're basically the same thing as query strings
@@ -215,6 +217,8 @@ try {
 ```
 
 This will automatically set the `Content-Type` header to `application/x-www-form-urlencoded`.
+
+------
 
 ###### MultipartForms
 
@@ -247,6 +251,8 @@ This will automatically set the `Content-Type` header to `multipart/form-data`.
 **Note**: `MultipartForm` has an `add()` method that accepts a `Pipe`. This can be used to add parts
 from streams (see the section below on how `Pipe` is used). `add()` for `File` objects is actually using
 this indirectly for you.
+
+------
 
 ###### Streaming (Pipe)
 
@@ -560,6 +566,8 @@ and `BridgeException#isCancelled()` will return true.
 
 The `Bridge` singleton allows you to cancel managed **async** requests.
 
+------
+
 ###### All Active
 
 This code will cancel all active requests, regardless of method or URL:
@@ -568,6 +576,8 @@ This code will cancel all active requests, regardless of method or URL:
 Bridge.client()
     .cancelAll();
 ```
+
+------
 
 ###### Method, URL/Regex
 
@@ -594,6 +604,8 @@ Bridge.client()
 **Note**: if you pass `null` for the first parameter (`Method`), it will ignore the HTTP method when
 looking for requests to cancel. In other words, you could cancel `GET`, `POST`, `PUT`, *and* `DELETE`
 requests to a specific URL.
+
+------
 
 ###### Tags
 
