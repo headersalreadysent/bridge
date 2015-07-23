@@ -29,7 +29,7 @@ public final class RequestBuilder implements AsResultsExceptions {
     private Request mRequest;
     protected boolean mCancellable = true;
     protected Object mTag;
-    private boolean throwIfNotSuccess = false;
+    protected boolean mThrowIfNotSuccess = false;
 
     protected RequestBuilder(String url, Method method, Bridge context) {
         mContext = context;
@@ -161,8 +161,9 @@ public final class RequestBuilder implements AsResultsExceptions {
         return new Request(this).makeRequest();
     }
 
-    public void throwIfNotSuccess() {
-        throwIfNotSuccess = true;
+    public RequestBuilder throwIfNotSuccess() {
+        mThrowIfNotSuccess = true;
+        return this;
     }
 
     public Request request(Callback callback) {
@@ -175,7 +176,6 @@ public final class RequestBuilder implements AsResultsExceptions {
                         mRequest.makeRequest();
                         if (mRequest.mCancelCallbackFired) return;
                         final Response response = mRequest.response();
-                        if (throwIfNotSuccess) response.throwIfNotSuccess();
                         mContext.fireCallbacks(mRequest, response, null);
                     } catch (final BridgeException e) {
                         if (mRequest.mCancelCallbackFired) return;
@@ -190,9 +190,7 @@ public final class RequestBuilder implements AsResultsExceptions {
     // Shortcut methods
 
     public Response response() throws BridgeException {
-        Response response = request().response();
-        if (throwIfNotSuccess) response.throwIfNotSuccess();
-        return response;
+        return request().response();
     }
 
     public byte[] asBytes() throws BridgeException {

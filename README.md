@@ -101,8 +101,8 @@ Behind the scenes, this is actually performing this:
 try {
     String content = Bridge.client()
         .get("http://www.google.com")
-        .response()
         .throwIfNotSuccess()
+        .response()
         .asString();
 } catch (BridgeException e) {
     // See the 'Error Handling' section for information on how to process BridgeExceptions

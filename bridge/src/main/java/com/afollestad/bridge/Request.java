@@ -93,7 +93,11 @@ public final class Request {
 
                 checkCancelled();
                 mResponse = new Response(data, url(), conn);
+                if (mBuilder.mThrowIfNotSuccess)
+                    Util.throwIfNotSuccess(mResponse);
             } catch (Exception fnf) {
+                if (fnf instanceof BridgeException)
+                    throw fnf; // redirect to outside catch
                 InputStream es = null;
                 try {
                     es = conn.getErrorStream();
@@ -113,6 +117,13 @@ public final class Request {
         }
         return this;
     }
+
+//    public Request throwIfNotSuccess() throws BridgeException {
+//        mBuilder.mThrowIfNotSuccess = true;
+//        if (mResponse != null)
+//            Util.throwIfNotSuccess(mResponse);
+//        return this;
+//    }
 
     private void checkCancelled() throws BridgeException {
         if (isCancelled) {

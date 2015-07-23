@@ -26,7 +26,7 @@ public final class Response implements AsResults {
 
     private final String mUrl;
     private final byte[] mData;
-    private final int mCode;
+    private int mCode = -1;
     private final String mMessage;
     private Bitmap mBitmapCache;
     private Map<String, List<String>> mHeaders;
@@ -70,13 +70,8 @@ public final class Response implements AsResults {
     }
 
     public boolean isSuccess() {
-        return mCode >= 200 && mCode < 300;
-    }
-
-    public Response throwIfNotSuccess() throws BridgeException {
-        if (!isSuccess())
-            throw new BridgeException(this, "Response status code was not successful.", BridgeException.REASON_RESPONSE_UNSUCCESSFUL);
-        return this;
+        //noinspection PointlessBooleanExpression
+        return mCode == -1 || mCode >= 200 && mCode < 300;
     }
 
     public byte[] asBytes() {
