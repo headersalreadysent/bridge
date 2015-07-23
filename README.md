@@ -25,18 +25,19 @@ dependencies {
 
 # Table of Contents
 
-1. [Basics](https://github.com/afollestad/bridge#basics)
-    1. [Request API](https://github.com/afollestad/bridge#request-api)
+1. [Requests](https://github.com/afollestad/bridge#requests)
+    1. [Basics](https://github.com/afollestad/bridge#basics)
     2. [URL Format Args](https://github.com/afollestad/bridge#url-format-args)
-    3. [Response Headers](https://github.com/afollestad/bridge#response-headers)
-    4. [Response Bodies](https://github.com/afollestad/bridge#response-bodies)
-    5. [Error Handling](https://github.com/afollestad/bridge#error-handling)
-2. [Request Headers](https://github.com/afollestad/bridge#request-headers)
-3. [Request Bodies](https://github.com/afollestad/bridge#request-bodies)
-    1. [Basics](https://github.com/afollestad/bridge#basics-1)
-    2. [Forms](https://github.com/afollestad/bridge#forms)
-    3. [MultipartForms](https://github.com/afollestad/bridge#multipartforms)
-    4. [Streaming (Pipe)](https://github.com/afollestad/bridge#streaming-pipe)
+    3. [Headers](https://github.com/afollestad/bridge#headers)
+    4. [Bodies](https://github.com/afollestad/bridge#bodies)
+        1. [Basics](https://github.com/afollestad/bridge#basics-1)
+        2. [Forms](https://github.com/afollestad/bridge#forms)
+        3. [MultipartForms](https://github.com/afollestad/bridge#multipartforms)
+        4. [Streaming (Pipe)](https://github.com/afollestad/bridge#streaming-pipe)
+2. [Responses](https://github.com/afollestad/bridge#responses)
+    1. [Headers](https://github.com/afollestad/bridge#headers2)
+    2. [Bodies](https://github.com/afollestad/bridge#bodies2)
+3. [Error Handling](https://github.com/afollestad/bridge#error-handling)
 4. [Async Requests, Duplicate Avoidance, and Progress Callbacks](https://github.com/afollestad/bridge#async-requests-and-duplicate-avoidance)
     1. [Example](https://github.com/afollestad/bridge#example)
     2. [Duplicate Avoidance](https://github.com/afollestad/bridge#duplicate-avoidance)
@@ -58,9 +59,9 @@ dependencies {
 
 ------
 
-# Basics
+# Requests
 
-### Request API
+### Basics
 
 Here's a very basic GET `Request` that retrieves Google's home page and saves the content to a `String`.
 
@@ -114,8 +115,6 @@ It just takes out the need to use `response()`, and it makes use of `throwIfNotS
 throw a `BridgeException` with the reason `REASON_RESPONSE_UNSUCCESSFUL`
 (see the [Error Handling](https://github.com/afollestad/bridge#error-handling) section).
 
----
-
 ### URL Format Args
 
 When passing query parameters in a URL, you can use format args:
@@ -137,116 +136,7 @@ This is using Java's `String.format()` method behind the scenes. The `searchQuer
 `%s` in your URL. You can have multiple format args, and they don't all have to be strings (e.g. `%d` for any number variable).
 Args that are strings will be automatically URL encoded for you.
 
----
-
-### Response Headers
-
-Retrieving response headers is simple:
-
-```java
-Response response = // ...
-String contentType = response.header("Content-Type");
-```
-
-Headers can also have multiple values, separated by commas:
-
-```java
-Response response = // ...
-List<String> values = response.headerList("header-name");
-```
-
-Since *Content-Type* and *Content-Length* are commonly used response headers, there's convenience methods
-to get these values:
-
-```java
-Response response = // ...
-String contentType = response.contentType();
-int contentLength = response.contentLength();
-```
-
----
-
-### Response Bodies
-
-The above examples all use `asString()` to save response content as a `String`. There are many other
-formats that responses can be converted/saved to:
-
-```java
-Response response = // ...
-
-byte[] responseRawData = response.asBytes();
-
-String responseString = response.asString();
-
-// If you set this to a TextView, it will display HTML formatting
-Spanned responseHtml = response.asHtml();
-
-JSONObject responseJsonObject = response.asJsonObject();
-
-JSONArray responseJsonArray = response.asJsonArray();
-
-// Don't forget to recycle!
-// Once you use this method once, the resulting Bitmap is cached in the Response object,
-// Meaning asBitmap() will always return the same Bitmap from any reference to this response.
-Bitmap responseImage = response.asBitmap();
-
-// Save the response content to a File of your choosing
-response.asFile(new File("/sdcard/Download.extension"));
-```
-
----
-
-### Error Handling
-
-The `BridgeException` class is used throughout the library and acts as a single exception provider.
-This helps avoid the need for different exception classes, or very unspecific Exceptions.
-
-The `BridgeException#reason()` method returns one of a set of constants that indicate why the exception
-was thrown. If the Exception is for a request, you can retrieve the `Request` with `BridgeException#request()`. 
-If the Exception is for a response, you can retrieve the `Response` with `BridgeException#response()`.
-
-```java
-BridgeException e = // ...
-switch (e.reason()) {
-    case BridgeException.REASON_REQUEST_CANCELLED: {
-        Request request = e.request();
-        // Used in BridgeExceptions passed to async request callbacks
-        // when the associated request was cancelled.
-        break;
-    }
-    case BridgeException.REASON_REQUEST_FAILED: {
-        Request request = e.request();
-        // Thrown when a general networking error occurs during a request.
-        break;
-    }
-    case BridgeException.REASON_RESPONSE_UNSUCCESSFUL: {
-        Response response = e.response();
-        // Thrown by throwIfNotSuccess(), when you explicitly want an
-        // Exception be thrown if the status code was unsuccessful.
-        break;
-    }
-    case BridgeException.REASON_RESPONSE_UNPARSEABLE: {
-        Response response = e.response();
-        // Thrown by the response conversion methods (e.g. asJsonObject())
-        // When the response content can't be successfully returned in the
-        // requested format. E.g. a JSON error.
-        break;
-    }
-    case BridgeException.REASON_RESPONSE_IOERROR: {
-        Response response = e.response();
-        // Thrown by the asFile() response converter when the library
-        // is unable to save the content to a file.
-        break;
-    }
-}
-```
-
-**Note**: you do not need to handle all of these cases everywhere a `BridgeException` is thrown. The comments
-within the above example code indicate where those reasons are generally used.
-
-------
-
-# Request Headers
+### Headers
 
 Changing or adding `Request` headers is pretty simple. You just use the `header(String, String)` method
 which can be chained to add multiple headers.
@@ -268,11 +158,9 @@ try {
 **Default headers**: see the [Configuration](https://github.com/afollestad/bridge#configuration) section
 for info on how to set default headers that are automatically included in every request.
 
-------
+### Bodies
 
-# Request Bodies
-
-### Basics
+###### Basics
 
 Here's a basic `POST` request that sends plain text in the body:
 
@@ -303,9 +191,7 @@ Byte arrays are obviously raw data. Passing a `JSONObject` or `JSONArray` will a
 to `application/json`. `Form`, `MultipartForm`, and `Pipe` will be discussed in the next few sections.
 `File` relies on the `Pipe` feature, it reads the file and sets the request body to the raw contents.
 
----
-
-### Forms
+###### Forms
 
 `Form`'s are commonly used with PUT/POST requests. They're basically the same thing as query strings
 with get requests, but the parameters are included in the body of the request rather than the URL.
@@ -330,9 +216,7 @@ try {
 
 This will automatically set the `Content-Type` header to `application/x-www-form-urlencoded`.
 
----
-
-### MultipartForms
+###### MultipartForms
 
 A `MultipartForm` is a bit different than a regular form. Content is added as a "part" to the request body.
 The content is included as raw data associated with a content type, allowing you to include entire files.
@@ -364,9 +248,7 @@ This will automatically set the `Content-Type` header to `multipart/form-data`.
 from streams (see the section below on how `Pipe` is used). `add()` for `File` objects is actually using
 this indirectly for you.
 
----
-
-### Streaming (Pipe)
+###### Streaming (Pipe)
 
 Bridge allows you to stream data directly into a post body:
 
@@ -414,6 +296,113 @@ Pipe transferPipe = Pipe.forStream(is, "text/plain");
 be read. `forFile(File)` indirectly uses `forUri(Context, Uri)` specifically for file:// URIs.
 `forStream(InputStream, String)` reads an `InputStream` and transfers the content into the Pipe,
 you need to specify a Content-Type value in the second parameter.
+
+------
+
+# Responses
+
+### Headers
+
+Retrieving response headers is simple:
+
+```java
+Response response = // ...
+String contentType = response.header("Content-Type");
+```
+
+Headers can also have multiple values, separated by commas:
+
+```java
+Response response = // ...
+List<String> values = response.headerList("header-name");
+```
+
+Since *Content-Type* and *Content-Length* are commonly used response headers, there's convenience methods
+to get these values:
+
+```java
+Response response = // ...
+String contentType = response.contentType();
+int contentLength = response.contentLength();
+```
+
+### Bodies
+
+The above examples all use `asString()` to save response content as a `String`. There are many other
+formats that responses can be converted/saved to:
+
+```java
+Response response = // ...
+
+byte[] responseRawData = response.asBytes();
+
+String responseString = response.asString();
+
+// If you set this to a TextView, it will display HTML formatting
+Spanned responseHtml = response.asHtml();
+
+JSONObject responseJsonObject = response.asJsonObject();
+
+JSONArray responseJsonArray = response.asJsonArray();
+
+// Don't forget to recycle!
+// Once you use this method once, the resulting Bitmap is cached in the Response object,
+// Meaning asBitmap() will always return the same Bitmap from any reference to this response.
+Bitmap responseImage = response.asBitmap();
+
+// Save the response content to a File of your choosing
+response.asFile(new File("/sdcard/Download.extension"));
+```
+
+------
+
+# Error Handling
+
+The `BridgeException` class is used throughout the library and acts as a single exception provider.
+This helps avoid the need for different exception classes, or very unspecific Exceptions.
+
+The `BridgeException#reason()` method returns one of a set of constants that indicate why the exception
+was thrown. If the Exception is for a request, you can retrieve the `Request` with `BridgeException#request()`. 
+If the Exception is for a response, you can retrieve the `Response` with `BridgeException#response()`.
+
+```java
+BridgeException e = // ...
+switch (e.reason()) {
+    case BridgeException.REASON_REQUEST_CANCELLED: {
+        Request request = e.request();
+        // Used in BridgeExceptions passed to async request callbacks
+        // when the associated request was cancelled.
+        break;
+    }
+    case BridgeException.REASON_REQUEST_FAILED: {
+        Request request = e.request();
+        // Thrown when a general networking error occurs during a request.
+        break;
+    }
+    case BridgeException.REASON_RESPONSE_UNSUCCESSFUL: {
+        Response response = e.response();
+        // Thrown by throwIfNotSuccess(), when you explicitly want an
+        // Exception be thrown if the status code was unsuccessful.
+        break;
+    }
+    case BridgeException.REASON_RESPONSE_UNPARSEABLE: {
+        Response response = e.response();
+        // Thrown by the response conversion methods (e.g. asJsonObject())
+        // When the response content can't be successfully returned in the
+        // requested format. E.g. a JSON error.
+        break;
+    }
+    case BridgeException.REASON_RESPONSE_IOERROR: {
+        Response response = e.response();
+        // Thrown by the asFile() response converter when the library
+        // is unable to save the content to a file.
+        break;
+    }
+}
+```
+
+**Note**: you do not need to handle all of these cases everywhere a `BridgeException` is thrown. The comments
+within the above example code indicate where those reasons are generally used.
 
 ------
 
@@ -466,8 +455,6 @@ Bridge.client()
     });
 ```
 
----
-
 ### Duplicate Avoidance
 
 Duplicate avoidance is a feature in this library that allows you to avoid making multiple requests to
@@ -509,8 +496,6 @@ would be called at the same time with the same response data.
 This lets you be very efficient on bandwidth and resource usage. If this library was being used to load images
 into `ImageView`'s, you could display 100 `ImageView`'s in a list, make a single request, and immediately populate
 all 100 `ImageView`'s with the same image at the same time. Check out the sample project to see this in action.
-
----
 
 ### Progress Callbacks
 
@@ -571,15 +556,11 @@ request.cancel();
 When a request is cancelled, the `BridgeException` will *not* be null (it will say the request was cancelled),
 and `BridgeException#isCancelled()` will return true.
 
----
-
 ### Cancelling Multiple Requests
 
 The `Bridge` singleton allows you to cancel managed **async** requests.
 
----
-
-##### All Active
+###### All Active
 
 This code will cancel all active requests, regardless of method or URL:
 
@@ -588,9 +569,7 @@ Bridge.client()
     .cancelAll();
 ```
 
----
-
-##### Method, URL/Regex
+###### Method, URL/Regex
 
 The `cancelAll(Method, String)` allows you to cancel all active requests that match an HTTP method
 *and* a URL or regular expression pattern.
@@ -616,9 +595,7 @@ Bridge.client()
 looking for requests to cancel. In other words, you could cancel `GET`, `POST`, `PUT`, *and* `DELETE`
 requests to a specific URL.
 
----
-
-##### Tags
+###### Tags
 
 When making a request, you can tag it with a value:
 
@@ -648,8 +625,6 @@ You can cancel all requests marked with a specific tag value:
 Bridge.client()
     .cancelAll("Hello!");
 ```
-
----
 
 ### Preventing Cancellation
 
@@ -688,8 +663,6 @@ unless you pass `true` for the `force` parameter.
 
 Bridge allows you configure various functions globally.
 
----
-
 ### Host
 
 You can set a host that is used as the base URL for every request.
@@ -710,8 +683,6 @@ Bridge.client()
 Basically, the URL you pass with each request is appended to the end of the host. If you were to pass a full
 URL (beginning with *HTTP*) in `get()` above, it would skip using the host for just that request.
 
----
-
 ### Default Headers
 
 Default headers are headers that are automatically applied to every request. You don't have to do it
@@ -727,8 +698,6 @@ Bridge.client().config()
 Every request, regardless of the method, will include those headers. You can override them at the
 individual request level by setting the header as you normally would.
 
----
-
 ### Timeouts
 
 You can configure how long the library will wait until timing out, either for connections or reading:
@@ -739,7 +708,7 @@ Bridge.client().config()
     .readTimeout(15000);
 ```
 
----
+------
 
 You can set timeouts at the request level too:
 
@@ -750,8 +719,6 @@ Bridge.client()
     .readTimeout(15000)
     .asFile(new File("/sdcard/Download/bigVideo.mp4"));
 ```
-
----
 
 ### Buffer Size
 
@@ -768,6 +735,8 @@ Bridge.client().config()
 
 Just remember to be careful with how much memory you consume, and test on various devices.
 
+------
+
 You can set the buffer size at the request level too:
 
 ```java
@@ -778,8 +747,6 @@ Bridge.client()
 ```
 
 **Note**: the buffer size is used in a few other places, such as pre-built `Pipe`'s (`Pipe#forUri`, `Pipe#forStream`, etc.).
-
----
 
 ### Logging
 
