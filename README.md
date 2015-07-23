@@ -72,7 +72,8 @@ try {
         .response();
 
     if (!response.isSuccess()) {
-        // If response code was not 200-300
+        // Response code was not 200-300,
+        // decide what to do in this case.
     } else {
         String responseContent = response.asString();
         // Do something with response
@@ -111,9 +112,9 @@ try {
 }
 ```
 
-It just takes out the need to use `response()`, and it makes use of `throwIfNotSuccess()` to automatically
+The shorter version makes use of `throwIfNotSuccess()` to automatically
 throw a `BridgeException` with the reason `REASON_RESPONSE_UNSUCCESSFUL`
-(see the [Error Handling](https://github.com/afollestad/bridge#error-handling) section).
+(see the [Error Handling](https://github.com/afollestad/bridge#error-handling) section) if `Response#isSuccess()` returns false.
 
 ### URL Format Args
 
