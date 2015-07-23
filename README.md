@@ -30,13 +30,13 @@ dependencies {
     2. [URL Format Args](https://github.com/afollestad/bridge#url-format-args)
     3. [Headers](https://github.com/afollestad/bridge#headers)
     4. [Bodies](https://github.com/afollestad/bridge#bodies)
-        1. [Basics](https://github.com/afollestad/bridge#basics-1)
+        1. [Plain](https://github.com/afollestad/bridge#plain)
         2. [Forms](https://github.com/afollestad/bridge#forms)
         3. [MultipartForms](https://github.com/afollestad/bridge#multipartforms)
         4. [Streaming (Pipe)](https://github.com/afollestad/bridge#streaming-pipe)
 2. [Responses](https://github.com/afollestad/bridge#responses)
-    1. [Headers](https://github.com/afollestad/bridge#headers2)
-    2. [Bodies](https://github.com/afollestad/bridge#bodies2)
+    1. [Headers](https://github.com/afollestad/bridge#headers-1)
+    2. [Bodies](https://github.com/afollestad/bridge#bodies-1)
 3. [Error Handling](https://github.com/afollestad/bridge#error-handling)
 4. [Async Requests, Duplicate Avoidance, and Progress Callbacks](https://github.com/afollestad/bridge#async-requests-and-duplicate-avoidance)
     1. [Example](https://github.com/afollestad/bridge#example)
@@ -160,7 +160,7 @@ for info on how to set default headers that are automatically included in every 
 
 ### Bodies
 
-###### Basics
+###### Plain
 
 Here's a basic `POST` request that sends plain text in the body:
 
