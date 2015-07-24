@@ -156,6 +156,25 @@ try {
 }
 ```
 
+You can also set a `Map` of headers:
+
+```java
+Map<String, Object> headersMap = new HashMap<>();
+headersMap.put("User-Agent", "BridgeSampleProject");
+headersMap.put("CustomHeader", "Hello");
+
+try {
+    String content = Bridge.client()
+        .get("http://www.google.com")
+        .headers(headersMap)
+        .asString();
+    // Do something with response
+} catch (BridgeException e) {
+    // See the 'Error Handling' section for information on how to process BridgeExceptions
+    int reason = e.reason();
+}
+```
+
 **Default headers**: see the [Configuration](https://github.com/afollestad/bridge#configuration) section
 for info on how to set default headers that are automatically included in every request.
 
@@ -322,6 +341,14 @@ Headers can also have multiple values, separated by commas:
 ```java
 Response response = // ...
 List<String> values = response.headerList("header-name");
+```
+
+You can even retrieve a Map containing all of the existing headers. The value portion of each Map entry
+contains a `List<String>` which will only have 1 entry unless a header has multiple values:
+
+```java
+Response response = // ...
+Map<String, List<String>> headers = response.headers();
 ```
 
 Since *Content-Type* and *Content-Length* are commonly used response headers, there's convenience methods
