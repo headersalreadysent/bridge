@@ -51,7 +51,7 @@ public final class RequestBuilder implements AsResultsExceptions {
         return this;
     }
 
-    public RequestBuilder headers(@NonNull Map<String, Object> headers) {
+    public RequestBuilder headers(@NonNull Map<String, ? extends Object> headers) {
         mHeaders.putAll(headers);
         return this;
     }
