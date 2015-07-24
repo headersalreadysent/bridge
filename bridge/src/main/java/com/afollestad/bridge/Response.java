@@ -55,6 +55,10 @@ public final class Response implements AsResults {
         return mHeaders.get(name).get(0);
     }
 
+    public Map<String, List<String>> headers() {
+        return mHeaders;
+    }
+
     public List<String> headerList(String name) {
         return mHeaders.get(name);
     }

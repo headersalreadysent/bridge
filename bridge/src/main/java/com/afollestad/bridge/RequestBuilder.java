@@ -51,6 +51,11 @@ public final class RequestBuilder implements AsResultsExceptions {
         return this;
     }
 
+    public RequestBuilder headers(@NonNull Map<String, ? extends Object> headers) {
+        mHeaders.putAll(headers);
+        return this;
+    }
+
     public RequestBuilder connectTimeout(int timeout) {
         if (timeout <= 0)
             throw new IllegalArgumentException("Connect timeout must be greater than 0.");
