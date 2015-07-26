@@ -6,6 +6,8 @@ import android.support.annotation.Nullable;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.net.SocketTimeoutException;
+import java.util.concurrent.TimeoutException;
 
 /**
  * @author Aidan Follestad (afollestad)
@@ -14,12 +16,14 @@ public class BridgeException extends Exception {
 
     public static final int REASON_REQUEST_CANCELLED = 1;
     public static final int REASON_REQUEST_FAILED = 2;
+    public static final int REASON_REQUEST_TIMEOUT = 3;
 
     public static final int REASON_RESPONSE_UNSUCCESSFUL = 3;
     public static final int REASON_RESPONSE_UNPARSEABLE = 4;
     public static final int REASON_RESPONSE_IOERROR = 5;
 
     @IntDef({REASON_REQUEST_CANCELLED, REASON_REQUEST_FAILED, REASON_RESPONSE_UNSUCCESSFUL,
+            REASON_REQUEST_TIMEOUT,
             REASON_RESPONSE_UNPARSEABLE, REASON_RESPONSE_IOERROR})
     @Retention(RetentionPolicy.SOURCE)
     public @interface Reason {
@@ -37,7 +41,9 @@ public class BridgeException extends Exception {
     protected BridgeException(@NonNull Request request, Exception wrap) {
         super(String.format("%s %s error: %s", request.method().name(), request.url(), wrap.getMessage()), wrap);
         mRequest = request;
-        mReason = REASON_REQUEST_FAILED;
+        if (wrap instanceof TimeoutException || wrap instanceof SocketTimeoutException)
+            mReason = REASON_REQUEST_TIMEOUT;
+        else mReason = REASON_REQUEST_FAILED;
     }
 
     protected BridgeException(@NonNull Request cancelledRequest) {

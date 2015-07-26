@@ -408,9 +408,15 @@ switch (e.reason()) {
         // when the associated request was cancelled.
         break;
     }
+    case BridgeException.REASON_REQUEST_TIMEOUT: {
+        Request request = e.request();
+        // The request timed out (self explanatory obviously)
+        break;
+    }
     case BridgeException.REASON_REQUEST_FAILED: {
         Request request = e.request();
-        // Thrown when a general networking error occurs during a request.
+        // Thrown when a general networking error occurs during a request,
+        // not including timeouts.
         break;
     }
     case BridgeException.REASON_RESPONSE_UNSUCCESSFUL: {
