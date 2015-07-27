@@ -21,7 +21,7 @@ dependencies {
 }
 ```
 
-![JitPack Badge](https://img.shields.io/github/release/afollestad/bridge.svg?label=bridge)
+[https://jitpack.io/#afollestad/bridge]( ![JitPack Badge](https://img.shields.io/github/release/afollestad/bridge.svg?label=bridge) )
 
 # Table of Contents
 
