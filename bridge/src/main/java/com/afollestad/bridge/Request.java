@@ -113,8 +113,10 @@ public final class Request {
                 conn.disconnect();
             }
         } catch (Exception e) {
-            if (e instanceof BridgeException)
+            if (e instanceof BridgeException) {
+                ((BridgeException) e).mRequest = this;
                 throw (BridgeException) e;
+            }
             throw new BridgeException(this, e);
         }
         return this;

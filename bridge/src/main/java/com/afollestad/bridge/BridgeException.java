@@ -32,7 +32,7 @@ public class BridgeException extends Exception {
     @Reason
     private int mReason;
     @Nullable
-    private Request mRequest;
+    protected Request mRequest;
     @Nullable
     private Response mResponse;
 
