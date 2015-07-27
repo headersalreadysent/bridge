@@ -14,6 +14,7 @@ public final class MultipartForm {
     protected final String BOUNDARY;
     private final byte[] LINE_FEED = "\r\n".getBytes();
     private ByteArrayOutputStream mBos;
+    private int mCount;
 
     public MultipartForm() {
         BOUNDARY = String.format("------%d------", System.currentTimeMillis());
@@ -28,6 +29,7 @@ public final class MultipartForm {
     public MultipartForm add(@NonNull String fieldName, @NonNull String fileName, @NonNull Pipe pipe) throws IOException {
         if (mBos == null)
             throw new IllegalStateException("This MultipartForm is already consumed.");
+        if (mCount > 0) mBos.write(LINE_FEED);
         mBos.write(("--" + BOUNDARY).getBytes());
         mBos.write(LINE_FEED);
         mBos.write(("Content-Disposition: form-data; name=\"" + fieldName
@@ -39,7 +41,7 @@ public final class MultipartForm {
         mBos.write(LINE_FEED);
         mBos.write(LINE_FEED);
         pipe.writeTo(mBos);
-        mBos.write(LINE_FEED);
+        mCount++;
         return this;
     }
 
@@ -47,6 +49,7 @@ public final class MultipartForm {
         if (mBos == null)
             throw new IllegalStateException("This MultipartForm is already consumed.");
         try {
+            if (mCount > 0) mBos.write(LINE_FEED);
             mBos.write(("--" + BOUNDARY).getBytes());
             mBos.write(LINE_FEED);
             mBos.write(String.format("Content-Disposition: form-data; name=\"%s\"", fieldName).getBytes());
@@ -55,11 +58,11 @@ public final class MultipartForm {
             mBos.write(LINE_FEED);
             mBos.write(LINE_FEED);
             mBos.write((value + "").getBytes());
-            mBos.write(LINE_FEED);
         } catch (Exception e) {
             // Shouldn't happen
             throw new RuntimeException(e);
         }
+        mCount++;
         return this;
     }
 
