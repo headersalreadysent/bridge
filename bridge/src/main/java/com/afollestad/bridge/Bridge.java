@@ -127,30 +127,38 @@ public class Bridge {
         cancelAll(method, urlRegex, false);
     }
 
+    public void cancelAllSync(@Nullable final Method method, @NonNull final String urlRegex) {
+        cancelAllSync(method, urlRegex, false);
+    }
+
+    public void cancelAllSync(@Nullable final Method method, @NonNull final String urlRegex, final boolean force) {
+        synchronized (LOCK) {
+            if (mRequestMap == null) return;
+            final Pattern pattern = Pattern.compile(urlRegex);
+            final Iterator<Map.Entry<String, CallbackStack>> iter = mRequestMap.entrySet().iterator();
+            while (iter.hasNext()) {
+                final Map.Entry<String, CallbackStack> entry = iter.next();
+                final String[] splitKey = entry.getKey().split("\0");
+                final String keyMethod = splitKey[0];
+                final String keyUrl = splitKey[1];
+
+                if (method != null && !keyMethod.equals(method.name()))
+                    continue;
+                else if (!pattern.matcher(keyUrl).find())
+                    continue;
+                mRequestMap.get(entry.getKey()).cancelAll(null, force);
+                iter.remove();
+            }
+            if (mRequestMap.size() == 0)
+                mRequestMap = null;
+        }
+    }
+
     public void cancelAll(@Nullable final Method method, @NonNull final String urlRegex, final boolean force) {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                synchronized (LOCK) {
-                    if (mRequestMap == null) return;
-                    final Pattern pattern = Pattern.compile(urlRegex);
-                    final Iterator<Map.Entry<String, CallbackStack>> iter = mRequestMap.entrySet().iterator();
-                    while (iter.hasNext()) {
-                        final Map.Entry<String, CallbackStack> entry = iter.next();
-                        final String[] splitKey = entry.getKey().split("\0");
-                        final String keyMethod = splitKey[0];
-                        final String keyUrl = splitKey[1];
-
-                        if (method != null && !keyMethod.equals(method.name()))
-                            continue;
-                        else if (!pattern.matcher(keyUrl).find())
-                            continue;
-                        mRequestMap.get(entry.getKey()).cancelAll(null, force);
-                        iter.remove();
-                    }
-                    if (mRequestMap.size() == 0)
-                        mRequestMap = null;
-                }
+                cancelAllSync(method, urlRegex, force);
             }
         }).start();
     }
@@ -159,21 +167,29 @@ public class Bridge {
         cancelAll(tag, false);
     }
 
+    public void cancelAllSync(final Object tag) {
+        cancelAllSync(tag, false);
+    }
+
+    public void cancelAllSync(final Object tag, final boolean force) {
+        synchronized (LOCK) {
+            if (mRequestMap == null) return;
+            final Iterator<Map.Entry<String, CallbackStack>> iter = mRequestMap.entrySet().iterator();
+            while (iter.hasNext()) {
+                final Map.Entry<String, CallbackStack> entry = iter.next();
+                if (entry.getValue().cancelAll(tag, force))
+                    iter.remove();
+            }
+            if (mRequestMap.size() == 0)
+                mRequestMap = null;
+        }
+    }
+
     public void cancelAll(final Object tag, final boolean force) {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                synchronized (LOCK) {
-                    if (mRequestMap == null) return;
-                    final Iterator<Map.Entry<String, CallbackStack>> iter = mRequestMap.entrySet().iterator();
-                    while (iter.hasNext()) {
-                        final Map.Entry<String, CallbackStack> entry = iter.next();
-                        if (entry.getValue().cancelAll(tag, force))
-                            iter.remove();
-                    }
-                    if (mRequestMap.size() == 0)
-                        mRequestMap = null;
-                }
+                cancelAllSync(tag, force);
             }
         }).start();
     }
@@ -182,23 +198,31 @@ public class Bridge {
         cancelAll(false);
     }
 
+    public void cancelAllSync() {
+        cancelAllSync(false);
+    }
+
     public void cancelAll(final boolean force) {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                synchronized (LOCK) {
-                    if (mRequestMap == null) return;
-                    final Iterator<Map.Entry<String, CallbackStack>> iter = mRequestMap.entrySet().iterator();
-                    while (iter.hasNext()) {
-                        final Map.Entry<String, CallbackStack> entry = iter.next();
-                        if (entry.getValue().cancelAll(null, force))
-                            iter.remove();
-                    }
-                    if (mRequestMap.size() == 0)
-                        mRequestMap = null;
-                }
+                cancelAllSync(force);
             }
         }).start();
+    }
+
+    public void cancelAllSync(final boolean force) {
+        synchronized (LOCK) {
+            if (mRequestMap == null) return;
+            final Iterator<Map.Entry<String, CallbackStack>> iter = mRequestMap.entrySet().iterator();
+            while (iter.hasNext()) {
+                final Map.Entry<String, CallbackStack> entry = iter.next();
+                if (entry.getValue().cancelAll(null, force))
+                    iter.remove();
+            }
+            if (mRequestMap.size() == 0)
+                mRequestMap = null;
+        }
     }
 
     public void destroy() {
