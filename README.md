@@ -49,14 +49,14 @@ dependencies {
         1. [Method, URL/Regex](https://github.com/afollestad/bridge#method-urlregex)
         2. [Tags](https://github.com/afollestad/bridge#tags)
     3. [Preventing Cancellation](https://github.com/afollestad/bridge#preventing-cancellation)
-6. [Validators](https://github.com/afollestad/bridge#validators-1)
+6. [Validators](https://github.com/afollestad/bridge#validators)
 7. [Configuration](https://github.com/afollestad/bridge#configuration)
     1. [Host](https://github.com/afollestad/bridge#host)
     2. [Default Headers](https://github.com/afollestad/bridge#default-headers)
     3. [Timeouts](https://github.com/afollestad/bridge#timeouts)
     4. [Buffer Size](https://github.com/afollestad/bridge#buffer-size)
     5. [Logging](https://github.com/afollestad/bridge#logging)
-    6. [Validators](https://github.com/afollestad/bridge#validators-2)
+    6. [Validators](https://github.com/afollestad/bridge#validators-1)
 7. [Cleanup](https://github.com/afollestad/bridge#cleanup)
 
 ------
