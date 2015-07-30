@@ -27,16 +27,23 @@ public final class Response implements AsResults {
     private final String mUrl;
     private final byte[] mData;
     private int mCode = -1;
-    private final String mMessage;
+    private String mMessage;
     private Bitmap mBitmapCache;
     private Map<String, List<String>> mHeaders;
 
     protected Response(byte[] data, String url, HttpURLConnection conn) throws IOException {
         mData = data;
         mUrl = url;
-        mCode = conn.getResponseCode();
-        mMessage = conn.getResponseMessage();
-        mHeaders = conn.getHeaderFields();
+        try {
+            mCode = conn.getResponseCode();
+            mMessage = conn.getResponseMessage();
+            mHeaders = conn.getHeaderFields();
+        } catch (Throwable t) {
+            t.printStackTrace();
+            mCode = -1;
+            mMessage = null;
+            mHeaders = null;
+        }
     }
 
     public String url() {

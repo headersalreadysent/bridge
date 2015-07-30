@@ -94,6 +94,7 @@ public final class Request {
                 mResponse = new Response(data, url(), conn);
                 if (mBuilder.mThrowIfNotSuccess)
                     BridgeUtil.throwIfNotSuccess(mResponse);
+                conn.disconnect();
             } catch (Exception fnf) {
                 if (fnf instanceof BridgeException) {
                     if (((BridgeException) fnf).reason() != BridgeException.REASON_RESPONSE_UNSUCCESSFUL)
@@ -107,9 +108,8 @@ public final class Request {
                     mResponse = new Response(null, url(), conn);
                 } finally {
                     BridgeUtil.closeQuietly(es);
+                    if (conn != null) conn.disconnect();
                 }
-            } finally {
-                conn.disconnect();
             }
         } catch (Exception e) {
             if (e instanceof BridgeException) {
