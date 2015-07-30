@@ -22,11 +22,12 @@ public class BridgeException extends Exception {
     public static final int REASON_RESPONSE_UNPARSEABLE = 4;
     public static final int REASON_RESPONSE_IOERROR = 5;
 
-    public static final int REASON_RESPONSE_VALIDATOR = 6;
+    public static final int REASON_RESPONSE_VALIDATOR_FALSE = 6;
+    public static final int REASON_RESPONSE_VALIDATOR_ERROR = 7;
 
     @IntDef({REASON_REQUEST_CANCELLED, REASON_REQUEST_FAILED, REASON_RESPONSE_UNSUCCESSFUL,
             REASON_REQUEST_TIMEOUT, REASON_RESPONSE_UNPARSEABLE, REASON_RESPONSE_IOERROR,
-            REASON_RESPONSE_VALIDATOR})
+            REASON_RESPONSE_VALIDATOR_FALSE, REASON_RESPONSE_VALIDATOR_ERROR})
     @Retention(RetentionPolicy.SOURCE)
     public @interface Reason {
     }
@@ -37,6 +38,8 @@ public class BridgeException extends Exception {
     protected Request mRequest;
     @Nullable
     private Response mResponse;
+    @Nullable
+    private String mValidatorId;
 
     // Request constructors
 
@@ -63,10 +66,18 @@ public class BridgeException extends Exception {
         mReason = reason;
     }
 
-    protected BridgeException(@Nullable Response response, @NonNull String message, @NonNull Exception e, @Reason int reason) {
-        super(message, e);
+    protected BridgeException(@Nullable Response response, ResponseValidator validator) {
+        super(String.format("Validation %s didn't pass.", validator.id()));
         mResponse = response;
-        mReason = reason;
+        mReason = REASON_RESPONSE_VALIDATOR_FALSE;
+        mValidatorId = validator.id();
+    }
+
+    protected BridgeException(@Nullable Response response, ResponseValidator validator, @NonNull Exception e) {
+        super(String.format("Validator %s threw an error.", validator.id()), e);
+        mResponse = response;
+        mReason = REASON_RESPONSE_VALIDATOR_ERROR;
+        mValidatorId = validator.id();
     }
 
     protected BridgeException(@NonNull Response response, @NonNull Exception e, @Reason int reason) {
@@ -90,5 +101,10 @@ public class BridgeException extends Exception {
     @Reason
     public int reason() {
         return mReason;
+    }
+
+    @Nullable
+    public String validatorId() {
+        return mValidatorId;
     }
 }

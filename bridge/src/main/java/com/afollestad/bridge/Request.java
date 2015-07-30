@@ -123,14 +123,10 @@ public final class Request {
             for (ResponseValidator val : mBuilder.mValidators) {
                 try {
                     if (!val.validate(mResponse)) {
-                        throw new BridgeException(mResponse,
-                                String.format("Validator %s returned false.", val.id()),
-                                BridgeException.REASON_RESPONSE_VALIDATOR);
+                        throw new BridgeException(mResponse, val);
                     }
                 } catch (Exception e) {
-                    throw new BridgeException(mResponse,
-                            String.format("Validator %s threw an error. %s", val.id(), e.getLocalizedMessage()),
-                            e, BridgeException.REASON_RESPONSE_VALIDATOR);
+                    throw new BridgeException(mResponse, val, e);
                 }
             }
         }

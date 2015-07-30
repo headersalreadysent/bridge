@@ -440,6 +440,10 @@ switch (e.reason()) {
         // is unable to save the content to a file.
         break;
     }
+    case BridgeException.REASON_RESPONSE_VALIDATOR_FALSE:
+    case BridgeException.REASON_RESPONSE_VALIDATOR_ERROR:
+        // Discussed in the Validators section
+        break;
 }
 ```
 
@@ -733,8 +737,12 @@ try {
         .validators(validator)
         .asJsonObject();
 } catch (BridgeException e) {
-    if (e.reason() == BridgeException.REASON_RESPONSE_VALIDATOR) {
-        // Validator threw an Exception OR returned false
+    if (e.reason() == BridgeException.REASON_RESPONSE_VALIDATOR_FALSE) {
+        String validatorId = e.validatorId();
+        // Validator returned false
+    } else if (e.reason() == BridgeException.REASON_RESPONSE_VALIDATOR_ERROR) {
+        String validatorId = e.validatorId();
+        // Validator threw an error
     }
 }
 ```
