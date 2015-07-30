@@ -15,7 +15,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
 import java.util.List;
 import java.util.Map;
 
@@ -31,19 +30,12 @@ public final class Response implements AsResults {
     private Bitmap mBitmapCache;
     private Map<String, List<String>> mHeaders;
 
-    protected Response(byte[] data, String url, HttpURLConnection conn) throws IOException {
+    protected Response(byte[] data, String url, int code, String message, Map<String, List<String>> headers) throws IOException {
         mData = data;
         mUrl = url;
-        try {
-            mCode = conn.getResponseCode();
-            mMessage = conn.getResponseMessage();
-            mHeaders = conn.getHeaderFields();
-        } catch (Throwable t) {
-            t.printStackTrace();
-            mCode = -1;
-            mMessage = null;
-            mHeaders = null;
-        }
+        mCode = code;
+        mMessage = message;
+        mHeaders = headers;
     }
 
     public String url() {

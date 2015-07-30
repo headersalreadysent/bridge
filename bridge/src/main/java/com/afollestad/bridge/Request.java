@@ -5,6 +5,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Aidan Follestad (afollestad)
@@ -28,6 +31,10 @@ public final class Request {
         try {
             URL url = new URL(mBuilder.mUrl);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            int responseCode = -1;
+            String responseMessage = "";
+            Map<String, List<String>> responseHeaders = new HashMap<>();
+
             try {
                 conn.setReadTimeout(mBuilder.mReadTimeout);
                 conn.setConnectTimeout(mBuilder.mConnectTimeout);
@@ -63,6 +70,11 @@ public final class Request {
                 byte[] data = null;
                 InputStream is = null;
                 ByteArrayOutputStream bos = null;
+
+                responseCode = conn.getResponseCode();
+                responseMessage = conn.getResponseMessage();
+                responseHeaders = conn.getHeaderFields();
+
                 try {
                     is = conn.getInputStream();
                     bos = new ByteArrayOutputStream();
@@ -91,7 +103,7 @@ public final class Request {
                 }
 
                 checkCancelled();
-                mResponse = new Response(data, url(), conn);
+                mResponse = new Response(data, url(), responseCode, responseMessage, responseHeaders);
                 if (mBuilder.mThrowIfNotSuccess)
                     BridgeUtil.throwIfNotSuccess(mResponse);
                 conn.disconnect();
@@ -103,9 +115,9 @@ public final class Request {
                 InputStream es = null;
                 try {
                     es = conn.getErrorStream();
-                    mResponse = new Response(BridgeUtil.readEntireStream(es), url(), conn);
+                    mResponse = new Response(BridgeUtil.readEntireStream(es), url(), responseCode, responseMessage, responseHeaders);
                 } catch (Throwable e3) {
-                    mResponse = new Response(null, url(), conn);
+                    mResponse = new Response(null, url(), responseCode, responseMessage, responseHeaders);
                 } finally {
                     BridgeUtil.closeQuietly(es);
                     if (conn != null) conn.disconnect();
