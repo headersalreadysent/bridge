@@ -109,8 +109,6 @@ public final class Request {
                 } finally {
                     Util.closeQuietly(es);
                 }
-                if (mBuilder.mThrowIfNotSuccess)
-                    Util.throwIfNotSuccess(mResponse);
             } finally {
                 conn.disconnect();
             }
@@ -132,6 +130,8 @@ public final class Request {
                 }
             }
         }
+        if (mBuilder.mThrowIfNotSuccess)
+            Util.throwIfNotSuccess(mResponse);
         return this;
     }
 
