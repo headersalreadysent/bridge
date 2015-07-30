@@ -96,8 +96,10 @@ public final class Request {
                 if (mBuilder.mThrowIfNotSuccess)
                     Util.throwIfNotSuccess(mResponse);
             } catch (Exception fnf) {
-                if (fnf instanceof BridgeException)
-                    throw fnf; // redirect to outside catch
+                if (fnf instanceof BridgeException) {
+                    if (((BridgeException) fnf).reason() != BridgeException.REASON_RESPONSE_UNSUCCESSFUL)
+                        throw fnf; // redirect to outside catch
+                }
                 InputStream es = null;
                 try {
                     es = conn.getErrorStream();
