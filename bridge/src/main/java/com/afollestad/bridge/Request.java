@@ -1,7 +1,6 @@
 package com.afollestad.bridge;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -56,7 +55,7 @@ public final class Request {
                         }
                         os.flush();
                     } finally {
-                        Util.closeQuietly(os);
+                        BridgeUtil.closeQuietly(os);
                     }
                 }
 
@@ -87,14 +86,14 @@ public final class Request {
                         mBuilder.mContext.fireProgress(Request.this, 100, 100);
                     data = bos.toByteArray();
                 } finally {
-                    Util.closeQuietly(is);
-                    Util.closeQuietly(bos);
+                    BridgeUtil.closeQuietly(is);
+                    BridgeUtil.closeQuietly(bos);
                 }
 
                 checkCancelled();
                 mResponse = new Response(data, url(), conn);
                 if (mBuilder.mThrowIfNotSuccess)
-                    Util.throwIfNotSuccess(mResponse);
+                    BridgeUtil.throwIfNotSuccess(mResponse);
             } catch (Exception fnf) {
                 if (fnf instanceof BridgeException) {
                     if (((BridgeException) fnf).reason() != BridgeException.REASON_RESPONSE_UNSUCCESSFUL)
@@ -103,11 +102,11 @@ public final class Request {
                 InputStream es = null;
                 try {
                     es = conn.getErrorStream();
-                    mResponse = new Response(Util.readEntireStream(es), url(), conn);
-                } catch (IOException e3) {
+                    mResponse = new Response(BridgeUtil.readEntireStream(es), url(), conn);
+                } catch (Throwable e3) {
                     mResponse = new Response(null, url(), conn);
                 } finally {
-                    Util.closeQuietly(es);
+                    BridgeUtil.closeQuietly(es);
                 }
             } finally {
                 conn.disconnect();
@@ -131,7 +130,7 @@ public final class Request {
             }
         }
         if (mBuilder.mThrowIfNotSuccess)
-            Util.throwIfNotSuccess(mResponse);
+            BridgeUtil.throwIfNotSuccess(mResponse);
         return this;
     }
 

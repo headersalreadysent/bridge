@@ -36,7 +36,7 @@ class UriPipe extends Pipe {
             while ((read = is.read(buffer)) != -1)
                 os.write(buffer, 0, read);
         } finally {
-            Util.closeQuietly(is);
+            BridgeUtil.closeQuietly(is);
         }
     }
 

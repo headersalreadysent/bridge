@@ -76,7 +76,7 @@ public final class MultipartForm {
             throw new RuntimeException(e);
         }
         final byte[] data = mBos.toByteArray();
-        Util.closeQuietly(mBos);
+        BridgeUtil.closeQuietly(mBos);
         mBos = null;
         return data;
     }

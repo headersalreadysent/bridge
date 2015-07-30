@@ -10,7 +10,7 @@ import java.io.InputStream;
 /**
  * @author Aidan Follestad (afollestad)
  */
-public class Util {
+public class BridgeUtil {
 
     public static void closeQuietly(@Nullable Closeable c) {
         if (c != null) {
@@ -33,8 +33,8 @@ public class Util {
             os.flush();
             return os.toByteArray();
         } finally {
-            Util.closeQuietly(os);
-            Util.closeQuietly(is);
+            BridgeUtil.closeQuietly(os);
+            BridgeUtil.closeQuietly(is);
         }
     }
 
@@ -45,6 +45,6 @@ public class Util {
                     BridgeException.REASON_RESPONSE_UNSUCCESSFUL);
     }
 
-    private Util() {
+    private BridgeUtil() {
     }
 }

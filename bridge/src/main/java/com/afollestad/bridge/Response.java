@@ -106,7 +106,7 @@ public final class Response implements AsResults {
         if (mBitmapCache == null) {
             final InputStream is = new ByteArrayInputStream(asBytes());
             mBitmapCache = BitmapFactory.decodeStream(is);
-            Util.closeQuietly(is);
+            BridgeUtil.closeQuietly(is);
         }
         return mBitmapCache;
     }
@@ -142,7 +142,7 @@ public final class Response implements AsResults {
         } catch (IOException e) {
             throw new BridgeException(this, e, BridgeException.REASON_RESPONSE_IOERROR);
         } finally {
-            Util.closeQuietly(os);
+            BridgeUtil.closeQuietly(os);
         }
     }
 

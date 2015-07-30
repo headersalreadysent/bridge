@@ -27,7 +27,7 @@ class TransferPipe extends Pipe {
             while ((read = mIs.read(buffer)) != -1)
                 os.write(buffer, 0, read);
         } finally {
-            Util.closeQuietly(mIs);
+            BridgeUtil.closeQuietly(mIs);
         }
     }
 
