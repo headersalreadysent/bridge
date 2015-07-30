@@ -2,6 +2,7 @@ package com.afollestad.bridge;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.support.annotation.Nullable;
 import android.text.Html;
 import android.text.Spanned;
 
@@ -50,14 +51,19 @@ public final class Response implements AsResults {
         return mMessage;
     }
 
+    @Nullable
     public String header(String name) {
-        return mHeaders.get(name).get(0);
+        List<String> header = mHeaders.get(name);
+        if (header == null || header.isEmpty())
+            return null;
+        return header.get(0);
     }
 
     public Map<String, List<String>> headers() {
         return mHeaders;
     }
 
+    @Nullable
     public List<String> headerList(String name) {
         return mHeaders.get(name);
     }
@@ -68,6 +74,7 @@ public final class Response implements AsResults {
         return Integer.parseInt(contentLength);
     }
 
+    @Nullable
     public String contentType() {
         return header("Content-Type");
     }
@@ -77,10 +84,12 @@ public final class Response implements AsResults {
         return mCode == -1 || mCode >= 200 && mCode < 300;
     }
 
+    @Nullable
     public byte[] asBytes() {
         return mData;
     }
 
+    @Nullable
     public String asString() {
         try {
             final byte[] bytes = asBytes();
@@ -133,10 +142,13 @@ public final class Response implements AsResults {
     }
 
     public void asFile(File destination) throws BridgeException {
+        final byte[] content = asBytes();
+        if (content == null)
+            throw new BridgeException(this, "No content was returned in this response.", BridgeException.REASON_RESPONSE_UNPARSEABLE);
         FileOutputStream os = null;
         try {
             os = new FileOutputStream(destination);
-            os.write(asBytes());
+            os.write(content);
             os.flush();
         } catch (IOException e) {
             throw new BridgeException(this, e, BridgeException.REASON_RESPONSE_IOERROR);
