@@ -5,10 +5,15 @@ import android.support.annotation.NonNull;
 /**
  * @author Aidan Follestad (afollestad)
  */
-public interface ResponseValidator {
+public abstract class ResponseValidator {
 
-    boolean validate(@NonNull Response response) throws Exception;
+    public abstract boolean validate(@NonNull Response response) throws Exception;
 
     @NonNull
-    String id();
+    public abstract String id();
+
+    @Override
+    public String toString() {
+        return "Validator: " + id();
+    }
 }
