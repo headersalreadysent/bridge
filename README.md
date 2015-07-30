@@ -49,12 +49,14 @@ dependencies {
         1. [Method, URL/Regex](https://github.com/afollestad/bridge#method-urlregex)
         2. [Tags](https://github.com/afollestad/bridge#tags)
     3. [Preventing Cancellation](https://github.com/afollestad/bridge#preventing-cancellation)
-6. [Configuration](https://github.com/afollestad/bridge#configuration)
+6. [Validators](https://github.com/afollestad/bridge#validators-1)
+7. [Configuration](https://github.com/afollestad/bridge#configuration)
     1. [Host](https://github.com/afollestad/bridge#host)
     2. [Default Headers](https://github.com/afollestad/bridge#default-headers)
     3. [Timeouts](https://github.com/afollestad/bridge#timeouts)
     4. [Buffer Size](https://github.com/afollestad/bridge#buffer-size)
     5. [Logging](https://github.com/afollestad/bridge#logging)
+    6. [Validators](https://github.com/afollestad/bridge#validators-2)
 7. [Cleanup](https://github.com/afollestad/bridge#cleanup)
 
 ------
@@ -705,6 +707,68 @@ unless you pass `true` for the `force` parameter.
 
 ------
 
+# Validators
+
+Validators allow you to provide consistent checking that certain conditions are true for a response.
+
+Here's a quick example:
+
+```java
+ResponseValidator validator = new ResponseValidator() {
+    @Override
+    public boolean validate(@NonNull Response response) throws Exception {
+        JSONObject json = response.asJsonObject();
+        return json.getBoolean("success");
+    }
+
+    @NonNull
+    @Override
+    public String id() {
+        return "custom-validator";
+    }
+};
+try {
+    JSONObject response = Bridge.client()
+        .get("http://www.someurl.com/api/test")
+        .validators(validator)
+        .asJsonObject();
+} catch (BridgeException e) {
+    if (e.reason() == BridgeException.REASON_RESPONSE_VALIDATOR) {
+        // Validator threw an Exception OR returned false
+    }
+}
+```
+
+The validator is passed before the request returns. Basically, the validator will check if a boolean field
+in the response JSON called `success` is equal to true. If you had an API on a server that returned true
+or false for this value, you could automatically check if it's true for every request with a single
+validator.
+
+You can even use multiple validators for a single request:
+
+```java
+ResponseValidator validatorOne = // ...
+ResponseValidator validatorTwo = // ...
+
+try {
+    JSONObject response = Bridge.client()
+        .get("http://www.someurl.com/api/test")
+        .validators(validatorOne, validatorTwo)
+        .asJsonObject();
+} catch (BridgeException e) {
+    if (e.reason() == BridgeException.REASON_RESPONSE_VALIDATOR) {
+        // Validators threw an Exception OR returned false
+    }
+}
+```
+
+**Note**: validators work with async requests too!
+
+**Note:** you can apply validators to every request in your application with global configuration,
+which is discussed in the next section.
+
+------
+
 # Configuration
 
 Bridge allows you configure various functions globally.
@@ -802,6 +866,31 @@ By default, logging is disabled. You can enable logging to see what the library 
 Bridge.client().config()
     .logging(true);
 ```
+
+### Validators
+
+Validators for individual requests were shown above. You can apply validators to every request
+in your application:
+
+```java
+Bridge.client().config()
+    .validators(new ResponseValidator() {
+        @Override
+        public boolean validate(@NonNull Response response) throws Exception {
+            JSONObject json = response.asJsonObject();
+            return json.getBoolean("success");
+        }
+
+        @NonNull
+        @Override
+        public String id() {
+            return "custom-validator";
+        }
+    });
+```
+
+**Note**: you can pass multiple validators into the `validators()` method just like the individual request
+version.
 
 ------
 

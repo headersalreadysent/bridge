@@ -119,15 +119,23 @@ public final class Request {
             }
             throw new BridgeException(this, e);
         }
+        if (mBuilder.mValidators != null) {
+            for (ResponseValidator val : mBuilder.mValidators) {
+                try {
+                    if (!val.validate(mResponse)) {
+                        throw new BridgeException(mResponse,
+                                String.format("Validator %s returned false.", val.id()),
+                                BridgeException.REASON_RESPONSE_VALIDATOR);
+                    }
+                } catch (Exception e) {
+                    throw new BridgeException(mResponse,
+                            String.format("Validator %s threw an error. %s", val.id(), e.getLocalizedMessage()),
+                            e, BridgeException.REASON_RESPONSE_VALIDATOR);
+                }
+            }
+        }
         return this;
     }
-
-//    public Request throwIfNotSuccess() throws BridgeException {
-//        mBuilder.mThrowIfNotSuccess = true;
-//        if (mResponse != null)
-//            Util.throwIfNotSuccess(mResponse);
-//        return this;
-//    }
 
     private void checkCancelled() throws BridgeException {
         if (isCancelled) {

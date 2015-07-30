@@ -23,6 +23,7 @@ public final class Config {
     protected int mReadTimeout = 15000;
     protected int mBufferSize = 1024 * 4;
     protected boolean mLogging = false;
+    protected ResponseValidator[] mValidators;
 
     public Config host(@Nullable String host) {
         mHost = host;
@@ -59,6 +60,11 @@ public final class Config {
         if (size <= 0)
             throw new IllegalArgumentException("The buffer size must be greater than 0.");
         mBufferSize = size;
+        return this;
+    }
+
+    public Config validators(ResponseValidator... validators) {
+        mValidators = validators;
         return this;
     }
 

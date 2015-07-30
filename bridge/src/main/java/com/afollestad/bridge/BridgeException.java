@@ -22,9 +22,11 @@ public class BridgeException extends Exception {
     public static final int REASON_RESPONSE_UNPARSEABLE = 4;
     public static final int REASON_RESPONSE_IOERROR = 5;
 
+    public static final int REASON_RESPONSE_VALIDATOR = 6;
+
     @IntDef({REASON_REQUEST_CANCELLED, REASON_REQUEST_FAILED, REASON_RESPONSE_UNSUCCESSFUL,
-            REASON_REQUEST_TIMEOUT,
-            REASON_RESPONSE_UNPARSEABLE, REASON_RESPONSE_IOERROR})
+            REASON_REQUEST_TIMEOUT, REASON_RESPONSE_UNPARSEABLE, REASON_RESPONSE_IOERROR,
+            REASON_RESPONSE_VALIDATOR})
     @Retention(RetentionPolicy.SOURCE)
     public @interface Reason {
     }
@@ -57,6 +59,12 @@ public class BridgeException extends Exception {
 
     protected BridgeException(@Nullable Response response, @NonNull String message, @Reason int reason) {
         super(message);
+        mResponse = response;
+        mReason = reason;
+    }
+
+    protected BridgeException(@Nullable Response response, @NonNull String message, @NonNull Exception e, @Reason int reason) {
+        super(message, e);
         mResponse = response;
         mReason = reason;
     }

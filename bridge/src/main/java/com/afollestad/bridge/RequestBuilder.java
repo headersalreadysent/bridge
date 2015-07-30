@@ -30,6 +30,7 @@ public final class RequestBuilder implements AsResultsExceptions {
     protected boolean mCancellable = true;
     protected Object mTag;
     protected boolean mThrowIfNotSuccess = false;
+    protected ResponseValidator[] mValidators;
 
     protected RequestBuilder(String url, Method method, Bridge context) {
         mContext = context;
@@ -44,6 +45,7 @@ public final class RequestBuilder implements AsResultsExceptions {
         mConnectTimeout = cf.mConnectTimeout;
         mReadTimeout = cf.mReadTimeout;
         mBufferSize = cf.mBufferSize;
+        mValidators = cf.mValidators;
     }
 
     public RequestBuilder header(@NonNull String name, @NonNull Object value) {
@@ -74,6 +76,11 @@ public final class RequestBuilder implements AsResultsExceptions {
         if (size <= 0)
             throw new IllegalArgumentException("Buffer size must be greater than 0.");
         mBufferSize = size;
+        return this;
+    }
+
+    public RequestBuilder validators(ResponseValidator... validators) {
+        mValidators = validators;
         return this;
     }
 
