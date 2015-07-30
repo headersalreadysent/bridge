@@ -74,7 +74,7 @@ public class BridgeException extends Exception {
     }
 
     protected BridgeException(@Nullable Response response, ResponseValidator validator, @NonNull Exception e) {
-        super(e);
+        super(e.getLocalizedMessage(), e);
         mResponse = response;
         mReason = REASON_RESPONSE_VALIDATOR_ERROR;
         mValidatorId = validator.id();
