@@ -138,10 +138,11 @@ public final class Request {
         if (mBuilder.mValidators != null) {
             for (ResponseValidator val : mBuilder.mValidators) {
                 try {
-                    if (!val.validate(mResponse)) {
+                    if (!val.validate(mResponse))
                         throw new BridgeException(mResponse, val);
-                    }
                 } catch (Exception e) {
+                    if (e instanceof BridgeException)
+                        throw (BridgeException) e;
                     throw new BridgeException(mResponse, val, e);
                 }
             }
