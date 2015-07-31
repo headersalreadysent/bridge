@@ -57,8 +57,10 @@ public final class Request {
                         os = conn.getOutputStream();
                         if (mBuilder.mPipe != null) {
                             mBuilder.mPipe.writeTo(os);
+                            Log.d(Request.this, "Wrote pipe content to %s %s request.", method().name(), url());
                         } else {
                             os.write(mBuilder.mBody);
+                            Log.d(Request.this, "Wrote %d bytes to %s %s request.", mBuilder.mBody.length, method().name(), url());
                         }
                         os.flush();
                     } finally {
@@ -74,6 +76,7 @@ public final class Request {
                 responseCode = conn.getResponseCode();
                 responseMessage = conn.getResponseMessage();
                 responseHeaders = conn.getHeaderFields();
+                Log.d(Request.this, "%s %s status: %s %s", method().name(), url(), responseCode, responseMessage);
 
                 try {
                     is = conn.getInputStream();
@@ -97,6 +100,7 @@ public final class Request {
                     if (totalAvailable == 0)
                         mBuilder.mContext.fireProgress(Request.this, 100, 100);
                     data = bos.toByteArray();
+                    Log.d(Request.this, "Read %d bytes from the %s %s response.", data != null ? data.length : 0, method().name(), url());
                 } finally {
                     BridgeUtil.closeQuietly(is);
                     BridgeUtil.closeQuietly(bos);
@@ -107,6 +111,7 @@ public final class Request {
                 if (mBuilder.mThrowIfNotSuccess)
                     BridgeUtil.throwIfNotSuccess(mResponse);
                 conn.disconnect();
+                Log.d(Request.this, "%s %s request completed successfully.", method().name(), url());
             } catch (Exception fnf) {
                 if (fnf instanceof BridgeException) {
                     if (((BridgeException) fnf).reason() != BridgeException.REASON_RESPONSE_UNSUCCESSFUL)
