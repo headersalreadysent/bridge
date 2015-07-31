@@ -45,6 +45,8 @@ public class BridgeException extends Exception {
 
     protected BridgeException(@NonNull Request request, Exception wrap) {
         super(String.format("%s %s error: %s", request.method().name(), request.url(), wrap.getMessage()), wrap);
+        if (wrap instanceof BridgeException)
+            throw new IllegalArgumentException("BridgeException cannot wrap a BridgeException.");
         mRequest = request;
         if (wrap instanceof TimeoutException || wrap instanceof SocketTimeoutException)
             mReason = REASON_REQUEST_TIMEOUT;
@@ -75,6 +77,8 @@ public class BridgeException extends Exception {
 
     protected BridgeException(@Nullable Response response, ResponseValidator validator, @NonNull Exception e) {
         super(e.getLocalizedMessage(), e);
+        if (e instanceof BridgeException)
+            throw new IllegalArgumentException("BridgeException cannot wrap a BridgeException.");
         mResponse = response;
         mReason = REASON_RESPONSE_VALIDATOR_ERROR;
         mValidatorId = validator.id();
@@ -82,6 +86,8 @@ public class BridgeException extends Exception {
 
     protected BridgeException(@NonNull Response response, @NonNull Exception e, @Reason int reason) {
         super(String.format("%s: %s", response.toString(), e.getLocalizedMessage()), e);
+        if (e instanceof BridgeException)
+            throw new IllegalArgumentException("BridgeException cannot wrap a BridgeException.");
         mResponse = response;
         mReason = reason;
     }
