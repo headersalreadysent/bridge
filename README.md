@@ -50,7 +50,7 @@ dependencies {
         2. [Tags](https://github.com/afollestad/bridge#tags)
     3. [Preventing Cancellation](https://github.com/afollestad/bridge#preventing-cancellation)
 6. [Validators](https://github.com/afollestad/bridge#validators)
-7. [Configuration](https://github.com/afollestad/bridge#configuration)
+7. [Global Configuration](https://github.com/afollestad/bridge#global-configuration)
     1. [Host](https://github.com/afollestad/bridge#host)
     2. [Default Headers](https://github.com/afollestad/bridge#default-headers)
     3. [Timeouts](https://github.com/afollestad/bridge#timeouts)
@@ -764,8 +764,12 @@ try {
         .validators(validatorOne, validatorTwo)
         .asJsonObject();
 } catch (BridgeException e) {
-    if (e.reason() == BridgeException.REASON_RESPONSE_VALIDATOR) {
-        // Validators threw an Exception OR returned false
+    if (e.reason() == BridgeException.REASON_RESPONSE_VALIDATOR_FALSE) {
+        String validatorId = e.validatorId();
+        // Validator returned false
+    } else if (e.reason() == BridgeException.REASON_RESPONSE_VALIDATOR_ERROR) {
+        String validatorId = e.validatorId();
+        // Validator threw an error
     }
 }
 ```
@@ -777,7 +781,7 @@ which is discussed in the next section.
 
 ------
 
-# Configuration
+# Global Configuration
 
 Bridge allows you configure various functions globally.
 
