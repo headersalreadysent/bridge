@@ -234,4 +234,9 @@ public final class RequestBuilder implements AsResultsExceptions {
     public void asFile(File destination) throws BridgeException {
         response().asFile(destination);
     }
+
+    @Override
+    public Object asSuggested() throws BridgeException {
+        return response().asSuggested();
+    }
 }

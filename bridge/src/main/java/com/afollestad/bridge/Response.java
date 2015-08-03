@@ -158,6 +158,31 @@ public final class Response implements AsResults {
     }
 
     @Override
+    public Object asSuggested() throws BridgeException {
+        final String contentType = contentType();
+        if (contentType == null) {
+            return asBytes();
+        } else if (contentType.startsWith("text/html")) {
+            return asHtml();
+        } else if (contentType.startsWith("text/")) {
+            return asString();
+        } else if (contentType.startsWith("application/json")) {
+            try {
+                final String contentStr = asString();
+                if (contentStr == null) return asBytes();
+                if (contentStr.startsWith("["))
+                    return new JSONArray(contentStr);
+                else return new JSONObject(contentStr);
+            } catch (JSONException e) {
+                throw new BridgeException(this, e, BridgeException.REASON_RESPONSE_UNPARSEABLE);
+            }
+        } else if (contentType.startsWith("image/")) {
+            return asBitmap();
+        }
+        return asBytes();
+    }
+
+    @Override
     public String toString() {
         return String.format("%s, %d %s, %d bytes", mUrl, mCode, mMessage, mData != null ? mData.length : 0);
     }

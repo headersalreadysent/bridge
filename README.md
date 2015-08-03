@@ -17,7 +17,7 @@ Then, add Bridge to your dependencies list:
 
 ```gradle
 dependencies {
-    compile 'com.afollestad:bridge:1.5.2'
+    compile 'com.afollestad:bridge:1.5.3'
 }
 ```
 
@@ -388,6 +388,10 @@ Bitmap responseImage = response.asBitmap();
 
 // Save the response content to a File of your choosing
 response.asFile(new File("/sdcard/Download.extension"));
+
+// Returns String, Spanned (for HTML), JSONObject, JSONArray, Bitmap, or byte[]
+// based on the Content-Type header.
+Object suggested = response.asSuggested();
 ```
 
 ------

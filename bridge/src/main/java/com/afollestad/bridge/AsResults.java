@@ -26,4 +26,6 @@ interface AsResults {
     JSONArray asJsonArray() throws BridgeException;
 
     void asFile(File destination) throws BridgeException;
+
+    Object asSuggested() throws BridgeException;
 }
