@@ -372,13 +372,18 @@ Response response = // ...
 
 byte[] responseRawData = response.asBytes();
 
+// Converts asBytes() to a UTF-8 encoded String.
 String responseString = response.asString();
 
 // If you set this to a TextView, it will display HTML formatting
 Spanned responseHtml = response.asHtml();
 
+// Cached in the Response object, using this method multiples will reference the same JSONObject.
+// This allows your app to not re-parse the JSON if it's used multiple times.
 JSONObject responseJsonObject = response.asJsonObject();
 
+// Cached in the Response object, using this method multiples will reference the same JSONArray.
+// This allows your app to not re-parse the JSON if it's used multiple times.
 JSONArray responseJsonArray = response.asJsonArray();
 
 // Don't forget to recycle!
