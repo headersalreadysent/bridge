@@ -184,6 +184,14 @@ public final class Response implements AsResults {
 
     @Override
     public String toString() {
-        return String.format("%s, %d %s, %d bytes", mUrl, mCode, mMessage, mData != null ? mData.length : 0);
+        Object suggested;
+        try {
+            suggested = asSuggested();
+        } catch (BridgeException e) {
+            suggested = asBytes();
+        }
+        String bodyDescriptor = suggested instanceof byte[] ?
+                String.format("%d bytes", ((byte[]) suggested).length) : suggested.toString();
+        return String.format("%s, %d %s, %s", mUrl, mCode, mMessage, bodyDescriptor);
     }
 }
