@@ -189,7 +189,7 @@ public final class Request {
     @Override
     public String toString() {
         if (mResponse != null)
-            return String.format("[%s]: %s %s", mResponse.toString(), method().name(), url());
+            return String.format("[%s]", mResponse.toString());
         return String.format("%s %s", method().name(), url());
     }
 }

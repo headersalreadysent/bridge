@@ -29,6 +29,8 @@ public final class Response implements AsResults {
     private int mCode = -1;
     private String mMessage;
     private Bitmap mBitmapCache;
+    private JSONObject mJsonObjCache;
+    private JSONArray mJsonArrayCache;
     private Map<String, List<String>> mHeaders;
 
     protected Response(byte[] data, String url, int code, String message, Map<String, List<String>> headers) throws IOException {
@@ -124,7 +126,9 @@ public final class Response implements AsResults {
         if (content == null)
             throw new BridgeException(this, "No content was returned in this response.", BridgeException.REASON_RESPONSE_UNPARSEABLE);
         try {
-            return new JSONObject(content);
+            if (mJsonObjCache == null)
+                mJsonObjCache = new JSONObject(content);
+            return mJsonObjCache;
         } catch (JSONException e) {
             throw new BridgeException(this, e, BridgeException.REASON_RESPONSE_UNPARSEABLE);
         }
@@ -135,7 +139,9 @@ public final class Response implements AsResults {
         if (content == null)
             throw new BridgeException(this, "No content was returned in this response.", BridgeException.REASON_RESPONSE_UNPARSEABLE);
         try {
-            return new JSONArray(content);
+            if (mJsonArrayCache == null)
+                mJsonArrayCache = new JSONArray(content);
+            return mJsonArrayCache;
         } catch (JSONException e) {
             throw new BridgeException(this, e, BridgeException.REASON_RESPONSE_UNPARSEABLE);
         }
