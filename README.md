@@ -68,50 +68,35 @@ dependencies {
 Here's a very basic GET `Request` that retrieves Google's home page and saves the content to a `String`.
 
 ```java
-try {
-    Response response = Bridge.client()
-        .get("http://www.google.com")
-        .response();
+Response response = Bridge.client()
+    .get("http://www.google.com")
+    .response();
 
-    if (!response.isSuccess()) {
-        // Response code was not 200-300,
-        // decide what to do in this case.
-    } else {
-        String responseContent = response.asString();
-        // Do something with response
-    }
-} catch (BridgeException e) {
-    // See the 'Error Handling' section for information on how to process BridgeExceptions
+if (!response.isSuccess()) {
+    // Response code was not 200-300,
+    // decide what to do in this case.
+} else {
+    String responseContent = response.asString();
+    // Do something with response
 }
 ```
 
 This could be shortened to:
 
 ```java
-try {
-    String content = Bridge.client()
-        .get("http://www.google.com")
-        .asString();
-    // Do something with response
-} catch (BridgeException e) {
-    // See the 'Error Handling' section for information on how to process BridgeExceptions
-    int reason = e.reason();
-}
+String content = Bridge.client()
+    .get("http://www.google.com")
+    .asString();
 ```
 
 Behind the scenes, this is actually performing this:
 
 ```java
-try {
-    String content = Bridge.client()
-        .get("http://www.google.com")
-        .throwIfNotSuccess()
-        .response()
-        .asString();
-} catch (BridgeException e) {
-    // See the 'Error Handling' section for information on how to process BridgeExceptions
-    int reason = e.reason();
-}
+String content = Bridge.client()
+    .get("http://www.google.com")
+    .throwIfNotSuccess()
+    .response()
+    .asString();
 ```
 
 The shorter version makes use of `throwIfNotSuccess()` to automatically
@@ -123,16 +108,11 @@ throw a `BridgeException` with the reason `REASON_RESPONSE_UNSUCCESSFUL`
 When passing query parameters in a URL, you can use format args:
 
 ```java
-try {
-    String searchQuery = "hello, how are you?";
-    String content = Bridge.client()
-        .get("http://www.google.com/search?q=%s", searchQuery)
-        .asString();
-    // Do something with response
-} catch (BridgeException e) {
-    // See the 'Error Handling' section for information on how to process BridgeExceptions
-    int reason = e.reason();
-}
+String searchQuery = "hello, how are you?";
+String content = Bridge.client()
+    .get("http://www.google.com/search?q=%s", searchQuery)
+    .asString();
+// Do something with response
 ```
 
 This is using Java's `String.format()` method behind the scenes. The `searchQuery` variable replaces
@@ -145,17 +125,12 @@ Changing or adding `Request` headers is pretty simple. You just use the `header(
 which can be chained to add multiple headers.
 
 ```java
-try {
-    String content = Bridge.client()
-        .get("http://www.google.com")
-        .header("User-Agent", "BridgeSampleProject")
-        .header("CustomHeader", "Hello")
-        .asString();
-    // Do something with response
-} catch (BridgeException e) {
-    // See the 'Error Handling' section for information on how to process BridgeExceptions
-    int reason = e.reason();
-}
+String content = Bridge.client()
+    .get("http://www.google.com")
+    .header("User-Agent", "BridgeSampleProject")
+    .header("CustomHeader", "Hello")
+    .asString();
+// Do something with response
 ```
 
 You can also set a `Map` of headers:
@@ -165,16 +140,11 @@ Map<String, Object> headersMap = new HashMap<>();
 headersMap.put("User-Agent", "BridgeSampleProject");
 headersMap.put("CustomHeader", "Hello");
 
-try {
-    String content = Bridge.client()
-        .get("http://www.google.com")
-        .headers(headersMap)
-        .asString();
-    // Do something with response
-} catch (BridgeException e) {
-    // See the 'Error Handling' section for information on how to process BridgeExceptions
-    int reason = e.reason();
-}
+String content = Bridge.client()
+    .get("http://www.google.com")
+    .headers(headersMap)
+    .asString();
+// Do something with response
 ```
 
 **Default headers**: see the [Configuration](https://github.com/afollestad/bridge#configuration) section
@@ -187,16 +157,11 @@ for info on how to set default headers that are automatically included in every 
 Here's a basic `POST` request that sends plain text in the body:
 
 ```java
-try {
-    String postContent = "Hello, how are you?";
-    String response = Bridge.client()
-        .post("http://someurl.com/post")
-        .body(postContent)
-        .asString();
-} catch (BridgeException e) {
-    // See the 'Error Handling' section for information on how to process BridgeExceptions
-    int reason = e.reason();
-}
+String postContent = "Hello, how are you?";
+String response = Bridge.client()
+    .post("http://someurl.com/post")
+    .body(postContent)
+    .asString();
 ```
 
 Passing a `String` will automatically set the `Content-Type` header to `text/plain`. The `body()`
@@ -223,19 +188,14 @@ with get requests, but the parameters are included in the body of the request ra
 Here's a basic example of how it's done:
 
 ```java
-try {
-    Form form = new Form()
-        .add("Username", "Aidan")
-        .add("Password", "Hello");
+Form form = new Form()
+    .add("Username", "Aidan")
+    .add("Password", "Hello");
 
-    String response = Bridge.client()
-        .post("http://someurl.com/login")
-        .body(form)
-        .asString();
-} catch (BridgeException e) {
-    // See the 'Error Handling' section for information on how to process BridgeExceptions
-    int reason = e.reason();
-}
+String response = Bridge.client()
+    .post("http://someurl.com/login")
+    .body(form)
+    .asString();
 ```
 
 This will automatically set the `Content-Type` header to `application/x-www-form-urlencoded`.
@@ -252,20 +212,15 @@ for uploading files to a website.
 Here's a basic example of how it's done:
 
 ```java
-try {
-    MultipartForm form = new MultipartForm()
-        .add("Subject", "Hello")
-        .add("Body", "Hey, how are you?")
-        .add("FileUpload", new File("/sdcard/Download/ToUpload.txt"));
+MultipartForm form = new MultipartForm()
+    .add("Subject", "Hello")
+    .add("Body", "Hey, how are you?")
+    .add("FileUpload", new File("/sdcard/Download/ToUpload.txt"));
 
-    String response = Bridge.client()
-        .post("http://someurl.com/post")
-        .body(form)
-        .asString();
-} catch (BridgeException e) {
-    // See the 'Error Handling' section for information on how to process BridgeExceptions
-    int reason = e.reason();
-}
+String response = Bridge.client()
+    .post("http://someurl.com/post")
+    .body(form)
+    .asString();
 ```
 
 This will automatically set the `Content-Type` header to `multipart/form-data`.
@@ -281,27 +236,22 @@ this indirectly for you.
 Bridge allows you to stream data directly into a post body:
 
 ```java
-try {
-    Pipe pipe = new Pipe() {
-        @Override
-        public void writeTo(OutputStream os) throws IOException {
-            os.write("Hello, this is a streaming example".getBytes());
-        }
+Pipe pipe = new Pipe() {
+    @Override
+    public void writeTo(OutputStream os) throws IOException {
+        os.write("Hello, this is a streaming example".getBytes());
+    }
 
-        @Override
-        public String contentType() {
-            return "text/plain";
-        }
-    };
+    @Override
+    public String contentType() {
+        return "text/plain";
+    }
+};
 
-    String response = Bridge.client()
-        .post("http://someurl.com/post")
-        .body(pipe)
-        .asString();
-} catch (BridgeException e) {
-    // See the 'Error Handling' section for information on how to process BridgeExceptions
-    int reason = e.reason();
-}
+String response = Bridge.client()
+    .post("http://someurl.com/post")
+    .body(pipe)
+    .asString();
 ```
 
 **Note**: when you use a `Pipe` as a body, the `Content-Type` header will automatically be set based
@@ -406,6 +356,11 @@ Object suggested = response.asSuggested();
 The `BridgeException` class is used throughout the library and acts as a single exception provider.
 This helps avoid the need for different exception classes, or very unspecific Exceptions.
 
+If you wanted, you could just display errors to the user using `BridgeException#getMessage()`. However,
+`BridgeException` lets you know exactly what happened before the user sees anything.
+
+---
+
 The `BridgeException#reason()` method returns one of a set of constants that indicate why the exception
 was thrown. If the Exception is for a request, you can retrieve the `Request` with `BridgeException#request()`. 
 If the Exception is for a response, you can retrieve the `Response` with `BridgeException#response()`.
@@ -451,6 +406,7 @@ switch (e.reason()) {
     }
     case BridgeException.REASON_RESPONSE_VALIDATOR_FALSE:
     case BridgeException.REASON_RESPONSE_VALIDATOR_ERROR:
+        String validatorId = e.validatorId();
         // Discussed in the Validators section
         break;
 }
@@ -751,6 +707,7 @@ try {
         // Validator returned false
     } else if (e.reason() == BridgeException.REASON_RESPONSE_VALIDATOR_ERROR) {
         String validatorId = e.validatorId();
+        String errorMessage = e.getMessage();
         // Validator threw an error
     }
 }
@@ -778,6 +735,7 @@ try {
         // Validator returned false
     } else if (e.reason() == BridgeException.REASON_RESPONSE_VALIDATOR_ERROR) {
         String validatorId = e.validatorId();
+        String errorMessage = e.getMessage();
         // Validator threw an error
     }
 }
