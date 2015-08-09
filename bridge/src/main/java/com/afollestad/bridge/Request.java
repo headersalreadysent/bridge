@@ -1,8 +1,12 @@
 package com.afollestad.bridge;
 
+import android.support.annotation.IntDef;
+
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
@@ -13,6 +17,11 @@ import java.util.Map;
  * @author Aidan Follestad (afollestad)
  */
 public final class Request {
+
+    @IntDef({Method.GET, Method.POST, Method.PUT, Method.DELETE})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface MethodInt {
+    }
 
     private final RequestBuilder mBuilder;
     private boolean isCancelled;
@@ -38,7 +47,7 @@ public final class Request {
             try {
                 conn.setReadTimeout(mBuilder.mReadTimeout);
                 conn.setConnectTimeout(mBuilder.mConnectTimeout);
-                conn.setRequestMethod(mBuilder.mMethod.name());
+                conn.setRequestMethod(Method.name(mBuilder.mMethod));
                 conn.setInstanceFollowRedirects(true);
 
                 if (mBuilder.mHeaders != null && mBuilder.mHeaders.size() > 0) {
@@ -57,10 +66,12 @@ public final class Request {
                         os = conn.getOutputStream();
                         if (mBuilder.mPipe != null) {
                             mBuilder.mPipe.writeTo(os);
-                            Log.d(Request.this, "Wrote pipe content to %s %s request.", method().name(), url());
+                            Log.d(Request.this, "Wrote pipe content to %s %s request.",
+                                    Method.name(method()), url());
                         } else {
                             os.write(mBuilder.mBody);
-                            Log.d(Request.this, "Wrote %d bytes to %s %s request.", mBuilder.mBody.length, method().name(), url());
+                            Log.d(Request.this, "Wrote %d bytes to %s %s request.",
+                                    mBuilder.mBody.length, Method.name(method()), url());
                         }
                         os.flush();
                     } finally {
@@ -76,7 +87,7 @@ public final class Request {
                 responseCode = conn.getResponseCode();
                 responseMessage = conn.getResponseMessage();
                 responseHeaders = conn.getHeaderFields();
-                Log.d(Request.this, "%s %s status: %s %s", method().name(), url(), responseCode, responseMessage);
+                Log.d(Request.this, "%s %s status: %s %s", Method.name(method()), url(), responseCode, responseMessage);
 
                 try {
                     is = conn.getInputStream();
@@ -100,7 +111,8 @@ public final class Request {
                     if (totalAvailable == 0)
                         mBuilder.mContext.fireProgress(Request.this, 100, 100);
                     data = bos.toByteArray();
-                    Log.d(Request.this, "Read %d bytes from the %s %s response.", data != null ? data.length : 0, method().name(), url());
+                    Log.d(Request.this, "Read %d bytes from the %s %s response.", data != null ?
+                            data.length : 0, Method.name(method()), url());
                 } finally {
                     BridgeUtil.closeQuietly(is);
                     BridgeUtil.closeQuietly(bos);
@@ -111,7 +123,7 @@ public final class Request {
                 if (mBuilder.mThrowIfNotSuccess)
                     BridgeUtil.throwIfNotSuccess(mResponse);
                 conn.disconnect();
-                Log.d(Request.this, "%s %s request completed successfully.", method().name(), url());
+                Log.d(Request.this, "%s %s request completed successfully.", Method.name(method()), url());
             } catch (Exception fnf) {
                 if (fnf instanceof BridgeException) {
                     if (((BridgeException) fnf).reason() != BridgeException.REASON_RESPONSE_UNSUCCESSFUL)
@@ -120,9 +132,11 @@ public final class Request {
                 InputStream es = null;
                 try {
                     es = conn.getErrorStream();
-                    mResponse = new Response(BridgeUtil.readEntireStream(es), url(), responseCode, responseMessage, responseHeaders);
+                    mResponse = new Response(BridgeUtil.readEntireStream(es), url(),
+                            responseCode, responseMessage, responseHeaders);
                 } catch (Throwable e3) {
-                    mResponse = new Response(null, url(), responseCode, responseMessage, responseHeaders);
+                    mResponse = new Response(null, url(), responseCode,
+                            responseMessage, responseHeaders);
                 } finally {
                     BridgeUtil.closeQuietly(es);
                     if (conn != null) conn.disconnect();
@@ -182,7 +196,8 @@ public final class Request {
         return mBuilder.mUrl;
     }
 
-    public Method method() {
+    @MethodInt
+    public int method() {
         return mBuilder.mMethod;
     }
 
@@ -190,6 +205,6 @@ public final class Request {
     public String toString() {
         if (mResponse != null)
             return String.format("[%s]", mResponse.toString());
-        return String.format("%s %s", method().name(), url());
+        return String.format("%s %s", Method.name(method()), url());
     }
 }

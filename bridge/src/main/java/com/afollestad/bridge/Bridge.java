@@ -123,15 +123,15 @@ public class Bridge {
         return new RequestBuilder(processUrl(url, formatArgs), Method.DELETE, this);
     }
 
-    public void cancelAll(@Nullable final Method method, @NonNull final String urlRegex) {
+    public void cancelAll(@Request.MethodInt final int method, @NonNull final String urlRegex) {
         cancelAll(method, urlRegex, false);
     }
 
-    public void cancelAllSync(@Nullable final Method method, @NonNull final String urlRegex) {
+    public void cancelAllSync(@Request.MethodInt final int method, @NonNull final String urlRegex) {
         cancelAllSync(method, urlRegex, false);
     }
 
-    public void cancelAllSync(@Nullable final Method method, @NonNull final String urlRegex, final boolean force) {
+    public void cancelAllSync(@Request.MethodInt final int method, @NonNull final String urlRegex, final boolean force) {
         synchronized (LOCK) {
             if (mRequestMap == null) return;
             final Pattern pattern = Pattern.compile(urlRegex);
@@ -139,10 +139,10 @@ public class Bridge {
             while (iter.hasNext()) {
                 final Map.Entry<String, CallbackStack> entry = iter.next();
                 final String[] splitKey = entry.getKey().split("\0");
-                final String keyMethod = splitKey[0];
+                @Request.MethodInt
+                final int keyMethod = Integer.parseInt(splitKey[0]);
                 final String keyUrl = splitKey[1];
-
-                if (method != null && !keyMethod.equals(method.name()))
+                if (keyMethod != method)
                     continue;
                 else if (!pattern.matcher(keyUrl).find())
                     continue;
@@ -154,7 +154,7 @@ public class Bridge {
         }
     }
 
-    public void cancelAll(@Nullable final Method method, @NonNull final String urlRegex, final boolean force) {
+    public void cancelAll(@Request.MethodInt final int method, @NonNull final String urlRegex, final boolean force) {
         new Thread(new Runnable() {
             @Override
             public void run() {

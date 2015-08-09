@@ -17,7 +17,7 @@ Then, add Bridge to your dependencies list:
 
 ```gradle
 dependencies {
-    compile 'com.afollestad:bridge:1.5.4'
+    compile 'com.afollestad:bridge:1.5.5'
 }
 ```
 
@@ -605,10 +605,6 @@ that matches literal text:
 Bridge.client()
     .cancelAll(Method.GET, Pattern.quote("http://www.android.com/media/android_vector.jpg"));
 ```
-
-**Note**: if you pass `null` for the first parameter (`Method`), it will ignore the HTTP method when
-looking for requests to cancel. In other words, you could cancel `GET`, `POST`, `PUT`, *and* `DELETE`
-requests to a specific URL.
 
 ------
 

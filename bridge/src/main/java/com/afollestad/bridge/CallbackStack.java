@@ -12,7 +12,7 @@ import java.util.List;
 final class CallbackStack {
 
     public static String createKey(Request req) {
-        return String.format("%s\0%s\0%s", req.method().name(), req.url(),
+        return String.format("%d\0%s\0%s", req.method(), req.url(),
                 req.builder().mBody != null ? req.builder().mBody.length + "" : "");
     }
 

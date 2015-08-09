@@ -19,7 +19,9 @@ public final class RequestBuilder implements AsResultsExceptions {
 
     protected final Bridge mContext;
     protected final String mUrl;
-    protected final Method mMethod;
+    protected final
+    @Request.MethodInt
+    int mMethod;
     protected Map<String, Object> mHeaders;
     protected byte[] mBody;
     protected Pipe mPipe;
@@ -32,11 +34,11 @@ public final class RequestBuilder implements AsResultsExceptions {
     protected boolean mThrowIfNotSuccess = false;
     protected ResponseValidator[] mValidators;
 
-    protected RequestBuilder(String url, Method method, Bridge context) {
+    protected RequestBuilder(String url, @Request.MethodInt int method, Bridge context) {
         mContext = context;
         if (!url.startsWith("http") && Bridge.client().config().mHost != null)
             url = Bridge.client().config().mHost + url;
-        Log.d(this, "%s %s", method.name(), url);
+        Log.d(this, "%s %s", Method.name(method), url);
         mUrl = url;
         mMethod = method;
 

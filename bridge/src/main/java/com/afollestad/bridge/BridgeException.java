@@ -44,7 +44,7 @@ public class BridgeException extends Exception {
     // Request constructors
 
     protected BridgeException(@NonNull Request request, Exception wrap) {
-        super(String.format("%s %s error: %s", request.method().name(), request.url(), wrap.getMessage()), wrap);
+        super(String.format("%s %s error: %s", Method.name(request.method()), request.url(), wrap.getMessage()), wrap);
         if (wrap instanceof BridgeException)
             throw new IllegalArgumentException("BridgeException cannot wrap a BridgeException.");
         mRequest = request;
@@ -55,7 +55,7 @@ public class BridgeException extends Exception {
 
     protected BridgeException(@NonNull Request cancelledRequest) {
         super(String.format("%s request to %s was cancelled.",
-                cancelledRequest.method().name(), cancelledRequest.url()));
+                Method.name(cancelledRequest.method()), cancelledRequest.url()));
         mRequest = cancelledRequest;
         mReason = REASON_REQUEST_CANCELLED;
     }
