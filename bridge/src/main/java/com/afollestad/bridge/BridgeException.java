@@ -68,6 +68,12 @@ public class BridgeException extends Exception {
         mReason = reason;
     }
 
+    protected BridgeException(@Nullable Request request, @NonNull String message, @Reason int reason) {
+        super(message);
+        mRequest = request;
+        mReason = reason;
+    }
+
     protected BridgeException(@Nullable Response response, ResponseValidator validator) {
         super(String.format("Validation %s didn't pass.", validator.id()));
         mResponse = response;

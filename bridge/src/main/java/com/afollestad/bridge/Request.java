@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.net.HttpURLConnection;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
@@ -129,7 +130,11 @@ public final class Request {
                 conn.disconnect();
                 Log.d(Request.this, "%s %s request completed successfully.", Method.name(method()), url());
             } catch (Exception fnf) {
-                if (fnf instanceof BridgeException) {
+                if (fnf instanceof SocketTimeoutException)
+                    throw new BridgeException(this, String.format("The request to %s timed out.", url()), BridgeException.REASON_REQUEST_TIMEOUT);
+                else if (fnf instanceof SecurityException)
+                    throw new BridgeException(this, fnf);
+                else if (fnf instanceof BridgeException) {
                     if (((BridgeException) fnf).reason() != BridgeException.REASON_RESPONSE_UNSUCCESSFUL)
                         throw fnf; // redirect to outside catch
                 }

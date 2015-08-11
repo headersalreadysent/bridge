@@ -17,7 +17,7 @@ Then, add Bridge to your dependencies list:
 
 ```gradle
 dependencies {
-    compile 'com.afollestad:bridge:1.5.6'
+    compile 'com.afollestad:bridge:1.5.7'
 }
 ```
 
