@@ -239,10 +239,16 @@ Bridge allows you to stream data directly into a post body:
 ```java
 Pipe pipe = new Pipe() {
     @Override
-    public void writeTo(OutputStream os) throws IOException {
-        os.write("Hello, this is a streaming example".getBytes());
+    public void writeTo(@NonNull OutputStream os, @Nullable ProgressCallback progressListener) throws IOException {
+        byte[] content = "Hello, this is a streaming example".getBytes();
+        os.write(content);
+
+        // Notify optional progress listener that all data was transferred
+        if (progressListener != null)
+            progressListener.publishProgress(content.length, content.length);
     }
 
+    @NonNull
     @Override
     public String contentType() {
         return "text/plain";
@@ -259,7 +265,7 @@ String response = Bridge.client()
 on what `contentType()` in the `Pipe` implementation returns. If you want to override this header,
 you can change it in the `Pipe` or reset the header after setting the body.
 
-`Pipe` has three convenience methods that create a pre-designed `Pipe` instance:
+`Pipe` has three static convenience methods that create a pre-designed `Pipe` instance:
 
 ```java
 Pipe uriPipe = Pipe.forUri(this, Uri.parse(
