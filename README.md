@@ -545,7 +545,8 @@ all 100 `ImageView`'s with the same image at the same time. Check out the sample
 ### Download Progress Callbacks
 
 The `Callback` class has an optional `progress(Request, int, int, int)` method that can be overridden to receive
-progress updates for response downloading. The second int parameter represents the percentage that's been downloaded.
+progress updates for response downloading. `current` is how many bytes have been downloaded, `total` is how many
+bytes are available to be downloaded, and `percent` is the *current/total ratio times 100*.
 
 ```java
 Bridge.client()
