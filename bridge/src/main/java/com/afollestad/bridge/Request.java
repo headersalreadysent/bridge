@@ -1,5 +1,6 @@
 package com.afollestad.bridge;
 
+import android.os.NetworkOnMainThreadException;
 import android.support.annotation.IntDef;
 
 import java.io.ByteArrayOutputStream;
@@ -132,7 +133,7 @@ public final class Request {
             } catch (Exception fnf) {
                 if (fnf instanceof SocketTimeoutException)
                     throw new BridgeException(this, String.format("The request to %s timed out.", url()), BridgeException.REASON_REQUEST_TIMEOUT);
-                else if (fnf instanceof SecurityException)
+                else if (fnf instanceof SecurityException || fnf instanceof NetworkOnMainThreadException)
                     throw new BridgeException(this, fnf);
                 else if (fnf instanceof BridgeException) {
                     if (((BridgeException) fnf).reason() != BridgeException.REASON_RESPONSE_UNSUCCESSFUL)
