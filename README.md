@@ -42,7 +42,7 @@ dependencies {
 4. [Async Requests, Duplicate Avoidance, and Progress Callbacks](https://github.com/afollestad/bridge#async-requests-and-duplicate-avoidance)
     1. [Example](https://github.com/afollestad/bridge#example)
     2. [Duplicate Avoidance](https://github.com/afollestad/bridge#duplicate-avoidance)
-    3. [Progress Callbacks](https://github.com/afollestad/bridge#progress-callbacks)
+    3. [Download Progress Callbacks](https://github.com/afollestad/bridge#download-progress-callbacks)
 5. [Request Cancellation](https://github.com/afollestad/bridge#request-cancellation)
     1. [Cancelling Individual Requests](https://github.com/afollestad/bridge#cancelling-individual-requests)
     2. [Cancelling Multiple Requests](https://github.com/afollestad/bridge#cancelling-multiple-requests)
@@ -542,7 +542,7 @@ This lets you be very efficient on bandwidth and resource usage. If this library
 into `ImageView`'s, you could display 100 `ImageView`'s in a list, make a single request, and immediately populate
 all 100 `ImageView`'s with the same image at the same time. Check out the sample project to see this in action.
 
-### Progress Callbacks
+### Download Progress Callbacks
 
 The `Callback` class has an optional `progress(Request, int, int, int)` method that can be overridden to receive
 progress updates for response downloading. The second int parameter represents the percentage that's been downloaded.
@@ -571,6 +571,8 @@ Bridge.client()
 **Note**: progress callbacks are only called if the library is able to determinate the size of the
 content being downloaded. Generally, this means the requested endpoint needs to return a `Content-Length`
 header.
+
+*Upload progress callbacks were discussed in [Upload Progress](https://github.com/afollestad/bridge#upload-progress) section.*
 
 ------
 
