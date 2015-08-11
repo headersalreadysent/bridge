@@ -1,6 +1,7 @@
 package com.afollestad.bridge;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,12 +21,17 @@ class TransferPipe extends Pipe {
     }
 
     @Override
-    public void writeTo(@NonNull OutputStream os) throws IOException {
+    public void writeTo(@NonNull OutputStream os, @Nullable ProgressCallback progressCallback) throws IOException {
         try {
             byte[] buffer = new byte[Bridge.client().config().mBufferSize];
             int read;
-            while ((read = mIs.read(buffer)) != -1)
+            int totalRead = 0;
+            while ((read = mIs.read(buffer)) != -1) {
                 os.write(buffer, 0, read);
+                totalRead += read;
+                if (progressCallback != null)
+                    progressCallback.publishProgress(totalRead, mIs.available());
+            }
         } finally {
             BridgeUtil.closeQuietly(mIs);
         }

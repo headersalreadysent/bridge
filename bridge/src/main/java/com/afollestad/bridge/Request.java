@@ -60,16 +60,20 @@ public final class Request {
 
                 checkCancelled();
                 if (mBuilder.mPipe != null || mBuilder.mBody != null) {
+                    if (mBuilder.mUploadProgress != null)
+                        mBuilder.mUploadProgress.mRequest = this;
                     conn.setDoOutput(true);
                     OutputStream os = null;
                     try {
                         os = conn.getOutputStream();
                         if (mBuilder.mPipe != null) {
-                            mBuilder.mPipe.writeTo(os);
+                            mBuilder.mPipe.writeTo(os, mBuilder.mUploadProgress);
                             Log.d(Request.this, "Wrote pipe content to %s %s request.",
                                     Method.name(method()), url());
                         } else {
                             os.write(mBuilder.mBody);
+                            if (mBuilder.mUploadProgress != null)
+                                mBuilder.mUploadProgress.publishProgress(mBuilder.mBody.length, mBuilder.mBody.length);
                             Log.d(Request.this, "Wrote %d bytes to %s %s request.",
                                     mBuilder.mBody.length, Method.name(method()), url());
                         }

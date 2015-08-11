@@ -17,7 +17,7 @@ Then, add Bridge to your dependencies list:
 
 ```gradle
 dependencies {
-    compile 'com.afollestad:bridge:1.5.5'
+    compile 'com.afollestad:bridge:1.5.6'
 }
 ```
 
@@ -34,6 +34,7 @@ dependencies {
         2. [Forms](https://github.com/afollestad/bridge#forms)
         3. [MultipartForms](https://github.com/afollestad/bridge#multipartforms)
         4. [Streaming (Pipe)](https://github.com/afollestad/bridge#streaming-pipe)
+        5. [Upload Progress](https://github.com/afollestad/bridge#upload-progress)
 2. [Responses](https://github.com/afollestad/bridge#responses)
     1. [Headers](https://github.com/afollestad/bridge#headers-1)
     2. [Bodies](https://github.com/afollestad/bridge#bodies-1)
@@ -274,6 +275,33 @@ Pipe transferPipe = Pipe.forStream(is, "text/plain");
 be read. `forFile(File)` indirectly uses `forUri(Context, Uri)` specifically for file:// URIs.
 `forStream(InputStream, String)` reads an `InputStream` and transfers the content into the Pipe,
 you need to specify a Content-Type value in the second parameter.
+
+------
+
+###### Upload Progress
+
+You can monitor upload progress like this:
+
+```java
+Bridge.client()
+    .post("http://someurl.com/upload")
+    .body(Pipe.forUri(this, data.getData()))
+    .throwIfNotSuccess()
+    .uploadProgress(new ProgressCallback() {
+        @Override
+        public void progress(Request request, int current, int total, int percent) {
+            // Use progress
+        }
+    })
+    .request(new Callback() {
+        @Override
+        public void response(Request request, Response response, BridgeException e) {
+            // Use response
+        }
+    });
+```
+
+**Note**: this only works effectively with Pipes (streams). If you specify non-stream data, upload is one step and can't be monitored.
 
 ------
 

@@ -33,6 +33,7 @@ public final class RequestBuilder implements AsResultsExceptions {
     protected Object mTag;
     protected boolean mThrowIfNotSuccess = false;
     protected ResponseValidator[] mValidators;
+    protected ProgressCallback mUploadProgress;
 
     protected RequestBuilder(String url, @Request.MethodInt int method, Bridge context) {
         mContext = context;
@@ -159,6 +160,11 @@ public final class RequestBuilder implements AsResultsExceptions {
 
     public RequestBuilder body(@NonNull File file) {
         return body(Pipe.forFile(file));
+    }
+
+    public RequestBuilder uploadProgress(@NonNull ProgressCallback callback) {
+        mUploadProgress = callback;
+        return this;
     }
 
     public RequestBuilder cancellable(boolean cancelable) {

@@ -40,7 +40,7 @@ public final class MultipartForm {
         mBos.write("Content-Transfer-Encoding: binary".getBytes());
         mBos.write(LINE_FEED);
         mBos.write(LINE_FEED);
-        pipe.writeTo(mBos);
+        pipe.writeTo(mBos, null);
         mCount++;
         return this;
     }

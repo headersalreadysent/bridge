@@ -3,6 +3,7 @@ package com.afollestad.bridge;
 import android.content.Context;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -25,7 +26,7 @@ class UriPipe extends Pipe {
     }
 
     @Override
-    public void writeTo(@NonNull OutputStream os) throws IOException {
+    public void writeTo(@NonNull OutputStream os, @Nullable ProgressCallback progressCallback) throws IOException {
         InputStream is = null;
         try {
             if (mUri.getScheme() == null || mUri.getScheme().equalsIgnoreCase("file"))
@@ -33,8 +34,14 @@ class UriPipe extends Pipe {
             else is = mContext.getContentResolver().openInputStream(mUri);
             byte[] buffer = new byte[Bridge.client().config().mBufferSize];
             int read;
-            while ((read = is.read(buffer)) != -1)
+            int totalRead = 0;
+            final int totalAvailable = is.available();
+            while ((read = is.read(buffer)) != -1) {
                 os.write(buffer, 0, read);
+                totalRead += read;
+                if (progressCallback != null)
+                    progressCallback.publishProgress(totalRead, totalAvailable);
+            }
         } finally {
             BridgeUtil.closeQuietly(is);
         }

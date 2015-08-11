@@ -3,6 +3,7 @@ package com.afollestad.bridge;
 import android.content.Context;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,7 +18,7 @@ public abstract class Pipe {
     public Pipe() {
     }
 
-    public abstract void writeTo(@NonNull OutputStream os) throws IOException;
+    public abstract void writeTo(@NonNull OutputStream os, @Nullable ProgressCallback progressListener) throws IOException;
 
     @NonNull
     public abstract String contentType();
