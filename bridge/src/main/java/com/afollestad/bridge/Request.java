@@ -133,6 +133,7 @@ public final class Request {
                 conn.disconnect();
                 Log.d(Request.this, "%s %s request completed successfully.", Method.name(method()), url());
             } catch (Exception fnf) {
+                Log.e(Request.this, "Processing exception... %s, %s", fnf.getClass().getName(), fnf.getMessage());
                 if (fnf instanceof SocketTimeoutException)
                     throw new BridgeException(this, String.format("The request to %s timed out.", url()), BridgeException.REASON_REQUEST_TIMEOUT);
                 else if (fnf instanceof SecurityException || fnf instanceof NetworkOnMainThreadException)
@@ -147,6 +148,7 @@ public final class Request {
                     mResponse = new Response(BridgeUtil.readEntireStream(es), url(),
                             responseCode, responseMessage, responseHeaders);
                 } catch (Throwable e3) {
+                    Log.e(Request.this, "Unable to get error stream... %s", e3.getMessage());
                     mResponse = new Response(null, url(), responseCode,
                             responseMessage, responseHeaders);
                 } finally {
