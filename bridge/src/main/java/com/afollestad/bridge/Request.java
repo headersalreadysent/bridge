@@ -138,7 +138,7 @@ public final class Request {
                 Log.e(Request.this, "Processing exception... %s, %s", fnf.getClass().getName(), fnf.getMessage());
                 if (fnf instanceof SocketTimeoutException)
                     throw new BridgeException(this, String.format("The request to %s timed out.", url()), BridgeException.REASON_REQUEST_TIMEOUT);
-                else if (fnf instanceof SecurityException || fnf instanceof NetworkOnMainThreadException)
+                else if (fnf instanceof SecurityException || fnf instanceof NetworkOnMainThreadException || fnf instanceof IllegalStateException)
                     throw new BridgeException(this, fnf);
                 else if (fnf instanceof BridgeException) {
                     if (((BridgeException) fnf).reason() != BridgeException.REASON_RESPONSE_UNSUCCESSFUL)
