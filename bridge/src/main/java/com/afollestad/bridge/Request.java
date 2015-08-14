@@ -1,15 +1,14 @@
 package com.afollestad.bridge;
 
-import android.os.NetworkOnMainThreadException;
 import android.support.annotation.IntDef;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.net.HttpURLConnection;
-import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
@@ -136,14 +135,11 @@ public final class Request {
                 Log.d(Request.this, "%s %s request completed successfully.", Method.name(method()), url());
             } catch (Exception fnf) {
                 Log.e(Request.this, "Processing exception... %s, %s", fnf.getClass().getName(), fnf.getMessage());
-                if (fnf instanceof SocketTimeoutException)
-                    throw new BridgeException(this, String.format("The request to %s timed out.", url()), BridgeException.REASON_REQUEST_TIMEOUT);
-                else if (fnf instanceof SecurityException || fnf instanceof NetworkOnMainThreadException || fnf instanceof IllegalStateException)
-                    throw new BridgeException(this, fnf);
-                else if (fnf instanceof BridgeException) {
+                if (fnf instanceof BridgeException) {
                     if (((BridgeException) fnf).reason() != BridgeException.REASON_RESPONSE_UNSUCCESSFUL)
                         throw fnf; // redirect to outside catch
-                }
+                } else if (!(fnf instanceof FileNotFoundException))
+                    throw new BridgeException(this, fnf);
                 InputStream es = null;
                 try {
                     es = conn.getErrorStream();
