@@ -69,10 +69,12 @@ public final class Request {
                     try {
                         os = conn.getOutputStream();
                         if (mBuilder.mPipe != null) {
+                            conn.setRequestProperty("Content-Length", mBuilder.mPipe.contentLength() + "");
                             mBuilder.mPipe.writeTo(os, mBuilder.mUploadProgress);
                             Log.d(Request.this, "Wrote pipe content to %s %s request.",
                                     Method.name(method()), url());
                         } else {
+                            conn.setRequestProperty("Content-Length", mBuilder.mBody.length + "");
                             os.write(mBuilder.mBody);
                             if (mBuilder.mUploadProgress != null)
                                 mBuilder.mUploadProgress.publishProgress(mBuilder.mBody.length, mBuilder.mBody.length);

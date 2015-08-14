@@ -17,7 +17,7 @@ Then, add Bridge to your dependencies list:
 
 ```gradle
 dependencies {
-    compile 'com.afollestad:bridge:1.5.7'
+    compile 'com.afollestad:bridge:1.5.8'
 }
 ```
 
@@ -238,9 +238,11 @@ Bridge allows you to stream data directly into a post body:
 
 ```java
 Pipe pipe = new Pipe() {
+
+    byte[] content = "Hello, this is a streaming example".getBytes();
+
     @Override
     public void writeTo(@NonNull OutputStream os, @Nullable ProgressCallback progressListener) throws IOException {
-        byte[] content = "Hello, this is a streaming example".getBytes();
         os.write(content);
 
         // Notify optional progress listener that all data was transferred
@@ -253,6 +255,11 @@ Pipe pipe = new Pipe() {
     public String contentType() {
         return "text/plain";
     }
+
+    @Override
+    public int contentLength() throws IOException {
+        return content.length;
+    }
 };
 
 String response = Bridge.client()
@@ -262,8 +269,8 @@ String response = Bridge.client()
 ```
 
 **Note**: when you use a `Pipe` as a body, the `Content-Type` header will automatically be set based
-on what `contentType()` in the `Pipe` implementation returns. If you want to override this header,
-you can change it in the `Pipe` or reset the header after setting the body.
+on what `contentType()` in the `Pipe` implementation returns, same for `Content-Length`. If you want to override these headers,
+you can change it in the `Pipe` or manually set the header *after* setting the body.
 
 `Pipe` has three static convenience methods that create a pre-designed `Pipe` instance:
 

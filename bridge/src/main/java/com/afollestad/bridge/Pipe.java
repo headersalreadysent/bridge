@@ -23,6 +23,8 @@ public abstract class Pipe {
     @NonNull
     public abstract String contentType();
 
+    public abstract int contentLength() throws IOException;
+
     /**
      * Creates a Pipe that reads a Uri (file:// or content://) into the Pipe.
      */

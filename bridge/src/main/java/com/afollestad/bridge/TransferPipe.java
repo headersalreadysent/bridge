@@ -42,4 +42,11 @@ class TransferPipe extends Pipe {
     public String contentType() {
         return mContentType;
     }
+
+    @Override
+    public int contentLength() throws IOException {
+        if (mIs == null)
+            return -1;
+        return mIs.available();
+    }
 }
