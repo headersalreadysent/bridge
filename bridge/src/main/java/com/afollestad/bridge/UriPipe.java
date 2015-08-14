@@ -46,11 +46,8 @@ class UriPipe extends Pipe {
 
     @Override
     public int contentLength() throws IOException {
-        if (mStream == null) {
-            if (mUri.getScheme() == null || mUri.getScheme().equalsIgnoreCase("file"))
-                mStream = new FileInputStream(mUri.getPath());
-            else mStream = mContext.getContentResolver().openInputStream(mUri);
-        }
+        InputStream stream = getStream();
+        if (stream == null) return -1;
         return mStream.available();
     }
 
@@ -66,5 +63,14 @@ class UriPipe extends Pipe {
         if (type == null || type.trim().isEmpty())
             type = "application/octet-stream";
         return type;
+    }
+
+    public InputStream getStream() throws IOException {
+        if (mStream == null) {
+            if (mUri.getScheme() == null || mUri.getScheme().equalsIgnoreCase("file"))
+                mStream = new FileInputStream(mUri.getPath());
+            else mStream = mContext.getContentResolver().openInputStream(mUri);
+        }
+        return mStream;
     }
 }

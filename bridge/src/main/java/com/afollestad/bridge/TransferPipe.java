@@ -2,6 +2,7 @@ package com.afollestad.bridge;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.InputType;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,5 +49,9 @@ class TransferPipe extends Pipe {
         if (mIs == null)
             return -1;
         return mIs.available();
+    }
+
+    public InputStream getStream() {
+        return mIs;
     }
 }
