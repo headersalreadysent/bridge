@@ -18,12 +18,12 @@ public class BridgeException extends Exception {
     public static final int REASON_REQUEST_FAILED = 2;
     public static final int REASON_REQUEST_TIMEOUT = 3;
 
-    public static final int REASON_RESPONSE_UNSUCCESSFUL = 3;
-    public static final int REASON_RESPONSE_UNPARSEABLE = 4;
-    public static final int REASON_RESPONSE_IOERROR = 5;
+    public static final int REASON_RESPONSE_UNSUCCESSFUL = 4;
+    public static final int REASON_RESPONSE_UNPARSEABLE = 5;
+    public static final int REASON_RESPONSE_IOERROR = 6;
 
-    public static final int REASON_RESPONSE_VALIDATOR_FALSE = 6;
-    public static final int REASON_RESPONSE_VALIDATOR_ERROR = 7;
+    public static final int REASON_RESPONSE_VALIDATOR_FALSE = 7;
+    public static final int REASON_RESPONSE_VALIDATOR_ERROR = 8;
 
     @IntDef({REASON_REQUEST_CANCELLED, REASON_REQUEST_FAILED, REASON_RESPONSE_UNSUCCESSFUL,
             REASON_REQUEST_TIMEOUT, REASON_RESPONSE_UNPARSEABLE, REASON_RESPONSE_IOERROR,
@@ -43,8 +43,8 @@ public class BridgeException extends Exception {
 
     // Request constructors
 
-    protected BridgeException(@NonNull Request request, Exception wrap) {
-        super(String.format("%s %s: %s", Method.name(request.method()), request.url(), wrap.getMessage()), wrap);
+    protected BridgeException(@SuppressWarnings("NullableProblems") @NonNull Request request, Exception wrap) {
+        super(wrap);
         if (wrap instanceof BridgeException)
             throw new IllegalArgumentException("BridgeException cannot wrap a BridgeException.");
         mRequest = request;
@@ -53,9 +53,8 @@ public class BridgeException extends Exception {
         else mReason = REASON_REQUEST_FAILED;
     }
 
-    protected BridgeException(@NonNull Request cancelledRequest) {
-        super(String.format("%s request to %s was cancelled.",
-                Method.name(cancelledRequest.method()), cancelledRequest.url()));
+    protected BridgeException(@SuppressWarnings("NullableProblems") @NonNull Request cancelledRequest) {
+        super("Request was cancelled.");
         mRequest = cancelledRequest;
         mReason = REASON_REQUEST_CANCELLED;
     }
