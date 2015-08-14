@@ -92,7 +92,7 @@ public class Bridge {
     }
 
     private String processUrl(String url, @Nullable Object... formatArgs) {
-        if (formatArgs != null) {
+        if (formatArgs != null && formatArgs.length > 0) {
             for (int i = 0; i < formatArgs.length; i++) {
                 if (formatArgs[i] instanceof String) {
                     try {
