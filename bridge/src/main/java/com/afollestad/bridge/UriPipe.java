@@ -15,13 +15,13 @@ import java.net.URLConnection;
 /**
  * @author Aidan Follestad (afollestad)
  */
-class UriPipe extends Pipe {
+public final class UriPipe extends Pipe {
 
     private final Context mContext;
     private final Uri mUri;
     private InputStream mStream;
 
-    public UriPipe(Context context, Uri uri) {
+    protected UriPipe(Context context, Uri uri) {
         mContext = context;
         mUri = uri;
     }

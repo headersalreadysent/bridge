@@ -11,12 +11,12 @@ import java.io.OutputStream;
 /**
  * @author Aidan Follestad (afollestad)
  */
-class TransferPipe extends Pipe {
+public final class TransferPipe extends Pipe {
 
     private final InputStream mIs;
     private final String mContentType;
 
-    public TransferPipe(@NonNull InputStream is, @NonNull String contentType) {
+    protected TransferPipe(@NonNull InputStream is, @NonNull String contentType) {
         mIs = is;
         mContentType = contentType;
     }
