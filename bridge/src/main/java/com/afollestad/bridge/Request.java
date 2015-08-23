@@ -68,6 +68,10 @@ public final class Request {
                     if (mBuilder.mUploadProgress != null)
                         mBuilder.mUploadProgress.mRequest = this;
                     conn.setDoOutput(true);
+                    conn.connect();
+                    if (mBuilder.mInfoCallback != null)
+                        mBuilder.mInfoCallback.onConnected(this);
+
                     OutputStream os = null;
                     try {
                         os = conn.getOutputStream();
@@ -83,9 +87,15 @@ public final class Request {
                                     mBuilder.mBody.length, Method.name(method()), url());
                         }
                         os.flush();
+                        if (mBuilder.mInfoCallback != null)
+                            mBuilder.mInfoCallback.onRequestSent(this);
                     } finally {
                         BridgeUtil.closeQuietly(os);
                     }
+                } else {
+                    conn.connect();
+                    if (mBuilder.mInfoCallback != null)
+                        mBuilder.mInfoCallback.onConnected(this);
                 }
 
                 checkCancelled();

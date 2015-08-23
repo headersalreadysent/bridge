@@ -34,6 +34,7 @@ public final class RequestBuilder implements AsResultsExceptions {
     protected boolean mThrowIfNotSuccess = false;
     protected ResponseValidator[] mValidators;
     protected ProgressCallback mUploadProgress;
+    protected InfoCallback mInfoCallback;
 
     protected RequestBuilder(String url, @Request.MethodInt int method, Bridge context) {
         mContext = context;
@@ -164,6 +165,11 @@ public final class RequestBuilder implements AsResultsExceptions {
 
     public RequestBuilder uploadProgress(@NonNull ProgressCallback callback) {
         mUploadProgress = callback;
+        return this;
+    }
+
+    public RequestBuilder infoCallback(@NonNull InfoCallback callback) {
+        mInfoCallback = callback;
         return this;
     }
 

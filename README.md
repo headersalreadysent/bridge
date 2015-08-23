@@ -17,7 +17,7 @@ Then, add Bridge to your dependencies list:
 
 ```gradle
 dependencies {
-    compile 'com.afollestad:bridge:1.6.1'
+    compile 'com.afollestad:bridge:1.6.2'
 }
 ```
 
@@ -35,6 +35,7 @@ dependencies {
         3. [MultipartForms](https://github.com/afollestad/bridge#multipartforms)
         4. [Streaming (Pipe)](https://github.com/afollestad/bridge#streaming-pipe)
         5. [Upload Progress](https://github.com/afollestad/bridge#upload-progress)
+    5. [Info Callback](https://github.com/afollestad/bridge#info-callback)
 2. [Responses](https://github.com/afollestad/bridge#responses)
     1. [Headers](https://github.com/afollestad/bridge#headers-1)
     2. [Bodies](https://github.com/afollestad/bridge#bodies-1)
@@ -317,6 +318,36 @@ Bridge.client()
 **Note**: this only works effectively with Pipes (streams). If you specify non-stream data, upload is one step and can't be monitored.
 
 ------
+
+### Info Callback
+
+You can set an info callback to receive various events, including a connection being established, and request
+bodies being sent:
+
+```java
+Bridge.client()
+    .get("https://www.google.com")
+    .infoCallback(new InfoCallback() {
+        @Override
+        public void onConnected(Request request) {
+            // Connection to Google established
+        }
+
+        @Override
+        public void onRequestSent(Request request) {
+            // This method is optional to override
+            // Indicates request body was sent to Google
+        }
+    })
+    .request(new Callback() {
+        @Override
+        public void response(Request request, Response response, BridgeException e) {
+            // Response received from Google
+        }
+    });
+```
+
+---
 
 # Responses
 
