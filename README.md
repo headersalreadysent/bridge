@@ -217,7 +217,8 @@ Here's a basic example of how it's done:
 MultipartForm form = new MultipartForm()
     .add("Subject", "Hello")
     .add("Body", "Hey, how are you?")
-    .add("FileUpload", new File("/sdcard/Download/ToUpload.txt"));
+    .add("FileUpload", new File("/sdcard/Download/ToUpload.txt"))
+    .add("FileUpload2", "ToUpload2.mp4", Pipe.forFile(new File("/sdcard/Download/ToUpload2.mp4")));
 
 String response = Bridge.client()
     .post("http://someurl.com/post")
