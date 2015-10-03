@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +23,7 @@ import java.util.Map;
 /**
  * @author Aidan Follestad (afollestad)
  */
-public final class Response implements AsResults {
+public final class Response implements AsResults, Serializable {
 
     private final String mUrl;
     private final byte[] mData;

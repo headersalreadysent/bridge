@@ -6,6 +6,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.net.HttpURLConnection;
@@ -17,7 +18,7 @@ import java.util.Map;
 /**
  * @author Aidan Follestad (afollestad)
  */
-public final class Request {
+public final class Request implements Serializable {
 
     @IntDef({Method.GET, Method.POST, Method.PUT, Method.DELETE})
     @Retention(RetentionPolicy.SOURCE)

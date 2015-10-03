@@ -9,13 +9,14 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
 /**
  * @author Aidan Follestad (afollestad)
  */
-public final class RequestBuilder implements AsResultsExceptions {
+public final class RequestBuilder implements AsResultsExceptions, Serializable {
 
     protected final Bridge mContext;
     protected final String mUrl;
