@@ -4,7 +4,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author Aidan Follestad (afollestad)
@@ -18,7 +17,7 @@ public final class Config {
     }
 
     protected String mHost;
-    protected Map<String, Object> mDefaultHeaders;
+    protected HashMap<String, Object> mDefaultHeaders;
     protected int mConnectTimeout = 10000;
     protected int mReadTimeout = 15000;
     protected int mBufferSize = 1024 * 4;

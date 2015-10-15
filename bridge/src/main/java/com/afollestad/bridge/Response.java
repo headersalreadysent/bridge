@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,12 +30,12 @@ public final class Response implements AsResults, Serializable {
     private final byte[] mData;
     private int mCode = -1;
     private String mMessage;
-    private Bitmap mBitmapCache;
-    private JSONObject mJsonObjCache;
-    private JSONArray mJsonArrayCache;
-    private Map<String, List<String>> mHeaders;
+    private transient Bitmap mBitmapCache;
+    private transient JSONObject mJsonObjCache;
+    private transient JSONArray mJsonArrayCache;
+    private HashMap<String, List<String>> mHeaders;
 
-    protected Response(byte[] data, String url, int code, String message, Map<String, List<String>> headers) throws IOException {
+    protected Response(byte[] data, String url, int code, String message, HashMap<String, List<String>> headers) throws IOException {
         mData = data;
         mUrl = url;
         mCode = code;

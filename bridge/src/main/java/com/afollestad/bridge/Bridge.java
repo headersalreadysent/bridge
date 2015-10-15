@@ -3,6 +3,7 @@ package com.afollestad.bridge;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.HashMap;
@@ -13,14 +14,14 @@ import java.util.regex.Pattern;
 /**
  * @author Aidan Follestad (afollestad)
  */
-public class Bridge {
+public class Bridge implements Serializable {
 
     private static Bridge mBridge;
     private static Config mConfig;
 
     protected static final Object LOCK = new Object();
 
-    private Map<String, CallbackStack> mRequestMap;
+    private HashMap<String, CallbackStack> mRequestMap;
 
     protected boolean pushCallback(Request request, Callback callback) {
         synchronized (LOCK) {

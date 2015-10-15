@@ -13,7 +13,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Aidan Follestad (afollestad)
@@ -44,7 +43,7 @@ public final class Request implements Serializable {
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             int responseCode = -1;
             String responseMessage = "";
-            Map<String, List<String>> responseHeaders = new HashMap<>();
+            HashMap<String, List<String>> responseHeaders = new HashMap<>();
 
             try {
                 conn.setReadTimeout(mBuilder.mReadTimeout);
@@ -106,7 +105,7 @@ public final class Request implements Serializable {
 
                 responseCode = conn.getResponseCode();
                 responseMessage = conn.getResponseMessage();
-                responseHeaders = conn.getHeaderFields();
+                responseHeaders = new HashMap<>(conn.getHeaderFields());
                 Log.d(Request.this, "%s %s status: %s %s", Method.name(method()), url(), responseCode, responseMessage);
 
                 try {

@@ -11,6 +11,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -23,7 +24,7 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
     protected final
     @Request.MethodInt
     int mMethod;
-    protected Map<String, Object> mHeaders;
+    protected HashMap<String, Object> mHeaders;
     protected byte[] mBody;
     protected Pipe mPipe;
     protected int mConnectTimeout;

@@ -9,11 +9,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 
 /**
  * @author Aidan Follestad (afollestad)
  */
-public abstract class Pipe {
+public abstract class Pipe implements Serializable {
 
     public Pipe() {
     }

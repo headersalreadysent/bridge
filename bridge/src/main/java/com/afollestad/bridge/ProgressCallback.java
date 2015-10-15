@@ -1,9 +1,11 @@
 package com.afollestad.bridge;
 
+import java.io.Serializable;
+
 /**
  * @author Aidan Follestad (afollestad)
  */
-public abstract class ProgressCallback {
+public abstract class ProgressCallback implements Serializable {
 
     protected Request mRequest;
     protected int mLastPercent = -1;
