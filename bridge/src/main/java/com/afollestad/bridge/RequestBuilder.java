@@ -207,7 +207,7 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
                         mContext.fireCallbacks(mRequest, response, null);
                     } catch (final BridgeException e) {
                         if (mRequest.mCancelCallbackFired) return;
-                        mContext.fireCallbacks(mRequest, null, e);
+                        mContext.fireCallbacks(mRequest, mRequest.getResponse(), e);
                     }
                 }
             }).start();
