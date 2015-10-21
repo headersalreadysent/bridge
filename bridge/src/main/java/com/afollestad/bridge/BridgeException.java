@@ -90,7 +90,11 @@ public class BridgeException extends Exception {
     }
 
     protected BridgeException(@NonNull Response response, @NonNull Exception e, @Reason int reason) {
-        super(String.format("%s: %s", response.toString(), e.getLocalizedMessage()), e);
+        this(response, e, reason, false);
+    }
+
+    protected BridgeException(@NonNull Response response, @NonNull Exception e, @Reason int reason, boolean forceString) {
+        super(String.format("%s: %s", forceString ? response.asString() : response.toString(), e.getLocalizedMessage()), e);
         if (e instanceof BridgeException)
             throw new IllegalArgumentException("BridgeException cannot wrap a BridgeException.");
         mResponse = response;

@@ -182,7 +182,7 @@ public final class Response implements AsResults, Serializable {
                     return new JSONArray(contentStr);
                 else return new JSONObject(contentStr);
             } catch (JSONException e) {
-                throw new BridgeException(this, e, BridgeException.REASON_RESPONSE_UNPARSEABLE);
+                throw new BridgeException(this, e, BridgeException.REASON_RESPONSE_UNPARSEABLE, true);
             }
         } else if (contentType.startsWith("image/")) {
             return asBitmap();
