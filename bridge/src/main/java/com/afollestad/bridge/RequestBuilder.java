@@ -40,13 +40,14 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
 
     protected RequestBuilder(String url, @Request.MethodInt int method, Bridge context) {
         mContext = context;
-        if (!url.startsWith("http") && Bridge.client().config().mHost != null)
-            url = Bridge.client().config().mHost + url;
+        final Config cf = Bridge.config();
+        if (!url.startsWith("http") && cf.mHost != null)
+            url = cf.mHost + url;
+
         Log.d(this, "%s %s", Method.name(method), url);
         mUrl = url;
         mMethod = method;
 
-        Config cf = Bridge.client().config();
         mHeaders = cf.mDefaultHeaders;
         mConnectTimeout = cf.mConnectTimeout;
         mReadTimeout = cf.mReadTimeout;

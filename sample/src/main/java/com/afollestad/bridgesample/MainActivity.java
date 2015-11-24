@@ -1,11 +1,15 @@
 package com.afollestad.bridgesample;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
 import com.afollestad.bridge.Bridge;
+import com.afollestad.bridge.Method;
+
+import java.util.TimerTask;
 
 /**
  * @author Aidan Follestad (afollestad)
@@ -25,6 +29,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        Bridge.client().cancelAll();
+        Bridge.destroy();
     }
 }

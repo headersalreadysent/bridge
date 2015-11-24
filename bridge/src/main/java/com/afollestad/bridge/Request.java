@@ -19,7 +19,7 @@ import java.util.List;
  */
 public final class Request implements Serializable {
 
-    @IntDef({Method.GET, Method.POST, Method.PUT, Method.DELETE})
+    @IntDef({Method.UNSPECIFIED, Method.GET, Method.POST, Method.PUT, Method.DELETE})
     @Retention(RetentionPolicy.SOURCE)
     public @interface MethodInt {
     }
@@ -115,7 +115,7 @@ public final class Request implements Serializable {
                 try {
                     is = conn.getInputStream();
                     bos = new ByteArrayOutputStream();
-                    byte[] buf = new byte[Bridge.client().config().mBufferSize];
+                    byte[] buf = new byte[Bridge.config().mBufferSize];
                     int read;
                     int totalRead = 0;
                     int totalAvailable;

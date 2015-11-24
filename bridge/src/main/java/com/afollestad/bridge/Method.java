@@ -5,6 +5,7 @@ package com.afollestad.bridge;
  */
 public final class Method {
 
+    protected final static int UNSPECIFIED = -1;
     public final static int GET = 1;
     public final static int PUT = 2;
     public final static int POST = 3;

@@ -20,37 +20,37 @@ final class Log {
     }
 
     public static void d(Object context, String message, Object... formatArgs) {
-        if (!Bridge.client().config().mLogging) return;
+        if (!Bridge.config().mLogging) return;
         android.util.Log.d(getTag(context), getMessage(message, formatArgs));
     }
 
     public static void v(Object context, String message, Object... formatArgs) {
-        if (!Bridge.client().config().mLogging) return;
+        if (!Bridge.config().mLogging) return;
         android.util.Log.v(getTag(context), getMessage(message, formatArgs));
     }
 
     public static void e(Object context, String message, Object... formatArgs) {
-        if (!Bridge.client().config().mLogging) return;
+        if (!Bridge.config().mLogging) return;
         android.util.Log.e(getTag(context), getMessage(message, formatArgs));
     }
 
     public static void i(Object context, String message, Object... formatArgs) {
-        if (!Bridge.client().config().mLogging) return;
+        if (!Bridge.config().mLogging) return;
         android.util.Log.i(getTag(context), getMessage(message, formatArgs));
     }
 
     public static void w(Object context, String message, Object... formatArgs) {
-        if (!Bridge.client().config().mLogging) return;
+        if (!Bridge.config().mLogging) return;
         android.util.Log.w(getTag(context), getMessage(message, formatArgs));
     }
 
     public static void wtf(Object context, String message, Object... formatArgs) {
-        if (!Bridge.client().config().mLogging) return;
+        if (!Bridge.config().mLogging) return;
         android.util.Log.wtf(getTag(context), getMessage(message, formatArgs));
     }
 
     public static void println(Object context, int priority, String message, Object... formatArgs) {
-        if (!Bridge.client().config().mLogging) return;
+        if (!Bridge.config().mLogging) return;
         android.util.Log.println(priority, getTag(context), getMessage(message, formatArgs));
     }
 

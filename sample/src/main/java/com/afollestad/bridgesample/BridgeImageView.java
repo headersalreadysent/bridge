@@ -41,8 +41,7 @@ public class BridgeImageView extends ImageView {
 
     @Override
     public void setImageURI(Uri uri) {
-        Bridge.client()
-                .get(uri.toString())
+        Bridge.get(uri.toString())
                 .cancellable(mCancelable)
                 .tag(mTag)
                 .request(new Callback() {

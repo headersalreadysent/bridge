@@ -26,7 +26,7 @@ public class BridgeUtil {
         ByteArrayOutputStream os = null;
         try {
             os = new ByteArrayOutputStream();
-            byte[] buffer = new byte[Bridge.client().config().mBufferSize];
+            byte[] buffer = new byte[Bridge.config().mBufferSize];
             int read;
             while ((read = is.read(buffer)) != -1)
                 os.write(buffer, 0, read);

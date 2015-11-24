@@ -24,7 +24,7 @@ public final class TransferPipe extends Pipe {
     @Override
     public void writeTo(@NonNull OutputStream os, @Nullable ProgressCallback progressCallback) throws IOException {
         try {
-            byte[] buffer = new byte[Bridge.client().config().mBufferSize];
+            byte[] buffer = new byte[Bridge.config().mBufferSize];
             int read;
             int totalRead = 0;
             while ((read = mIs.read(buffer)) != -1) {

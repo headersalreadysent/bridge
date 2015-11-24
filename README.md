@@ -17,7 +17,7 @@ Then, add Bridge to your dependencies list:
 
 ```gradle
 dependencies {
-    compile 'com.github.afollestad:bridge:1.6.4'
+    compile 'com.github.afollestad:bridge:1.7.0'
 }
 ```
 
@@ -70,7 +70,7 @@ dependencies {
 Here's a very basic GET `Request` that retrieves Google's home page and saves the content to a `String`.
 
 ```java
-Response response = Bridge.client()
+Response response = Bridge
     .get("http://www.google.com")
     .response();
 
@@ -86,7 +86,7 @@ if (!response.isSuccess()) {
 This could be shortened to:
 
 ```java
-String content = Bridge.client()
+String content = Bridge
     .get("http://www.google.com")
     .asString();
 ```
@@ -94,7 +94,7 @@ String content = Bridge.client()
 Behind the scenes, this is actually performing this:
 
 ```java
-String content = Bridge.client()
+String content = Bridge
     .get("http://www.google.com")
     .throwIfNotSuccess()
     .response()
@@ -111,7 +111,7 @@ When passing query parameters in a URL, you can use format args:
 
 ```java
 String searchQuery = "hello, how are you?";
-String content = Bridge.client()
+String content = Bridge
     .get("http://www.google.com/search?q=%s", searchQuery)
     .asString();
 // Do something with response
@@ -127,7 +127,7 @@ Changing or adding `Request` headers is pretty simple. You just use the `header(
 which can be chained to add multiple headers.
 
 ```java
-String content = Bridge.client()
+String content = Bridge
     .get("http://www.google.com")
     .header("User-Agent", "BridgeSampleProject")
     .header("CustomHeader", "Hello")
@@ -142,7 +142,7 @@ Map<String, Object> headersMap = new HashMap<>();
 headersMap.put("User-Agent", "BridgeSampleProject");
 headersMap.put("CustomHeader", "Hello");
 
-String content = Bridge.client()
+String content = Bridge
     .get("http://www.google.com")
     .headers(headersMap)
     .asString();
@@ -160,7 +160,7 @@ Here's a basic `POST` request that sends plain text in the body:
 
 ```java
 String postContent = "Hello, how are you?";
-String response = Bridge.client()
+String response = Bridge
     .post("http://someurl.com/post")
     .body(postContent)
     .asString();
@@ -194,7 +194,7 @@ Form form = new Form()
     .add("Username", "Aidan")
     .add("Password", "Hello");
 
-String response = Bridge.client()
+String response = Bridge
     .post("http://someurl.com/login")
     .body(form)
     .asString();
@@ -220,7 +220,7 @@ MultipartForm form = new MultipartForm()
     .add("FileUpload", new File("/sdcard/Download/ToUpload.txt"))
     .add("FileUpload2", "ToUpload2.mp4", Pipe.forFile(new File("/sdcard/Download/ToUpload2.mp4")));
 
-String response = Bridge.client()
+String response = Bridge
     .post("http://someurl.com/post")
     .body(form)
     .asString();
@@ -264,7 +264,7 @@ Pipe pipe = new Pipe() {
     }
 };
 
-String response = Bridge.client()
+String response = Bridge
     .post("http://someurl.com/post")
     .body(pipe)
     .asString();
@@ -298,7 +298,7 @@ you need to specify a Content-Type value in the second parameter.
 You can monitor upload progress like this:
 
 ```java
-Bridge.client()
+Bridge
     .post("http://someurl.com/upload")
     .body(Pipe.forUri(this, data.getData()))
     .throwIfNotSuccess()
@@ -326,7 +326,7 @@ You can set an info callback to receive various events, including a connection b
 bodies being sent:
 
 ```java
-Bridge.client()
+Bridge
     .get("https://www.google.com")
     .infoCallback(new InfoCallback() {
         @Override
@@ -497,7 +497,7 @@ within the above example code indicate where those reasons are generally used.
 Here's a basic example of an asynchronous request:
 
 ```java
-Bridge.client()
+Bridge
     .get("http://www.google.com")
     .request(new Callback() {
         @Override
@@ -523,7 +523,7 @@ Like synchronous requests, you can use `throwIfNotSuccess` to receive a `BridgeE
 reason `REASON_RESPONSE_UNSUCCESSFUL` if the status code is not successful:
 
 ```java
-Bridge.client()
+Bridge
     .get("http://www.google.com")
     .throwIfNotSuccess()
     .request(new Callback() {
@@ -545,7 +545,7 @@ Duplicate avoidance is a feature in this library that allows you to avoid making
 the same URL at the same time. For an example, if you were to do this...
 
 ```java
-Bridge.client()
+Bridge
     .get("http://www.google.com")
     .request(new Callback() {
         @Override
@@ -559,7 +559,7 @@ Bridge.client()
         }
     });
 
-Bridge.client()
+Bridge
     .get("http://www.google.com")
     .request(new Callback() {
         @Override
@@ -588,7 +588,7 @@ progress updates for response downloading. `current` is how many bytes have been
 bytes are available to be downloaded, and `percent` is the *current/total ratio times 100*.
 
 ```java
-Bridge.client()
+Bridge
     .get("http://someurl/bigfile.extension")
     .request(new Callback() {
         @Override
@@ -623,7 +623,7 @@ header.
 This library allows you easily cancel requests:
 
 ```java
-Request request = Bridge.client()
+Request request = Bridge
     .get("http://www.google.com")
     .request(new Callback() {
         @Override
@@ -637,7 +637,7 @@ Request request = Bridge.client()
         }
     });
 
-request.cancel();
+request.cancelAll();
 ```
 
 When a request is cancelled, the `BridgeException` will *not* be null (it will say the request was cancelled),
@@ -654,22 +654,23 @@ The `Bridge` singleton allows you to cancel managed **async** requests.
 This code will cancel all active requests, regardless of method or URL:
 
 ```java
-Bridge.client()
-    .cancelAll();
+Bridge.cancelAll().commit();
 ```
 
 ------
 
 ###### Method, URL/Regex
 
-The `cancelAll(Method, String)` allows you to cancel all active requests that match an HTTP method
+You can even cancel all active requests that match an HTTP method
 *and* a URL or regular expression pattern.
 
 This will cancel all GET requests to any URL starting with http:// and ending with `.png`:
 
 ```java
-Bridge.client()
-    .cancelAll(Method.GET, "http://.*\\.png");
+int count = Bridge.cancelAll()
+    .method(Method.GET)
+    .url("http://.*\\.png")
+    .commit();
 ```
 
 `.*` is a wildcard in regular expressions, `\\` escapes the period to make it literal.
@@ -678,8 +679,10 @@ If you want to cancel all requests to a specific URL, you can use `Pattern.quote
 that matches literal text:
 
 ```java
-Bridge.client()
-    .cancelAll(Method.GET, Pattern.quote("http://www.android.com/media/android_vector.jpg"));
+int count = Bridge.cancelAll()
+    .method(Method.GET)
+    .url(Pattern.quote("http://www.android.com/media/android_vector.jpg"))
+    .commit();
 ```
 
 ------
@@ -689,7 +692,7 @@ Bridge.client()
 When making a request, you can tag it with a value:
 
 ```java
-Bridge.client()
+Bridge
     .get("http://www.google.com")
     .tag("Hello!")
     .request(new Callback() {
@@ -711,19 +714,20 @@ You can cancel all requests marked with a specific tag value:
 
 ```java
 // Add a second parameter with a value of true to cancel un-cancellable requests
-Bridge.client()
-    .cancelAll("Hello!");
+Bridge.cancelAll()
+    .tag("Hello!")
+    .commit();
 ```
 
 ### Preventing Cancellation
 
 There are certain situations in which you wouldn't want to allow a request to be cancelled. For an example,
-your app may make calls to `Bridge.client().cancelAll()` when an `Activity` pauses; that way, all requests
+your app may make calls to `Bridge.cancelAll().commit()` when an `Activity` pauses; that way, all requests
 that were active in that screen are cancelled. However, there may be a `Service` in your app that's making requests
 in the background that you would want to maintain. You can make those requests non-cancellable:
 
 ```java
-Bridge.client()
+Bridge
     .get("http://www.google.com")
     .cancellable(false)
     .request(new Callback() {
@@ -739,12 +743,19 @@ Bridge.client()
     });
 ```
 
-If you tried to make a call to `cancel()` on this `Request`, an `IllegalStateException` would be thrown.
+If you tried to make a call to `cancelAll()` on this `Request`, an `IllegalStateException` would be thrown.
 If you really want to cancel an un-cancellable request (`Request.isCancellable()` returns true), you
 can force it to be cancelled with `cancel(true)`.
 
-Un-cancellable requests will be ignored by `Bridge.cancelAll()` and the other variants of that method,
-unless you pass `true` for the `force` parameter.
+---
+
+Un-cancellable requests will be ignored by `Bridge.cancelAll()` unless cancellation is forced:
+
+```java
+Bridge.cancelAll()
+    .force()
+    .commit();
+```
 
 ------
 
@@ -769,7 +780,7 @@ ResponseValidator validator = new ResponseValidator() {
     }
 };
 try {
-    JSONObject response = Bridge.client()
+    JSONObject response = Bridge
         .get("http://www.someurl.com/api/test")
         .validators(validator)
         .asJsonObject();
@@ -797,7 +808,7 @@ ResponseValidator validatorOne = // ...
 ResponseValidator validatorTwo = // ...
 
 try {
-    JSONObject response = Bridge.client()
+    JSONObject response = Bridge
         .get("http://www.someurl.com/api/test")
         .validators(validatorOne, validatorTwo)
         .asJsonObject();
@@ -829,14 +840,14 @@ Bridge allows you configure various functions globally.
 You can set a host that is used as the base URL for every request.
 
 ```java
-Bridge.client().config()
+Bridge.config()
     .host("http://www.google.com");
 ```
 
 With Google's homepage set as the host, the code below would request `http://www.google.com/search?q=Hello`:
 
 ```java
-Bridge.client()
+Bridge
     .get("/search?q=%s", "Hello")
     .asString();
 ```
@@ -850,7 +861,7 @@ Default headers are headers that are automatically applied to every request. You
 yourself with every request in your app.
 
 ```java
-Bridge.client().config()
+Bridge.config()
     .defaultHeader("User-Agent", "Bridge Sample Code")
     .defaultHeader("Content-Type", "application/json")
     .defaultHeader("Via", "My App");
@@ -864,7 +875,7 @@ individual request level by setting the header as you normally would.
 You can configure how long the library will wait until timing out, either for connections or reading:
 
 ```java
-Bridge.client().config()
+Bridge.config()
     .connectTimeout(10000)
     .readTimeout(15000);
 ```
@@ -874,7 +885,7 @@ Bridge.client().config()
 You can set timeouts at the request level too:
 
 ```java
-Bridge.client()
+Bridge
     .get("http://someurl.com/bigVideo.mp4")
     .connectTimeout(10000)
     .readTimeout(15000)
@@ -890,7 +901,7 @@ byte array, which can affect memory usage, but it also increases the pace in whi
 The buffer size can easily be configured:
 
 ```java
-Bridge.client().config()
+Bridge.config()
     .bufferSize(1024 * 10);
 ```
 
@@ -901,7 +912,7 @@ Just remember to be careful with how much memory you consume, and test on variou
 You can set the buffer size at the request level too:
 
 ```java
-Bridge.client()
+Bridge
     .get("http://someurl.com/bigVideo.mp4")
     .bufferSize(1024 * 10)
     .asFile(new File("/sdcard/Download/bigVideo.mp4"));
@@ -914,7 +925,7 @@ Bridge.client()
 By default, logging is disabled. You can enable logging to see what the library is doing in your Logcat:
 
 ```java
-Bridge.client().config()
+Bridge.config()
     .logging(true);
 ```
 
@@ -924,7 +935,7 @@ Validators for individual requests were shown above. You can apply validators to
 in your application:
 
 ```java
-Bridge.client().config()
+Bridge.config()
     .validators(new ResponseValidator() {
         @Override
         public boolean validate(@NonNull Response response) throws Exception {
