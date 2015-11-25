@@ -637,7 +637,7 @@ Request request = Bridge
         }
     });
 
-request.cancelAll();
+request.cancel();
 ```
 
 When a request is cancelled, the `BridgeException` will *not* be null (it will say the request was cancelled),
