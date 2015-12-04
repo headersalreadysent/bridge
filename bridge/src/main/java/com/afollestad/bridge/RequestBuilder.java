@@ -3,6 +3,8 @@ package com.afollestad.bridge;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.UiThread;
+import android.support.annotation.WorkerThread;
 import android.text.Spanned;
 
 import org.json.JSONArray;
@@ -186,6 +188,7 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
         return this;
     }
 
+    @WorkerThread
     public Request request() throws BridgeException {
         return new Request(this).makeRequest();
     }
@@ -195,6 +198,7 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
         return this;
     }
 
+    @UiThread
     public Request request(Callback callback) {
         mRequest = new Request(this);
         if (mContext.pushCallback(mRequest, callback)) {
@@ -218,40 +222,49 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
 
     // Shortcut methods
 
+    @WorkerThread
     public Response response() throws BridgeException {
         return request().response();
     }
 
+    @WorkerThread
     public byte[] asBytes() throws BridgeException {
         return response().asBytes();
     }
 
+    @WorkerThread
     public String asString() throws BridgeException {
         return response().asString();
     }
 
+    @WorkerThread
     @Override
     public Spanned asHtml() throws BridgeException {
         return response().asHtml();
     }
 
+    @WorkerThread
     @Override
     public Bitmap asBitmap() throws BridgeException {
         return response().asBitmap();
     }
 
+    @WorkerThread
     public JSONObject asJsonObject() throws BridgeException {
         return response().asJsonObject();
     }
 
+    @WorkerThread
     public JSONArray asJsonArray() throws BridgeException {
         return response().asJsonArray();
     }
 
+    @WorkerThread
     public void asFile(File destination) throws BridgeException {
         response().asFile(destination);
     }
 
+    @WorkerThread
     @Override
     public Object asSuggested() throws BridgeException {
         return response().asSuggested();

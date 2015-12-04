@@ -1,6 +1,7 @@
 package com.afollestad.bridge;
 
 import android.support.annotation.IntDef;
+import android.support.annotation.WorkerThread;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
@@ -41,6 +42,7 @@ public final class Request implements Serializable {
         return mBuilder;
     }
 
+    @WorkerThread
     protected Request makeRequest() throws BridgeException {
         try {
             URL url = new URL(mBuilder.mUrl);
@@ -165,7 +167,7 @@ public final class Request implements Serializable {
                             responseMessage, responseHeaders);
                 } finally {
                     BridgeUtil.closeQuietly(es);
-                    if (conn != null) conn.disconnect();
+                    conn.disconnect();
                 }
             }
         } catch (Exception e) {
