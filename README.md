@@ -5,15 +5,22 @@ powered by Java/Android's URLConnection classes for maximum compatibility and sp
 
 # Gradle Dependency
 
-First, add JitPack.io to the repositories list in your app module's build.gradle file:
+### Repository
+
+Add this in your root `build.gradle` file (**not** your module `build.gradle` file):
 
 ```gradle
-repositories {
-    maven { url "https://jitpack.io" }
+allprojects {
+	repositories {
+		...
+		maven { url "https://jitpack.io" }
+	}
 }
 ```
 
-Then, add Bridge to your dependencies list:
+### Dependency
+
+Add this to your module's `build.gradle` file:
 
 ```gradle
 dependencies {
@@ -22,6 +29,8 @@ dependencies {
 ```
 
 [ ![JitPack Badge](https://img.shields.io/github/release/afollestad/bridge.svg?label=bridge) ](https://jitpack.io/#afollestad/bridge)
+
+---
 
 # Table of Contents
 
