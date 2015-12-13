@@ -521,8 +521,6 @@ class JsonConverter {
         } catch (Exception e) {
             throw new RuntimeException("Object to JSON body conversion failed: " + e.getMessage(), e);
         }
-
-        // TODO
         return result;
     }
 }
