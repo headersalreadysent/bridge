@@ -15,6 +15,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -24,6 +26,15 @@ import java.util.Map;
 class Converter {
 
     private Converter() {
+    }
+
+    private static List<Field> getAllFields(@NonNull Class<?> cls) {
+        final List<Field> fields = new ArrayList<>(Arrays.asList(cls.getDeclaredFields()));
+        while (cls.getSuperclass() != null) {
+            cls = cls.getSuperclass();
+            Collections.addAll(fields, cls.getDeclaredFields());
+        }
+        return fields;
     }
 
     private static boolean isShort(@NonNull Class<?> fieldType) {
@@ -227,7 +238,7 @@ class Converter {
     public static Object convert(@Nullable Object object, @NonNull Class<?> cls, @NonNull JSONObject responseBody, @Nullable Map<String, List<String>> headers) {
         if (object == null)
             object = newInstance(cls);
-        final Field[] fields = cls.getDeclaredFields();
+        final List<Field> fields = getAllFields(cls);
 
         for (Field fld : fields) {
             fld.setAccessible(true);
