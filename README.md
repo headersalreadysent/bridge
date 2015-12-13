@@ -644,6 +644,24 @@ Bridge
     });
 ```
 
+There's also a shortcuts to async response conversion:
+ 
+```java
+Bridge
+    .get("http://www.google.com")
+    .asString(new ResponseConvertCallback<String>() {
+        @Override
+        public void onResponse(@NonNull Response response, @Nullable String object, @Nullable BridgeException e) {
+            if (e != null) {
+                // See the 'Error Handling' section for information on how to process BridgeExceptions
+                int reason = e.reason();
+            } else {
+                // Use object parameter
+            }
+        }
+    });
+```
+
 ---
 
 ### Duplicate Avoidance

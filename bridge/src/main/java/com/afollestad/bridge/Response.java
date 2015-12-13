@@ -152,7 +152,7 @@ public final class Response implements AsResults, Serializable {
         }
     }
 
-    public void asFile(File destination) throws BridgeException {
+    public void asFile(@NonNull File destination) throws BridgeException {
         final byte[] content = asBytes();
         if (content == null)
             throw new BridgeException(this, "No content was returned in this response.", BridgeException.REASON_RESPONSE_UNPARSEABLE);

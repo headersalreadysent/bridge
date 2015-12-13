@@ -231,65 +231,176 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
     @Nullable
     @WorkerThread
     public byte[] asBytes() throws BridgeException {
+        throwIfNotSuccess();
         Response response = response();
         if (response == null) return null;
         return response.asBytes();
+    }
+
+    @Override
+    public void asBytes(final @NonNull ResponseConvertCallback<byte[]> callback) {
+        request(new Callback() {
+            @Override
+            public void response(Request request, Response response, BridgeException e) {
+                if (e != null)
+                    callback.onResponse(response, null, e);
+                else callback.onResponse(response, response.asBytes(), null);
+            }
+        });
     }
 
     @Nullable
     @WorkerThread
     @Override
     public String asString() throws BridgeException {
+        throwIfNotSuccess();
         Response response = response();
         if (response == null) return null;
         return response.asString();
+    }
+
+    @Override
+    public void asString(final @NonNull ResponseConvertCallback<String> callback) {
+        request(new Callback() {
+            @Override
+            public void response(Request request, Response response, BridgeException e) {
+                if (e != null)
+                    callback.onResponse(response, null, e);
+                else callback.onResponse(response, response.asString(), null);
+            }
+        });
     }
 
     @Nullable
     @WorkerThread
     @Override
     public Spanned asHtml() throws BridgeException {
+        throwIfNotSuccess();
         Response response = response();
         if (response == null) return null;
         return response.asHtml();
+    }
+
+    @Override
+    public void asHtml(final @NonNull ResponseConvertCallback<Spanned> callback) {
+        request(new Callback() {
+            @Override
+            public void response(Request request, Response response, BridgeException e) {
+                if (e != null)
+                    callback.onResponse(response, null, e);
+                else callback.onResponse(response, response.asHtml(), null);
+            }
+        });
     }
 
     @Nullable
     @WorkerThread
     @Override
     public Bitmap asBitmap() throws BridgeException {
+        throwIfNotSuccess();
         Response response = response();
         if (response == null) return null;
         return response.asBitmap();
     }
 
+    @Override
+    public void asBitmap(final @NonNull ResponseConvertCallback<Bitmap> callback) {
+        request(new Callback() {
+            @Override
+            public void response(Request request, Response response, BridgeException e) {
+                if (e != null)
+                    callback.onResponse(response, null, e);
+                else callback.onResponse(response, response.asBitmap(), null);
+            }
+        });
+    }
+
     @Nullable
     @WorkerThread
     public JSONObject asJsonObject() throws BridgeException {
+        throwIfNotSuccess();
         Response response = response();
         if (response == null) return null;
         return response.asJsonObject();
     }
 
+    @Override
+    public void asJsonObject(final @NonNull ResponseConvertCallback<JSONObject> callback) {
+        request(new Callback() {
+            @Override
+            public void response(Request request, Response response, BridgeException e) {
+                if (e != null) {
+                    callback.onResponse(response, null, e);
+                } else {
+                    try {
+                        callback.onResponse(response, response.asJsonObject(), null);
+                    } catch (BridgeException e1) {
+                        callback.onResponse(response, null, e1);
+                    }
+                }
+            }
+        });
+    }
+
     @Nullable
     @WorkerThread
     public JSONArray asJsonArray() throws BridgeException {
+        throwIfNotSuccess();
         Response response = response();
         if (response == null) return null;
         return response.asJsonArray();
     }
 
+    @Override
+    public void asJsonArray(final @NonNull ResponseConvertCallback<JSONArray> callback) {
+        request(new Callback() {
+            @Override
+            public void response(Request request, Response response, BridgeException e) {
+                if (e != null) {
+                    callback.onResponse(response, null, e);
+                } else {
+                    try {
+                        callback.onResponse(response, response.asJsonArray(), null);
+                    } catch (BridgeException e1) {
+                        callback.onResponse(response, null, e1);
+                    }
+                }
+            }
+        });
+    }
+
     @WorkerThread
-    public void asFile(File destination) throws BridgeException {
+    public void asFile(@NonNull File destination) throws BridgeException {
+        throwIfNotSuccess();
         Response response = response();
         if (response == null)
             throw new BridgeException(request(), "No response was returned to save into a file.", BridgeException.REASON_RESPONSE_UNPARSEABLE);
         response.asFile(destination);
     }
 
+    @Override
+    public void asFile(final @NonNull File destination, final @NonNull ResponseConvertCallback<File> callback) {
+        request(new Callback() {
+            @Override
+            public void response(Request request, Response response, BridgeException e) {
+                if (e != null) {
+                    callback.onResponse(response, null, e);
+                } else {
+                    try {
+                        response.asFile(destination);
+                        callback.onResponse(response, destination, null);
+                    } catch (BridgeException e1) {
+                        callback.onResponse(response, null, e1);
+                    }
+                }
+            }
+        });
+    }
+
     @Nullable
     @Override
     public <T> T asClass(@NonNull Class<T> cls) throws BridgeException {
+        throwIfNotSuccess();
         Response response = response();
         if (response == null) return null;
         return response.asClass(cls);
@@ -311,6 +422,7 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
     @Nullable
     @Override
     public <T> T[] asClassArray(@NonNull Class<T> cls) throws BridgeException {
+        throwIfNotSuccess();
         Response response = response();
         if (response == null) return null;
         return response.asClassArray(cls);
@@ -333,8 +445,27 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
     @WorkerThread
     @Override
     public Object asSuggested() throws BridgeException {
+        throwIfNotSuccess();
         Response response = response();
         if (response == null) return null;
         return response.asSuggested();
+    }
+
+    @Override
+    public void asSuggested(final @NonNull ResponseConvertCallback<Object> callback) {
+        request(new Callback() {
+            @Override
+            public void response(Request request, Response response, BridgeException e) {
+                if (e != null) {
+                    callback.onResponse(response, null, e);
+                } else {
+                    try {
+                        callback.onResponse(response, response.asSuggested(), null);
+                    } catch (BridgeException e1) {
+                        callback.onResponse(response, null, e1);
+                    }
+                }
+            }
+        });
     }
 }

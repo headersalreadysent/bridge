@@ -20,22 +20,36 @@ interface AsResultsExceptions {
     @Nullable
     byte[] asBytes() throws BridgeException;
 
+    void asBytes(@NonNull ResponseConvertCallback<byte[]> callback);
+
     @Nullable
     String asString() throws BridgeException;
+
+    void asString(@NonNull ResponseConvertCallback<String> callback);
 
     @Nullable
     Spanned asHtml() throws BridgeException;
 
+    void asHtml(@NonNull ResponseConvertCallback<Spanned> callback);
+
     @Nullable
     Bitmap asBitmap() throws BridgeException;
+
+    void asBitmap(@NonNull ResponseConvertCallback<Bitmap> callback);
 
     @Nullable
     JSONObject asJsonObject() throws BridgeException;
 
+    void asJsonObject(@NonNull ResponseConvertCallback<JSONObject> callback);
+
     @Nullable
     JSONArray asJsonArray() throws BridgeException;
 
-    void asFile(File destination) throws BridgeException;
+    void asJsonArray(@NonNull ResponseConvertCallback<JSONArray> callback);
+
+    void asFile(@NonNull File destination) throws BridgeException;
+
+    void asFile(@NonNull File destination, @NonNull ResponseConvertCallback<File> callback);
 
     @Nullable
     <T> T asClass(@NonNull Class<T> cls) throws BridgeException;
@@ -49,4 +63,6 @@ interface AsResultsExceptions {
 
     @Nullable
     Object asSuggested() throws BridgeException;
+
+    void asSuggested(@NonNull ResponseConvertCallback<Object> callback);
 }
