@@ -115,6 +115,8 @@ The shorter version makes use of `throwIfNotSuccess()` to automatically
 throw a `BridgeException` with the reason `REASON_RESPONSE_UNSUCCESSFUL`
 (see the [Error Handling](https://github.com/afollestad/bridge#error-handling) section) if `Response#isSuccess()` returns false.
 
+---
+
 ### URL Format Args
 
 When passing query parameters in a URL, you can use format args:
@@ -130,6 +132,8 @@ String content = Bridge
 This is using Java's `String.format()` method behind the scenes. The `searchQuery` variable replaces
 `%s` in your URL. You can have multiple format args, and they don't all have to be strings (e.g. `%d` for any number variable).
 Args that are strings will be automatically URL encoded for you.
+
+---
 
 ### Headers
 
@@ -161,6 +165,8 @@ String content = Bridge
 
 **Default headers**: see the [Configuration](https://github.com/afollestad/bridge#configuration) section
 for info on how to set default headers that are automatically included in every request.
+
+---
 
 ### Bodies
 
@@ -395,6 +401,8 @@ String contentType = response.contentType();
 int contentLength = response.contentLength();
 ```
 
+---
+
 ### Bodies
 
 The above examples all use `asString()` to save response content as a `String`. There are many other
@@ -431,6 +439,8 @@ response.asFile(new File("/sdcard/Download.extension"));
 // based on the Content-Type header.
 Object suggested = response.asSuggested();
 ```
+
+---
 
 ### Conversion
 
@@ -482,6 +492,8 @@ Bridge.get("http://www.example.com/test.json")
 ```
 
 **Note**: it's safe to have arrays and lists of custom classes. They'll be converted automatically like the object above.
+
+---
 
 ##### Array
 
@@ -631,6 +643,8 @@ Bridge
     });
 ```
 
+---
+
 ### Duplicate Avoidance
 
 Duplicate avoidance is a feature in this library that allows you to avoid making multiple requests to
@@ -672,6 +686,8 @@ would be called at the same time with the same response data.
 This lets you be very efficient on bandwidth and resource usage. If this library was being used to load images
 into `ImageView`'s, you could display 100 `ImageView`'s in a list, make a single request, and immediately populate
 all 100 `ImageView`'s with the same image at the same time. Check out the sample project to see this in action.
+
+---
 
 ### Download Progress Callbacks
 
@@ -734,6 +750,8 @@ request.cancel();
 
 When a request is cancelled, the `BridgeException` will *not* be null (it will say the request was cancelled),
 and `BridgeException#isCancelled()` will return true.
+
+---
 
 ### Cancelling Multiple Requests
 
@@ -810,6 +828,8 @@ Bridge.cancelAll()
     .tag("Hello!")
     .commit();
 ```
+
+---
 
 ### Preventing Cancellation
 
@@ -947,6 +967,8 @@ Bridge
 Basically, the URL you pass with each request is appended to the end of the host. If you were to pass a full
 URL (beginning with *HTTP*) in `get()` above, it would skip using the host for just that request.
 
+---
+
 ### Default Headers
 
 Default headers are headers that are automatically applied to every request. You don't have to do it
@@ -961,6 +983,8 @@ Bridge.config()
 
 Every request, regardless of the method, will include those headers. You can override them at the
 individual request level by setting the header as you normally would.
+
+---
 
 ### Timeouts
 
@@ -983,6 +1007,8 @@ Bridge
     .readTimeout(15000)
     .asFile(new File("/sdcard/Download/bigVideo.mp4"));
 ```
+
+---
 
 ### Buffer Size
 
@@ -1012,6 +1038,8 @@ Bridge
 
 **Note**: the buffer size is used in a few other places, such as pre-built `Pipe`'s (`Pipe#forUri`, `Pipe#forStream`, etc.).
 
+---
+
 ### Logging
 
 By default, logging is disabled. You can enable logging to see what the library is doing in your Logcat:
@@ -1020,6 +1048,8 @@ By default, logging is disabled. You can enable logging to see what the library 
 Bridge.config()
     .logging(true);
 ```
+
+---
 
 ### Validators
 
