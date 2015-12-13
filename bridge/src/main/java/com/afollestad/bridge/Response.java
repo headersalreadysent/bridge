@@ -170,12 +170,12 @@ public final class Response implements AsResults, Serializable {
 
     @Nullable
     public <T> T asClass(@NonNull Class<T> cls) {
-        return Converter.convert(cls, this);
+        return JsonConverter.convert(cls, this);
     }
 
     @Nullable
     public <T> T[] asClassArray(@NonNull Class<T> cls) {
-        return Converter.convertArray(cls, this);
+        return JsonConverter.convertArray(cls, this);
     }
 
     @Nullable
@@ -214,7 +214,8 @@ public final class Response implements AsResults, Serializable {
             suggested = asBytes();
         }
         String bodyDescriptor = suggested instanceof byte[] ?
-                String.format("%d bytes", ((byte[]) suggested).length) : (String) suggested;
+                String.format("%d bytes", ((byte[]) suggested).length) :
+                suggested != null ? suggested.toString() : "(null)";
         return String.format("%s, %d %s, %s", mUrl, mCode, mMessage, bodyDescriptor);
     }
 }

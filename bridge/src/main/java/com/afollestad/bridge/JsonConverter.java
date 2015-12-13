@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 
 import com.afollestad.bridge.annotations.Body;
 import com.afollestad.bridge.annotations.Header;
+import com.afollestad.bridge.annotations.Json;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,9 +24,9 @@ import java.util.Map;
 /**
  * @author Aidan Follestad (afollestad)
  */
-class Converter {
+class JsonConverter {
 
-    private Converter() {
+    private JsonConverter() {
     }
 
     private static List<Field> getAllFields(@NonNull Class<?> cls) {
@@ -63,6 +64,12 @@ class Converter {
 
     private static boolean isString(@NonNull Class<?> fieldType) {
         return fieldType == String.class;
+    }
+
+    private static boolean isPrimitive(@NonNull Class<?> fieldType) {
+        return isShort(fieldType) || isInteger(fieldType) || isLong(fieldType) ||
+                isFloat(fieldType) || isDouble(fieldType) ||
+                isBoolean(fieldType) || isShort(fieldType);
     }
 
     private static boolean isArray(@NonNull Class<?> fieldType) {
@@ -220,13 +227,22 @@ class Converter {
             return null;
         }
 
-        final JSONObject responseBody;
+        JSONObject responseBody;
         try {
             responseBody = response.asJsonObject();
             if (responseBody == null)
                 throw new RuntimeException("Response body is null.");
         } catch (BridgeException e) {
             throw new RuntimeException("Failed to convert response body to JSONObject: " + e.getMessage(), e);
+        }
+
+        Json annotation = cls.getAnnotation(Json.class);
+        if (annotation != null) {
+            try {
+                responseBody = responseBody.getJSONObject(annotation.name());
+            } catch (JSONException e) {
+                throw new RuntimeException("Failed to find root JSON object by the name of " + annotation.name());
+            }
         }
 
         //noinspection unchecked
@@ -254,17 +270,17 @@ class Converter {
                         if (headerValue == null) {
                             fld.set(object, null);
                         } else if (isShort(fieldType)) {
-                            fld.set(object, Short.parseShort(headerValue));
+                            fld.setShort(object, Short.parseShort(headerValue));
                         } else if (isInteger(fieldType)) {
-                            fld.set(object, Integer.parseInt(headerValue));
+                            fld.setInt(object, Integer.parseInt(headerValue));
                         } else if (isLong((fieldType))) {
-                            fld.set(object, Long.parseLong(headerValue));
+                            fld.setLong(object, Long.parseLong(headerValue));
                         } else if (isFloat(fieldType)) {
-                            fld.set(object, Float.parseFloat(headerValue));
+                            fld.setFloat(object, Float.parseFloat(headerValue));
                         } else if (isDouble(fieldType)) {
-                            fld.set(object, Double.parseDouble(headerValue));
+                            fld.setDouble(object, Double.parseDouble(headerValue));
                         } else if (isBoolean(fieldType)) {
-                            fld.set(object, Boolean.parseBoolean(headerValue));
+                            fld.setBoolean(object, Boolean.parseBoolean(headerValue));
                         } else if (isString(fieldType)) {
                             fld.set(object, headerValue);
                         } else {
@@ -284,54 +300,54 @@ class Converter {
                     final Object bodyValue = responseBody.isNull(bodyName) ? null : responseBody.get(bodyName);
                     if (isShort(fieldType)) {
                         if (bodyValue == null)
-                            fld.set(object, (short) 0);
+                            fld.setShort(object, (short) 0);
                         else if (bodyValue instanceof Short)
-                            fld.set(object, bodyValue);
+                            fld.setShort(object, (Short) bodyValue);
                         else
                             throw new Exception("Unexpected JSON value type " + bodyValue.getClass().getName());
                     } else if (isInteger(fieldType)) {
                         if (bodyValue == null)
-                            fld.set(object, 0);
+                            fld.setInt(object, 0);
                         else if (bodyValue instanceof Integer)
-                            fld.set(object, bodyValue);
+                            fld.setInt(object, (Integer) bodyValue);
                         else
                             throw new Exception("Unexpected JSON value type " + bodyValue.getClass().getName());
                     } else if (isLong(fieldType)) {
                         if (bodyValue == null)
-                            fld.set(object, 0L);
+                            fld.setLong(object, 0L);
                         else if (bodyValue instanceof Long)
-                            fld.set(object, bodyValue);
+                            fld.setLong(object, (Long) bodyValue);
                         else
                             throw new Exception("Unexpected JSON value type " + bodyValue.getClass().getName());
                     } else if (isFloat(fieldType)) {
                         if (bodyValue == null)
-                            fld.set(object, 0f);
+                            fld.setFloat(object, 0f);
                         else if (bodyValue instanceof Double)
-                            fld.set(object, ((Double) bodyValue).floatValue());
+                            fld.setFloat(object, ((Double) bodyValue).floatValue());
                         else if (bodyValue instanceof Float)
-                            fld.set(object, bodyValue);
+                            fld.setFloat(object, (Float) bodyValue);
                         else if (bodyValue instanceof Integer)
-                            fld.set(object, ((Integer) bodyValue).floatValue());
+                            fld.setFloat(object, ((Integer) bodyValue).floatValue());
                         else
                             throw new Exception("Unexpected JSON value type " + bodyValue.getClass().getName());
                     } else if (isDouble(fieldType)) {
                         if (bodyValue == null)
-                            fld.set(object, 0d);
+                            fld.setDouble(object, 0d);
                         else if (bodyValue instanceof Float)
-                            fld.set(object, ((Float) bodyValue).doubleValue());
+                            fld.setDouble(object, ((Float) bodyValue).doubleValue());
                         else if (bodyValue instanceof Double)
-                            fld.set(object, bodyValue);
+                            fld.setDouble(object, (Double) bodyValue);
                         else if (bodyValue instanceof Integer)
-                            fld.set(object, ((Integer) bodyValue).doubleValue());
+                            fld.setDouble(object, ((Integer) bodyValue).doubleValue());
                         else
                             throw new Exception("Unexpected JSON value type " + bodyValue.getClass().getName());
                     } else if (isBoolean(fieldType)) {
                         if (bodyValue == null)
-                            fld.set(object, false);
+                            fld.setBoolean(object, false);
                         else if (bodyValue instanceof Integer)
-                            fld.set(object, (Integer) bodyValue == 1);
+                            fld.setBoolean(object, (Integer) bodyValue == 1);
                         else if (bodyValue instanceof Boolean)
-                            fld.set(object, bodyValue);
+                            fld.setBoolean(object, (Boolean) bodyValue);
                         else
                             throw new Exception("Unexpected JSON value type " + bodyValue.getClass().getName());
                     } else if (isString(fieldType)) {
@@ -399,5 +415,114 @@ class Converter {
             throw new IllegalStateException("No default constructor found for " + cls.getName());
         ctor.setAccessible(true);
         return ctor;
+    }
+
+    @Nullable
+    public static JSONArray convertToJsonArray(@Nullable Object array) {
+        if (array == null) return null;
+        try {
+            JSONArray result = new JSONArray();
+            final Class<?> elementType = array.getClass().getComponentType();
+            if (isShort(elementType)) {
+                short[] values = (short[]) array;
+                for (short s : values) result.put(s);
+            } else if (isInteger(elementType)) {
+                int[] values = (int[]) array;
+                for (int i : values) result.put(i);
+            } else if (isLong(elementType)) {
+                long[] values = (long[]) array;
+                for (long l : values) result.put(l);
+            } else if (isFloat(elementType)) {
+                float[] values = (float[]) array;
+                for (float f : values) result.put(f);
+            } else if (isDouble(elementType)) {
+                double[] values = (double[]) array;
+                for (double d : values) result.put(d);
+            } else if (isBoolean(elementType)) {
+                boolean[] values = (boolean[]) array;
+                for (boolean b : values) result.put(b);
+            } else if (isString(elementType)) {
+                String[] values = (String[]) array;
+                for (String s : values) result.put(s);
+            } else {
+                Object[] objects = (Object[]) array;
+                for (Object obj : objects)
+                    result.put(convertToJsonObject(obj, null));
+            }
+            return result;
+        } catch (JSONException e) {
+            throw new RuntimeException("Failed to convert class " + array.getClass().getName() + " to JSON array.", e);
+        }
+    }
+
+    @Nullable
+    public static JSONArray convertToJsonArray(@Nullable List<?> array) {
+        if (array == null) return null;
+        JSONArray result = new JSONArray();
+        for (Object obj : array) {
+            if (isPrimitive(obj.getClass()))
+                result.put(obj);
+            else
+                result.put(convertToJsonObject(obj, null));
+        }
+        return result;
+    }
+
+    @Nullable
+    public static JSONObject convertToJsonObject(@Nullable Object object, @Nullable RequestBuilder request) {
+        if (object == null) return null;
+        JSONObject result = new JSONObject();
+        JSONObject jsonObject;
+
+        try {
+            Json objectAnnotation = object.getClass().getAnnotation(Json.class);
+            if (objectAnnotation != null) {
+                jsonObject = new JSONObject();
+                result.put(objectAnnotation.name(), jsonObject);
+            } else {
+                jsonObject = result;
+            }
+
+            final List<Field> fields = getAllFields(object.getClass());
+            for (Field fld : fields) {
+                fld.setAccessible(true);
+                if (request != null) {
+                    final Header headerAnnotation = fld.getAnnotation(Header.class);
+                    if (headerAnnotation != null)
+                        request.header(getName(fld, headerAnnotation), fld.get(object));
+                }
+                final Body bodyAnnotation = fld.getAnnotation(Body.class);
+                if (bodyAnnotation != null) {
+                    final Class<?> fieldType = fld.getType();
+                    final String targetName = getName(fld, bodyAnnotation);
+                    if (isShort(fieldType)) {
+                        jsonObject.put(targetName, fld.getShort(object));
+                    } else if (isInteger(fieldType)) {
+                        jsonObject.put(targetName, fld.getInt(object));
+                    } else if (isLong(fieldType)) {
+                        jsonObject.put(targetName, fld.getLong(object));
+                    } else if (isFloat(fieldType)) {
+                        jsonObject.put(targetName, fld.getFloat(object));
+                    } else if (isDouble(fieldType)) {
+                        jsonObject.put(targetName, fld.getDouble(object));
+                    } else if (isBoolean(fieldType)) {
+                        jsonObject.put(targetName, fld.getBoolean(object));
+                    } else if (isString(fieldType)) {
+                        jsonObject.put(targetName, fld.get(object));
+                    } else if (isArray(fieldType)) {
+                        jsonObject.put(targetName, convertToJsonArray(fld.get(object)));
+                    } else if (isArrayList(fieldType)) {
+                        jsonObject.put(targetName, convertToJsonArray((List<?>) fld.get(object)));
+                    } else {
+                        jsonObject.put(targetName, convertToJsonObject(fld.get(object), null));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Object to JSON body conversion failed: " + e.getMessage(), e);
+        }
+
+        // TODO
+        return result;
     }
 }

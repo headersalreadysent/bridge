@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -166,6 +167,35 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
 
     public RequestBuilder body(@NonNull File file) {
         return body(Pipe.forFile(file));
+    }
+
+    public RequestBuilder body(@Nullable Object object) {
+        body(object, true);
+        return this;
+    }
+
+    public RequestBuilder body(@Nullable Object object, boolean includeHeaders) {
+        header("Content-Type", "application/json");
+        JSONObject json = JsonConverter.convertToJsonObject(object, includeHeaders ? this : null);
+        if (json == null) mBody = null;
+        else body(json.toString());
+        return this;
+    }
+
+    public RequestBuilder body(@Nullable Object[] objects) {
+        header("Content-Type", "application/json");
+        JSONArray json = JsonConverter.convertToJsonArray(objects);
+        if (json == null) mBody = null;
+        else body(json.toString());
+        return this;
+    }
+
+    public RequestBuilder body(@Nullable List<Object> objects) {
+        header("Content-Type", "application/json");
+        JSONArray json = JsonConverter.convertToJsonArray(objects);
+        if (json == null) mBody = null;
+        else body(json.toString());
+        return this;
     }
 
     public RequestBuilder uploadProgress(@NonNull ProgressCallback callback) {

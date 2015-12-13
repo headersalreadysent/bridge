@@ -44,12 +44,13 @@ dependencies {
         2. [Forms](https://github.com/afollestad/bridge#forms)
         3. [MultipartForms](https://github.com/afollestad/bridge#multipartforms)
         4. [Streaming (Pipe)](https://github.com/afollestad/bridge#streaming-pipe)
-        5. [Upload Progress](https://github.com/afollestad/bridge#upload-progress)
+        5. [Class Conversion](https://github.com/afollestad/bridge#class-conversion)
+        6. [Upload Progress](https://github.com/afollestad/bridge#upload-progress)
     5. [Info Callback](https://github.com/afollestad/bridge#info-callback)
 2. [Responses](https://github.com/afollestad/bridge#responses)
     1. [Headers](https://github.com/afollestad/bridge#headers-1)
     2. [Bodies](https://github.com/afollestad/bridge#bodies-1)
-    3. [Conversion](https://github.com/afollestad/bridge#conversion)
+    3. [Class Conversion](https://github.com/afollestad/bridge#class-conversion-1)
 3. [Error Handling](https://github.com/afollestad/bridge#error-handling)
 4. [Async Requests, Duplicate Avoidance, and Progress Callbacks](https://github.com/afollestad/bridge#async-requests-and-duplicate-avoidance)
     1. [Example](https://github.com/afollestad/bridge#example)
@@ -310,6 +311,12 @@ you need to specify a Content-Type value in the second parameter.
 
 ------
 
+##### Class Conversion
+
+TODO
+
+------
+
 ##### Upload Progress
 
 You can monitor upload progress like this:
@@ -443,7 +450,7 @@ Object suggested = response.asSuggested();
 
 ---
 
-### Conversion
+### Class Conversion
 
 Bridge is capable of converting JSON responses directly to Java object or array instances.
 

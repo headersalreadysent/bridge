@@ -10,6 +10,8 @@ import android.util.Log;
 
 import com.afollestad.bridge.Bridge;
 import com.afollestad.bridge.BridgeException;
+import com.afollestad.bridge.Callback;
+import com.afollestad.bridge.Request;
 import com.afollestad.bridge.Response;
 import com.afollestad.bridge.ResponseConvertCallback;
 import com.afollestad.bridgesample.conversion.Example;
@@ -37,6 +39,15 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(@NonNull Response response, @Nullable Example object, @Nullable BridgeException e) {
                         Log.d("Test", "Test");
+
+                        Bridge.post("http://requestb.in/ssdw1xss")
+                                .body(object)
+                                .request(new Callback() {
+                                    @Override
+                                    public void response(Request request, Response response, BridgeException e) {
+                                        Log.d("Test", "Test");
+                                    }
+                                });
                     }
                 });
     }
