@@ -2,6 +2,7 @@ package com.afollestad.bridge;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.Html;
 import android.text.Spanned;
@@ -105,6 +106,7 @@ public final class Response implements AsResults, Serializable {
         }
     }
 
+    @Nullable
     @Override
     public Spanned asHtml() {
         final String content = asString();
@@ -113,6 +115,7 @@ public final class Response implements AsResults, Serializable {
         return Html.fromHtml(content);
     }
 
+    @Nullable
     @Override
     public Bitmap asBitmap() {
         if (mBitmapCache == null) {
@@ -123,10 +126,10 @@ public final class Response implements AsResults, Serializable {
         return mBitmapCache;
     }
 
+    @Nullable
     public JSONObject asJsonObject() throws BridgeException {
         final String content = asString();
-        if (content == null)
-            throw new BridgeException(this, "No content was returned in this response.", BridgeException.REASON_RESPONSE_UNPARSEABLE);
+        if (content == null) return null;
         try {
             if (mJsonObjCache == null)
                 mJsonObjCache = new JSONObject(content);
@@ -136,10 +139,10 @@ public final class Response implements AsResults, Serializable {
         }
     }
 
+    @Nullable
     public JSONArray asJsonArray() throws BridgeException {
         final String content = asString();
-        if (content == null)
-            throw new BridgeException(this, "No content was returned in this response.", BridgeException.REASON_RESPONSE_UNPARSEABLE);
+        if (content == null) return null;
         try {
             if (mJsonArrayCache == null)
                 mJsonArrayCache = new JSONArray(content);
@@ -165,6 +168,17 @@ public final class Response implements AsResults, Serializable {
         }
     }
 
+    @Nullable
+    public <T> T asClass(@NonNull Class<T> cls) {
+        return Converter.convert(cls, this);
+    }
+
+    @Nullable
+    public <T> T[] asClassArray(@NonNull Class<T> cls) {
+        return Converter.convertArray(cls, this);
+    }
+
+    @Nullable
     @Override
     public Object asSuggested() throws BridgeException {
         final String contentType = contentType();
@@ -190,6 +204,7 @@ public final class Response implements AsResults, Serializable {
         return asBytes();
     }
 
+    @Nullable
     @Override
     public String toString() {
         Object suggested;
@@ -199,7 +214,7 @@ public final class Response implements AsResults, Serializable {
             suggested = asBytes();
         }
         String bodyDescriptor = suggested instanceof byte[] ?
-                String.format("%d bytes", ((byte[]) suggested).length) : suggested.toString();
+                String.format("%d bytes", ((byte[]) suggested).length) : (String) suggested;
         return String.format("%s, %d %s, %s", mUrl, mCode, mMessage, bodyDescriptor);
     }
 }

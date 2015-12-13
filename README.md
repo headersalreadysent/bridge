@@ -48,6 +48,7 @@ dependencies {
 2. [Responses](https://github.com/afollestad/bridge#responses)
     1. [Headers](https://github.com/afollestad/bridge#headers-1)
     2. [Bodies](https://github.com/afollestad/bridge#bodies-1)
+    3. [Conversion](https://github.com/afollestad/bridge#conversion)
 3. [Error Handling](https://github.com/afollestad/bridge#error-handling)
 4. [Async Requests, Duplicate Avoidance, and Progress Callbacks](https://github.com/afollestad/bridge#async-requests-and-duplicate-avoidance)
     1. [Example](https://github.com/afollestad/bridge#example)
@@ -429,6 +430,88 @@ response.asFile(new File("/sdcard/Download.extension"));
 // Returns String, Spanned (for HTML), JSONObject, JSONArray, Bitmap, or byte[]
 // based on the Content-Type header.
 Object suggested = response.asSuggested();
+```
+
+### Conversion
+
+Bridge is capable of converting JSON responses directly to Java object or array instances.
+
+#### Object 
+
+Consider the following JSON response data:
+
+```json
+{
+    "full_name": "Aidan Follestad",
+    "age": 20,
+    "year": 2015
+}
+```
+
+First, you need a convertible class. Fields are marked up with `Header` or `Body` annotations,
+which can optionally include a `name` parameter *if* the you want the field name to be different 
+than the JSON field or HTTP Header name:
+
+```java
+public class ExampleObject {
+
+    @Header(name = "Content-Type")
+    public String contentType;
+    @Header(name = "Content-Length")
+    public long contentLength;
+
+    @Body(name = "full_name")
+    public String name;
+    @Body
+    public int age;
+    @Body
+    public int year;
+}
+```
+
+You would retrieve the object like this:
+
+```java
+Bridge.get("http://www.example.com/test.json")
+    .asClass(Example.class, new ResponseConvertCallback<Example>() {
+        @Override
+        public void onResponse(@NonNull Response response, @Nullable Example object, @Nullable BridgeException e) {
+            // Use the object
+        }
+    });
+```
+
+**Note**: it's safe to have arrays and lists of custom classes. They'll be converted automatically like the object above.
+
+#### Array
+
+Consider the following JSON response data:
+
+```json
+[
+    {
+        "full_name": "Aidan Follestad",
+        "age": 20,
+        "year": 2015
+    },
+    {
+        "full_name": "Jeff Follestad",
+        "age": 42,
+        "year": 2015
+    }
+]
+```
+
+Using the same class setup from the `Object` section, you could process the above JSON like this:
+
+```java
+Bridge.get("http://www.example.com/testarray.json")
+    .asClassArray(Example.class, new ResponseConvertCallback<Example[]>() {
+        @Override
+        public void onResponse(@NonNull Response response, @Nullable Example[] objects, @Nullable BridgeException e) {
+            // Use the objects
+        }
+    });
 ```
 
 ------

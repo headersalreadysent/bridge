@@ -222,51 +222,119 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
 
     // Shortcut methods
 
+    @Nullable
     @WorkerThread
     public Response response() throws BridgeException {
         return request().response();
     }
 
+    @Nullable
     @WorkerThread
     public byte[] asBytes() throws BridgeException {
-        return response().asBytes();
+        Response response = response();
+        if (response == null) return null;
+        return response.asBytes();
     }
 
+    @Nullable
     @WorkerThread
+    @Override
     public String asString() throws BridgeException {
-        return response().asString();
+        Response response = response();
+        if (response == null) return null;
+        return response.asString();
     }
 
+    @Nullable
     @WorkerThread
     @Override
     public Spanned asHtml() throws BridgeException {
-        return response().asHtml();
+        Response response = response();
+        if (response == null) return null;
+        return response.asHtml();
     }
 
+    @Nullable
     @WorkerThread
     @Override
     public Bitmap asBitmap() throws BridgeException {
-        return response().asBitmap();
+        Response response = response();
+        if (response == null) return null;
+        return response.asBitmap();
     }
 
+    @Nullable
     @WorkerThread
     public JSONObject asJsonObject() throws BridgeException {
-        return response().asJsonObject();
+        Response response = response();
+        if (response == null) return null;
+        return response.asJsonObject();
     }
 
+    @Nullable
     @WorkerThread
     public JSONArray asJsonArray() throws BridgeException {
-        return response().asJsonArray();
+        Response response = response();
+        if (response == null) return null;
+        return response.asJsonArray();
     }
 
     @WorkerThread
     public void asFile(File destination) throws BridgeException {
-        response().asFile(destination);
+        Response response = response();
+        if (response == null)
+            throw new BridgeException(request(), "No response was returned to save into a file.", BridgeException.REASON_RESPONSE_UNPARSEABLE);
+        response.asFile(destination);
     }
 
+    @Nullable
+    @Override
+    public <T> T asClass(@NonNull Class<T> cls) throws BridgeException {
+        Response response = response();
+        if (response == null) return null;
+        return response.asClass(cls);
+    }
+
+    @Override
+    public <T> void asClass(final @NonNull Class<T> cls, final @NonNull ResponseConvertCallback<T> callback) {
+        request(new Callback() {
+            @Override
+            public void response(Request request, Response response, BridgeException e) {
+                if (e != null)
+                    callback.onResponse(response, null, e);
+                else
+                    callback.onResponse(response, response.asClass(cls), null);
+            }
+        });
+    }
+
+    @Nullable
+    @Override
+    public <T> T[] asClassArray(@NonNull Class<T> cls) throws BridgeException {
+        Response response = response();
+        if (response == null) return null;
+        return response.asClassArray(cls);
+    }
+
+    @Override
+    public <T> void asClassArray(final @NonNull Class<T> cls, final @NonNull ResponseConvertCallback<T[]> callback) {
+        request(new Callback() {
+            @Override
+            public void response(Request request, Response response, BridgeException e) {
+                if (e != null)
+                    callback.onResponse(response, null, e);
+                else
+                    callback.onResponse(response, response.asClassArray(cls), null);
+            }
+        });
+    }
+
+    @Nullable
     @WorkerThread
     @Override
     public Object asSuggested() throws BridgeException {
-        return response().asSuggested();
+        Response response = response();
+        if (response == null) return null;
+        return response.asSuggested();
     }
 }
