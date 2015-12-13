@@ -2,12 +2,14 @@ package com.afollestad.bridgesample.conversion;
 
 import com.afollestad.bridge.annotations.Body;
 import com.afollestad.bridge.annotations.Header;
+import com.afollestad.bridge.annotations.Json;
 
 import java.util.List;
 
 /**
  * @author Aidan Follestad (afollestad)
  */
+@Json(name = "data")
 public class Example {
 
     public Example() {

@@ -22,7 +22,7 @@ import com.afollestad.bridgesample.conversion.Example;
 public class MainActivity extends AppCompatActivity {
 
     @SuppressWarnings("FieldCanBeLocal")
-    private static String TEST_URL = "https://gist.githubusercontent.com/afollestad/97a52c5af3091a9d7c66/raw/263570b66b7c222d532a43204ed3c378f488cb33/Test1.json";
+    private static String TEST_URL = "https://gist.githubusercontent.com/afollestad/97a52c5af3091a9d7c66/raw/6c305df8698df79a54033f3a8f37933bcef55979/hellobridge.json";
 //    private static String TEST_URL = "https://gist.githubusercontent.com/afollestad/a21a8456423aec64a3b4/raw/ed5aa53e7153bb1136ed1c489a58923f58be963b/test4.json";
 
     @Override
