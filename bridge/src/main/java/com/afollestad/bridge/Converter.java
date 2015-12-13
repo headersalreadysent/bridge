@@ -85,7 +85,7 @@ class Converter {
         if (response.asBytes() == null || contentType == null ||
                 (!contentType.startsWith("application/json") &&
                         !contentType.startsWith("text/plain"))) {
-            return null;
+            throw new RuntimeException("Unexpected Content-Type for Object conversion: " + contentType);
         }
         final JSONArray responseBody;
         try {

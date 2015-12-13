@@ -24,7 +24,7 @@ Add this to your module's `build.gradle` file:
 
 ```gradle
 dependencies {
-    compile 'com.github.afollestad:bridge:1.7.0'
+    compile 'com.github.afollestad:bridge:2.0.0'
 }
 ```
 
