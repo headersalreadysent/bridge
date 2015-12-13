@@ -170,7 +170,7 @@ for info on how to set default headers that are automatically included in every 
 
 ### Bodies
 
-###### Plain
+##### Plain
 
 Here's a basic `POST` request that sends plain text in the body:
 
@@ -198,7 +198,7 @@ to `application/json`. `Form`, `MultipartForm`, and `Pipe` will be discussed in 
 
 ------
 
-###### Forms
+##### Forms
 
 `Form`'s are commonly used with PUT/POST requests. They're basically the same thing as query strings
 with get requests, but the parameters are included in the body of the request rather than the URL.
@@ -220,7 +220,7 @@ This will automatically set the `Content-Type` header to `application/x-www-form
 
 ------
 
-###### MultipartForms
+##### MultipartForms
 
 A `MultipartForm` is a bit different than a regular form. Content is added as a "part" to the request body.
 The content is included as raw data associated with a content type, allowing you to include entire files.
@@ -250,7 +250,7 @@ this indirectly for you.
 
 ------
 
-###### Streaming (Pipe)
+##### Streaming (Pipe)
 
 Bridge allows you to stream data directly into a post body:
 
@@ -309,7 +309,7 @@ you need to specify a Content-Type value in the second parameter.
 
 ------
 
-###### Upload Progress
+##### Upload Progress
 
 You can monitor upload progress like this:
 
