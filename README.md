@@ -436,7 +436,7 @@ Object suggested = response.asSuggested();
 
 Bridge is capable of converting JSON responses directly to Java object or array instances.
 
-#### Object 
+##### Object 
 
 Consider the following JSON response data:
 
@@ -483,7 +483,7 @@ Bridge.get("http://www.example.com/test.json")
 
 **Note**: it's safe to have arrays and lists of custom classes. They'll be converted automatically like the object above.
 
-#### Array
+##### Array
 
 Consider the following JSON response data:
 
