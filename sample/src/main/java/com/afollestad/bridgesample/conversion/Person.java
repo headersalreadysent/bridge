@@ -1,40 +1,26 @@
 package com.afollestad.bridgesample.conversion;
 
 import com.afollestad.bridge.annotations.Body;
-import com.afollestad.bridge.annotations.Header;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.afollestad.bridge.annotations.ContentType;
 
 /**
  * @author Aidan Follestad (afollestad)
  */
+@ContentType("application/json")
 public class Person {
 
     public Person() {
     }
 
+    public Person(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
     @Body
     public String name;
     @Body
-    public short age;
+    public int age;
     @Body
-    public int year;
-    @Body
-    public long skill;
-    @Body
-    public double rank;
-    @Body(name = "f_age")
-    public float fAge;
-    @Body(name = "is_programmer")
-    public boolean isProgrammer;
-    @Body
-    public SimplePerson girlfriend;
-    @Body
-    public SimplePerson[] parents;
-    @Body
-    public List<SimplePerson> friends;
-
-    @Header(name = "Custom-Header")
-    public String myHeader = "hello";
+    public Person girlfriend;
 }

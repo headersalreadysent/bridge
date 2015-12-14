@@ -915,10 +915,169 @@ Bridge.destroy();
 
 # Request Conversion
 
-TODO
+Bridge's request conversion feature allows you to use Java object instances directly as a request body. 
+Objects are serialized directly into a format such as JSON.
+
+### JSON Request Conversion
+
+Take this class for an example:
+
+```java
+@ContentType("application/json")
+public class Person {
+
+    public Person() {
+    }
+
+    public Person(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    @Header(name = "Custom-Header")
+    public String customHeader;
+
+    @Body(name = "full_name")
+    public String name;
+    @Body
+    public int age;
+    @Body
+    public Person spouse;   
+}
+```
+
+The `ContentType` annotation is used to lookup what request converter should be used. The annotation's value
+also gets applied as the `Content-Type` header of requests the object is passed in to.
+
+The `Header` annotation can be used to apply request header values.
+
+The `Body` annotations indicate fields that are serialized into the response body. The optional name
+parameter can be used if the output name of the field should be different than the actual name of the field.
+
+You can use instances of this class as a request body. Fields not marked with the `Header` or `Body`
+annotation are ignored.
+
+```java
+Person person = new Person("Aidan Follestad", 20);
+person.girlfriend = new Person("Waverly Moua", 18);
+Request request = Bridge
+    .post("https://someurl.com/post.js")
+    .body(person)
+    .request();
+```
+
+You can even send arrays or lists of this object as a request body (and it gets converted to a JSON Array):
+
+```java
+Person[] people = new People[] {
+    new Person("Aidan Follestad", 20),
+    new Person("Waverly Moua", 18)
+};
+Request request = Bridge
+    .post("https://someurl.com/post.js")
+    .body(people)
+    .request();
+```
+
+### Request Conversion API
+
+Bridge comes stock with a JSON request converter, but the API is extensible for people like you.
+
+See the [JsonRequestConverter](https://github.com/afollestad/bridge/blob/master/bridge/src/main/java/com/afollestad/bridge/conversion/JsonRequestConverter.java) 
+source code for an example of how a `RequestConverter` is made. It should come off as simple.
 
 ---
 
 # Response Conversion
 
-TODO
+Bridge's response conversion feature allows you convert responses directly to Java object instances. Objects
+are de-serialized from a format such as jSON.
+
+### JSON Response Conversion
+
+Take this class for an example (notice that the `ContentType` annotation is not used with response 
+conversion, but it should be left there if you plan on using request conversion):
+
+```java
+public class Person {
+
+    public Person() {
+    }
+
+    public Person(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    @Header(name = "Custom-Header")
+    public String customHeader;
+
+    @Body(name = "full_name")
+    public String name;
+    @Body
+    public int age;
+    @Body
+    public Person spouse;   
+}
+```
+
+Imagine a URL that returns JSON like this:
+
+```json
+{
+    "name": "Aidan Follestad",
+    "age": 20,
+    "spouse": {
+        "name": "Waverly Moua",
+        "age": 18
+    }
+}
+```
+
+You can retrieve that URL and convert the contents directly to a `Person` instance like this:
+
+```java
+Bridge.get("https://www.someurl.com/person.json")
+    .asClass(Person.class, new ResponseConvertCallback<Person>() {
+        @Override
+        public void onResponse(@NonNull Response response, @Nullable Person object, @Nullable BridgeException e) {
+            // Use response object
+        }
+    });
+```
+
+You can even retrieve arrays of JSON:
+
+```json
+[
+    {
+        "name": "Aidan Follestad",
+        "age": 20,
+        "spouse": {
+            "name": "Waverly Moua",
+            "age": 18
+        }
+    },
+    {
+        "name": "Waverly Moua",
+        "age": 18
+    }
+]
+```
+
+```java
+Bridge.get("https://www.someurl.com/person_array.json")
+    .asClassArray(Person.class, new ResponseConvertCallback<Person[]>() {
+        @Override
+        public void onResponse(@NonNull Response response, @Nullable Person[] objects, @Nullable BridgeException e) {
+            // Use response objects
+        }
+    });
+```
+
+### Response Conversion API
+
+Bridge comes stock with a JSON response converter, but the API is extensible for people like you.
+
+See the [JsonResponseConverter](https://github.com/afollestad/bridge/blob/master/bridge/src/main/java/com/afollestad/bridge/conversion/JsonResponseConverter.java) 
+source code for an example of how a `ResponseConverter` is made. It should come off as simple.

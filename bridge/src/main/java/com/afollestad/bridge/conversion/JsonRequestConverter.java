@@ -22,10 +22,12 @@ public class JsonRequestConverter extends RequestConverter<JSONObject, JSONArray
 
     @Override
     public void onPrepare(@NonNull RequestBuilder request, @NonNull Object object) throws Exception {
+        // Not used in the JsonRequestConverter, called before conversion of an object begins
     }
 
     @Override
     public void onPrepare(@NonNull RequestBuilder request, @NonNull Object[] objects) throws Exception {
+        // not used in the JsonRequestConverter, called before conversion of an object array begins
     }
 
     @Override
