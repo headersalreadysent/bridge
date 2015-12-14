@@ -73,6 +73,19 @@ public class JsonResponseConverter extends ResponseConverter {
     }
 
     @Override
+    public int getResponseArrayLength(@NonNull Response response) throws Exception {
+        //noinspection ConstantConditions
+        return response.asJsonArray().length();
+    }
+
+    @Nullable
+    @Override
+    public Object getValueFromResponseArray(@NonNull Response response, @IntRange(from = 0, to = Integer.MAX_VALUE - 1) int index) throws Exception {
+        //noinspection ConstantConditions
+        return response.asJsonArray().get(index);
+    }
+
+    @Override
     public int getResponseArrayLength(@NonNull Object array) {
         return ((JSONArray) array).length();
     }

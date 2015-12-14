@@ -14,4 +14,6 @@ public class SimplePerson {
     public String name;
     @Body
     public int age;
+    @Body
+    public float rank;
 }

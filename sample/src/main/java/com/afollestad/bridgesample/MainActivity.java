@@ -14,6 +14,7 @@ import com.afollestad.bridge.Response;
 import com.afollestad.bridge.ResponseConvertCallback;
 import com.afollestad.bridge.conversion.JsonResponseConverter;
 import com.afollestad.bridgesample.conversion.Person;
+import com.afollestad.bridgesample.conversion.SimplePerson;
 
 /**
  * @author Aidan Follestad (afollestad)
@@ -21,7 +22,7 @@ import com.afollestad.bridgesample.conversion.Person;
 public class MainActivity extends AppCompatActivity {
 
     @SuppressWarnings("FieldCanBeLocal")
-    private static String TEST_URL = "https://gist.githubusercontent.com/afollestad/d72de6a32804b0f6e1e6/raw/80bab66f19980feec7672f38ecfe09a500dda3bb/user.json";
+    private static String TEST_URL = "https://gist.githubusercontent.com/afollestad/b2ff13a08239b74d25c5/raw/725403b7cad2d42662006ec727c050cbbfe400e6/users.json";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,9 +36,9 @@ public class MainActivity extends AppCompatActivity {
         Bridge.config()
                 .responseConverter("text/plain", new JsonResponseConverter());
         Bridge.get(TEST_URL)
-                .asClass(Person.class, new ResponseConvertCallback<Person>() {
+                .asClassArray(SimplePerson.class, new ResponseConvertCallback<SimplePerson[]>() {
                     @Override
-                    public void onResponse(@NonNull Response response, @Nullable Person object, @Nullable BridgeException e) {
+                    public void onResponse(@NonNull Response response, @Nullable SimplePerson[] objects, @Nullable BridgeException e) {
                         Log.d("Test", "Test");
                     }
                 });

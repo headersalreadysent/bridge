@@ -26,8 +26,8 @@ public abstract class ResponseConverter extends Converter {
     }
 
     @Nullable
-    public final <T> T convert(@NonNull Response response, @NonNull Class<T> targetCls) {
-        byte[] responseContent = response.asBytes();
+    public final <T> T convertObject(@NonNull Response response, @NonNull Class<T> targetCls) {
+        final byte[] responseContent = response.asBytes();
         if (responseContent == null || responseContent.length == 0) return null;
         T object = BridgeUtil.newInstance(targetCls);
         try {
@@ -44,6 +44,37 @@ public abstract class ResponseConverter extends Converter {
                     targetCls.getName(), e.getMessage()), e);
         }
         return object;
+    }
+
+    public final <T> T[] convertArray(@NonNull Response response, @NonNull Class<T> targetCls) {
+        final byte[] responseContent = response.asBytes();
+        if (responseContent == null || responseContent.length == 0) return null;
+        final int size;
+        try {
+            size = getResponseArrayLength(response);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to get the size of a response's array: " + e.getMessage(), e);
+        }
+        final Object array = Array.newInstance(targetCls, size);
+
+        for (int i = 0; i < size; i++) {
+            Object value;
+            try {
+                final Object originalValue = getValueFromResponseArray(response, i);
+                if (originalValue == null) {
+                    value = null;
+                } else {
+                    final ResponseConverter converter = spawnConverter(targetCls, originalValue, response);
+                    value = converter.convertObject(response, targetCls);
+                }
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to retrieve an element from response's array: " + e.getMessage(), e);
+            }
+            Array.set(array, i, value);
+        }
+
+        //noinspection unchecked
+        return (T[]) array;
     }
 
     @SuppressWarnings({"MismatchedQueryAndUpdateOfCollection", "unchecked"})
@@ -189,7 +220,7 @@ public abstract class ResponseConverter extends Converter {
                                         Array.set(array, i, value);
                                     } else {
                                         ResponseConverter converter = spawnConverter(elementType, value, response);
-                                        Array.set(array, i, converter.convert(response, elementType));
+                                        Array.set(array, i, converter.convertObject(response, elementType));
                                     }
                                 } catch (Throwable t) {
                                     throw new RuntimeException(String.format("Failed to get value from response array of elements %s: %s",
@@ -212,7 +243,7 @@ public abstract class ResponseConverter extends Converter {
                                         list.add(value);
                                     } else {
                                         ResponseConverter converter = spawnConverter(elementType, value, response);
-                                        list.add(converter.convert(response, elementType));
+                                        list.add(converter.convertObject(response, elementType));
                                     }
                                 } catch (Throwable t) {
                                     throw new RuntimeException(String.format("Failed to get value from response array of elements %s: %s",
@@ -227,7 +258,7 @@ public abstract class ResponseConverter extends Converter {
                         } else {
                             try {
                                 ResponseConverter converter = spawnConverter(field.getType(), responseValue, response);
-                                field.set(object, converter.convert(response, field.getType()));
+                                field.set(object, converter.convertObject(response, field.getType()));
                             } catch (Exception e) {
                                 throw new RuntimeException(String.format("Failed to spawn a converter for field %s of type %s: %s",
                                         field.getName(), field.getType().getName(), e.getMessage()), e);
@@ -249,6 +280,12 @@ public abstract class ResponseConverter extends Converter {
 
     @Nullable
     public abstract Object getValueFromResponse(@NonNull Field field, @FieldType int fieldType, @NonNull Class<?> cls) throws Exception;
+
+    @IntRange(from = 0, to = Integer.MAX_VALUE)
+    public abstract int getResponseArrayLength(@NonNull Response response) throws Exception;
+
+    @Nullable
+    public abstract Object getValueFromResponseArray(@NonNull Response response, @IntRange(from = 0, to = Integer.MAX_VALUE - 1) int index) throws Exception;
 
     @IntRange(from = 0, to = Integer.MAX_VALUE)
     public abstract int getResponseArrayLength(@NonNull Object array);

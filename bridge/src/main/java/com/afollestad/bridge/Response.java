@@ -175,13 +175,17 @@ public final class Response implements AsResults, Serializable {
             throw new IllegalStateException("Response has no Content-Type, cannot determine appropriate response converter.");
         return Bridge.config()
                 .responseConverter(contentType)
-                .convert(this, cls);
+                .convertObject(this, cls);
     }
 
     @Nullable
     public <T> T[] asClassArray(@NonNull Class<T> cls) {
-//        return JsonResponseConverter.convertArray(cls, this);
-        return null; // TODO
+        String contentType = contentType();
+        if (contentType == null)
+            throw new IllegalStateException("Response has no Content-Type, cannot determine appropriate response converter.");
+        return Bridge.config()
+                .responseConverter(contentType)
+                .convertArray(this, cls);
     }
 
     @Nullable
