@@ -115,11 +115,15 @@ public abstract class RequestConverter<ObjectType, ArrayType> extends Converter 
                     } else if (isArrayList(field.getType())) {
                         processList(output, fieldValue, field, fieldType, request);
                     } else {
-                        ObjectType child = processObject(fieldValue, request);
-                        onAttachObjectToParent(name, child, output);
+                        if (fieldValue == null) {
+                            onAttachObjectToParent(name, null, output);
+                        } else {
+                            ObjectType child = processObject(fieldValue, request);
+                            onAttachObjectToParent(name, child, output);
+                        }
                     }
                 } catch (Exception e) {
-                    throw new RuntimeException("Failed to attach " + name);
+                    throw new RuntimeException("Failed to attach " + name, e);
                 }
             }
         }
@@ -180,13 +184,13 @@ public abstract class RequestConverter<ObjectType, ArrayType> extends Converter 
     @NonNull
     public abstract String getFieldOutputName(@NonNull Field field) throws Exception;
 
-    public abstract void onAttachValueToObject(@NonNull String name, @NonNull ObjectType object, @NonNull Object value, @FieldType int fieldType) throws Exception;
+    public abstract void onAttachValueToObject(@NonNull String name, @NonNull ObjectType object, @Nullable Object value, @FieldType int fieldType) throws Exception;
 
-    public abstract void onAttachValueToArray(@NonNull ArrayType array, @NonNull Object value, @FieldType int fieldType) throws Exception;
+    public abstract void onAttachValueToArray(@NonNull ArrayType array, @Nullable Object value, @FieldType int fieldType) throws Exception;
 
-    public abstract void onAttachObjectToParent(@NonNull String name, @NonNull ObjectType object, @NonNull ObjectType parent) throws Exception;
+    public abstract void onAttachObjectToParent(@NonNull String name, @Nullable ObjectType object, @NonNull ObjectType parent) throws Exception;
 
-    public abstract void onAttachArrayToParent(@NonNull String name, @NonNull ArrayType array, @NonNull ObjectType parent) throws Exception;
+    public abstract void onAttachArrayToParent(@NonNull String name, @Nullable ArrayType array, @NonNull ObjectType parent) throws Exception;
 
     @Nullable
     public abstract byte[] onFinish(@NonNull ObjectType output, @NonNull RequestBuilder request, @NonNull Object object) throws Exception;

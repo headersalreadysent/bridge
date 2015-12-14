@@ -53,22 +53,22 @@ public class JsonRequestConverter extends RequestConverter<JSONObject, JSONArray
     }
 
     @Override
-    public void onAttachValueToObject(@NonNull String name, @NonNull JSONObject object, @NonNull Object value, @FieldType int fieldType) throws Exception {
+    public void onAttachValueToObject(@NonNull String name, @NonNull JSONObject object, @Nullable Object value, @FieldType int fieldType) throws Exception {
         object.put(name, value);
     }
 
     @Override
-    public void onAttachValueToArray(@NonNull JSONArray array, @NonNull Object value, @FieldType int fieldType) throws Exception {
+    public void onAttachValueToArray(@NonNull JSONArray array, @Nullable Object value, @FieldType int fieldType) throws Exception {
         array.put(value);
     }
 
     @Override
-    public void onAttachObjectToParent(@NonNull String name, @NonNull JSONObject object, @NonNull JSONObject parent) throws Exception {
+    public void onAttachObjectToParent(@NonNull String name, @Nullable JSONObject object, @NonNull JSONObject parent) throws Exception {
         parent.put(name, object);
     }
 
     @Override
-    public void onAttachArrayToParent(@NonNull String name, @NonNull JSONArray array, @NonNull JSONObject parent) throws Exception {
+    public void onAttachArrayToParent(@NonNull String name, @Nullable JSONArray array, @NonNull JSONObject parent) throws Exception {
         parent.put(name, array);
     }
 

@@ -43,8 +43,11 @@ public class MainActivity extends AppCompatActivity {
 //        };
 
         List<SimplePerson> friends = new ArrayList<>();
-        friends.add(new SimplePerson("Anthony Cole", 18));
-        friends.add(new SimplePerson("Waverly Moua", 18));
+        SimplePerson tony = new SimplePerson("Anthony Cole", 18);
+        friends.add(tony);
+        SimplePerson waverly = new SimplePerson("Waverly Moua", 18);
+        waverly.otherFriend = tony;
+        friends.add(waverly);
 
         Bridge.post("http://requestb.in/1khnw6o1")
                 .body(friends)
