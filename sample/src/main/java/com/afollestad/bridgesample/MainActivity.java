@@ -1,6 +1,8 @@
 package com.afollestad.bridgesample;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -11,6 +13,7 @@ import com.afollestad.bridge.BridgeException;
 import com.afollestad.bridge.Callback;
 import com.afollestad.bridge.Request;
 import com.afollestad.bridge.Response;
+import com.afollestad.bridge.ResponseConvertCallback;
 import com.afollestad.bridge.conversion.JsonResponseConverter;
 import com.afollestad.bridgesample.conversion.SimplePerson;
 
@@ -42,18 +45,17 @@ public class MainActivity extends AppCompatActivity {
 //                new SimplePerson("Natalie Micheal", 41)
 //        };
 
-        List<SimplePerson> friends = new ArrayList<>();
-        SimplePerson tony = new SimplePerson("Anthony Cole", 18);
-        friends.add(tony);
-        SimplePerson waverly = new SimplePerson("Waverly Moua", 18);
-        waverly.otherFriend = tony;
-        friends.add(waverly);
+//        List<SimplePerson> friends = new ArrayList<>();
+//        SimplePerson tony = new SimplePerson("Anthony Cole", 18);
+//        friends.add(tony);
+//        SimplePerson waverly = new SimplePerson("Waverly Moua", 18);
+//        waverly.otherFriend = tony;
+//        friends.add(waverly);
 
-        Bridge.post("http://requestb.in/1khnw6o1")
-                .body(friends)
-                .request(new Callback() {
+        Bridge.get("https://gist.githubusercontent.com/afollestad/c667d71f413586d6546b/raw/7c7b3a340f93056c9c7e6160118d1753f3dd0a1b/test.json")
+                .asClass(SimplePerson.class, new ResponseConvertCallback<SimplePerson>() {
                     @Override
-                    public void response(Request request, Response response, BridgeException e) {
+                    public void onResponse(@NonNull Response response, @Nullable SimplePerson object, @Nullable BridgeException e) {
                         Log.d("TEST", "Test");
                     }
                 });
