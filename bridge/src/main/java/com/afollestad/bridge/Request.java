@@ -34,10 +34,6 @@ public final class Request implements Serializable {
         mBuilder = builder;
     }
 
-    public Response getResponse() {
-        return mResponse;
-    }
-
     protected RequestBuilder builder() {
         return mBuilder;
     }
