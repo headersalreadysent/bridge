@@ -3,7 +3,9 @@ package com.afollestad.bridge;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.afollestad.bridge.conversion.JsonRequestConverter;
 import com.afollestad.bridge.conversion.JsonResponseConverter;
+import com.afollestad.bridge.conversion.base.RequestConverter;
 import com.afollestad.bridge.conversion.base.ResponseConverter;
 
 import java.util.HashMap;
@@ -17,6 +19,10 @@ public final class Config {
         mDefaultHeaders = new HashMap<>();
         mDefaultHeaders.put("User-Agent", "afollestad/Bridge");
         mDefaultHeaders.put("Content-Type", "text/plain");
+
+        mRequestConverters = new HashMap<>();
+        mRequestConverters.put("application/json", new JsonRequestConverter());
+
         mResponseConverters = new HashMap<>();
         mResponseConverters.put("application/json", new JsonResponseConverter());
     }
@@ -28,6 +34,7 @@ public final class Config {
     protected int mBufferSize = 1024 * 4;
     protected boolean mLogging = false;
     protected ResponseValidator[] mValidators;
+    protected HashMap<String, RequestConverter> mRequestConverters;
     protected HashMap<String, ResponseConverter> mResponseConverters;
 
     public Config host(@Nullable String host) {
@@ -88,6 +95,24 @@ public final class Config {
             mResponseConverters.remove(contentType);
         else
             mResponseConverters.put(contentType, converter);
+        return this;
+    }
+
+    @NonNull
+    public RequestConverter requestConverter(@NonNull String contentType) {
+        if (contentType.contains(";"))
+            contentType = contentType.split(";")[0];
+        RequestConverter converter = mRequestConverters.get(contentType);
+        if (converter == null)
+            throw new IllegalStateException("No request converter available for content type " + contentType);
+        return converter;
+    }
+
+    public Config requestConverter(@NonNull String contentType, @Nullable RequestConverter converter) {
+        if (converter == null)
+            mRequestConverters.remove(contentType);
+        else
+            mRequestConverters.put(contentType, converter);
         return this;
     }
 

@@ -10,10 +10,13 @@ public class SimplePerson {
     public SimplePerson() {
     }
 
+    public SimplePerson(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
     @Body
     public String name;
     @Body
     public int age;
-    @Body
-    public float rank;
 }

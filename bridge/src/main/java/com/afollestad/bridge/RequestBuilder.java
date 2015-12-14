@@ -7,7 +7,7 @@ import android.support.annotation.UiThread;
 import android.support.annotation.WorkerThread;
 import android.text.Spanned;
 
-import com.afollestad.bridge.conversion.JsonResponseConverter;
+import com.afollestad.bridge.conversion.base.RequestConverter;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -68,6 +68,10 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
     public RequestBuilder headers(@NonNull Map<String, ? extends Object> headers) {
         mHeaders.putAll(headers);
         return this;
+    }
+
+    public RequestBuilder contentType(@NonNull String contentType) {
+        return header("Content-Type", contentType);
     }
 
     public RequestBuilder connectTimeout(int timeout) {
@@ -172,16 +176,12 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
     }
 
     public RequestBuilder body(@Nullable Object object) {
-        body(object, true);
-        return this;
-    }
-
-    public RequestBuilder body(@Nullable Object object, boolean includeHeaders) {
-//        header("Content-Type", "application/json");
-//        JSONObject json = JsonResponseConverter.convertToJsonObject(object, includeHeaders ? this : null);
-//        if (json == null) mBody = null;
-//        else body(json.toString());
-        // TODO
+        if (object == null) {
+            mBody = null;
+        } else {
+            RequestConverter converter = Bridge.config().requestConverter((String) mHeaders.get("Content-Type"));
+            mBody = converter.convertObject(object, this);
+        }
         return this;
     }
 

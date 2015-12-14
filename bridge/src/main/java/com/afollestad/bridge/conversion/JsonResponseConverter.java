@@ -103,7 +103,7 @@ public class JsonResponseConverter extends ResponseConverter {
     }
 
     @Override
-    public void onFinish(@NonNull Object object, @NonNull Response response) throws Exception {
+    public void onFinish(@NonNull Response response, @NonNull Object object) throws Exception {
     }
 
     private String getName(@NonNull Field fld, @NonNull Body body) {

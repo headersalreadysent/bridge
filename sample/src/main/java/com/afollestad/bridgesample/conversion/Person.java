@@ -3,6 +3,7 @@ package com.afollestad.bridgesample.conversion;
 import com.afollestad.bridge.annotations.Body;
 import com.afollestad.bridge.annotations.Header;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -34,8 +35,6 @@ public class Person {
     @Body
     public List<SimplePerson> friends;
 
-    @Header(name = "Content-Type")
-    public String contentType;
-    @Header(name = "Content-Length")
-    public long contentLength;
+    @Header(name = "Custom-Header")
+    public String myHeader = "hello";
 }

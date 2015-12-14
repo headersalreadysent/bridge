@@ -19,12 +19,6 @@ import java.util.List;
  */
 public abstract class ResponseConverter extends Converter {
 
-    private String getName(@NonNull Field fld, @NonNull Header header) {
-        if (header.name() == null || header.name().trim().isEmpty())
-            return fld.getName();
-        return header.name();
-    }
-
     @Nullable
     public final <T> T convertObject(@NonNull Response response, @NonNull Class<T> targetCls) {
         final byte[] responseContent = response.asBytes();
@@ -38,7 +32,7 @@ public abstract class ResponseConverter extends Converter {
         }
         object = convertObject(object, targetCls, response);
         try {
-            onFinish(object, response);
+            onFinish(response, object);
         } catch (Exception e) {
             throw new RuntimeException(String.format("Failed to finish ResponseConverter for target class %s: %s",
                     targetCls.getName(), e.getMessage()), e);
@@ -55,22 +49,24 @@ public abstract class ResponseConverter extends Converter {
         } catch (Exception e) {
             throw new RuntimeException("Failed to get the size of a response's array: " + e.getMessage(), e);
         }
-        final Object array = Array.newInstance(targetCls, size);
 
-        for (int i = 0; i < size; i++) {
-            Object value;
-            try {
-                final Object originalValue = getValueFromResponseArray(response, i);
-                if (originalValue == null) {
-                    value = null;
-                } else {
-                    final ResponseConverter converter = spawnConverter(targetCls, originalValue, response);
-                    value = converter.convertObject(response, targetCls);
+        final Object array = Array.newInstance(targetCls, size);
+        if (size > 0) {
+            for (int i = 0; i < size; i++) {
+                Object value;
+                try {
+                    final Object originalValue = getValueFromResponseArray(response, i);
+                    if (originalValue == null) {
+                        value = null;
+                    } else {
+                        final ResponseConverter converter = spawnConverter(targetCls, originalValue, response);
+                        value = converter.convertObject(response, targetCls);
+                    }
+                } catch (Exception e) {
+                    throw new RuntimeException("Failed to retrieve an element from response's array: " + e.getMessage(), e);
                 }
-            } catch (Exception e) {
-                throw new RuntimeException("Failed to retrieve an element from response's array: " + e.getMessage(), e);
+                Array.set(array, i, value);
             }
-            Array.set(array, i, value);
         }
 
         //noinspection unchecked
@@ -90,7 +86,7 @@ public abstract class ResponseConverter extends Converter {
 
             Header headerAnnotation = field.getAnnotation(Header.class);
             if (headerAnnotation != null) {
-                final String headerValue = response.header(getName(field, headerAnnotation));
+                final String headerValue = response.header(getHeaderName(field, headerAnnotation));
                 try {
                     switch (fieldType) {
                         case Converter.FIELD_SHORT:
@@ -296,5 +292,5 @@ public abstract class ResponseConverter extends Converter {
     @NonNull
     public abstract ResponseConverter spawnConverter(@NonNull Class<?> forType, @NonNull Object responseValue, @NonNull Response response) throws Exception;
 
-    public abstract void onFinish(@NonNull Object object, @NonNull Response response) throws Exception;
+    public abstract void onFinish(@NonNull Response response, @NonNull Object object) throws Exception;
 }

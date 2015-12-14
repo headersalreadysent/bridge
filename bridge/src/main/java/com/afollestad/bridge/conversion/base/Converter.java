@@ -3,6 +3,8 @@ package com.afollestad.bridge.conversion.base;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 
+import com.afollestad.bridge.annotations.Header;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.Field;
@@ -16,6 +18,12 @@ import java.util.List;
  * @author Aidan Follestad (afollestad)
  */
 class Converter {
+
+    protected String getHeaderName(@NonNull Field fld, @NonNull Header header) {
+        if (header.name() == null || header.name().trim().isEmpty())
+            return fld.getName();
+        return header.name();
+    }
 
     protected List<Field> getAllFields(@NonNull Class<?> cls) {
         final List<Field> fields = new ArrayList<>(Arrays.asList(cls.getDeclaredFields()));
