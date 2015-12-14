@@ -1,6 +1,7 @@
 package com.afollestad.bridge.conversion;
 
 import android.annotation.SuppressLint;
+import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -8,6 +9,7 @@ import com.afollestad.bridge.Response;
 import com.afollestad.bridge.annotations.Body;
 import com.afollestad.bridge.conversion.base.ResponseConverter;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.lang.reflect.Field;
@@ -70,9 +72,20 @@ public class JsonResponseConverter extends ResponseConverter {
         }
     }
 
+    @Override
+    public int getResponseArrayLength(@NonNull Object array) {
+        return ((JSONArray) array).length();
+    }
+
+    @Nullable
+    @Override
+    public Object getValueFromResponseArray(@NonNull Object array, @IntRange(from = 0, to = Integer.MAX_VALUE - 1) int index) throws Exception {
+        return ((JSONArray) array).get(index);
+    }
+
     @NonNull
     @Override
-    public ResponseConverter spawnConverter(@NonNull Field field, @NonNull Object responseValue, @NonNull Response response) throws Exception {
+    public ResponseConverter spawnConverter(@NonNull Class<?> forType, @NonNull Object responseValue, @NonNull Response response) throws Exception {
         return new JsonResponseConverter((JSONObject) responseValue);
     }
 

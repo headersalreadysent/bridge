@@ -5,9 +5,9 @@ import com.afollestad.bridge.annotations.Body;
 /**
  * @author Aidan Follestad (afollestad)
  */
-public class ExampleSub {
+public class SimplePerson {
 
-    public ExampleSub() {
+    public SimplePerson() {
     }
 
     @Body

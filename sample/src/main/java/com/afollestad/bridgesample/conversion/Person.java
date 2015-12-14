@@ -3,6 +3,8 @@ package com.afollestad.bridgesample.conversion;
 import com.afollestad.bridge.annotations.Body;
 import com.afollestad.bridge.annotations.Header;
 
+import java.util.List;
+
 /**
  * @author Aidan Follestad (afollestad)
  */
@@ -26,7 +28,11 @@ public class Person {
     @Body(name = "is_programmer")
     public boolean isProgrammer;
     @Body
-    public Person girlfriend;
+    public SimplePerson girlfriend;
+    @Body
+    public SimplePerson[] parents;
+    @Body
+    public List<SimplePerson> friends;
 
     @Header(name = "Content-Type")
     public String contentType;

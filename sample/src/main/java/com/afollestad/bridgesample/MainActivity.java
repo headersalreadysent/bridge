@@ -21,7 +21,7 @@ import com.afollestad.bridgesample.conversion.Person;
 public class MainActivity extends AppCompatActivity {
 
     @SuppressWarnings("FieldCanBeLocal")
-    private static String TEST_URL = "https://gist.githubusercontent.com/afollestad/d72de6a32804b0f6e1e6/raw/970d087f856d9c3aba34c4d52a251b6bf7c2e559/user2.json";
+    private static String TEST_URL = "https://gist.githubusercontent.com/afollestad/d72de6a32804b0f6e1e6/raw/80bab66f19980feec7672f38ecfe09a500dda3bb/user.json";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

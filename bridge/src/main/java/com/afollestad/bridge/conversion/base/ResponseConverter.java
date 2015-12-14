@@ -1,6 +1,7 @@
 package com.afollestad.bridge.conversion.base;
 
 import android.annotation.SuppressLint;
+import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -8,7 +9,9 @@ import com.afollestad.bridge.BridgeUtil;
 import com.afollestad.bridge.Response;
 import com.afollestad.bridge.annotations.Header;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -43,6 +46,7 @@ public abstract class ResponseConverter extends Converter {
         return object;
     }
 
+    @SuppressWarnings({"MismatchedQueryAndUpdateOfCollection", "unchecked"})
     @SuppressLint("SwitchIntDef")
     private <T> T convertObject(@Nullable T object, @NonNull Class<T> targetCls, @NonNull Response response) {
         if (object == null)
@@ -172,19 +176,57 @@ public abstract class ResponseConverter extends Converter {
                                 break;
                         }
                     } else if (isArray(field.getType())) {
-                        if (responseValue == null)
+                        if (responseValue == null) {
                             field.set(object, null);
-                        else ; // TODO
+                        } else {
+                            final int size = getResponseArrayLength(responseValue);
+                            final Class<?> elementType = field.getType().getComponentType();
+                            final Object array = Array.newInstance(elementType, size);
+                            for (int i = 0; i < size; i++) {
+                                try {
+                                    final Object value = getValueFromResponseArray(responseValue, i);
+                                    if (value == null || isPrimitive(elementType)) {
+                                        Array.set(array, i, value);
+                                    } else {
+                                        ResponseConverter converter = spawnConverter(elementType, value, response);
+                                        Array.set(array, i, converter.convert(response, elementType));
+                                    }
+                                } catch (Throwable t) {
+                                    throw new RuntimeException(String.format("Failed to get value from response array of elements %s: %s",
+                                            elementType.getName(), t.getMessage()), t);
+                                }
+                            }
+                            field.set(object, array);
+                        }
                     } else if (isArrayList(field.getType())) {
-                        if (responseValue == null)
+                        if (responseValue == null) {
                             field.set(object, null);
-                        else ; // TODO
+                        } else {
+                            final int size = getResponseArrayLength(responseValue);
+                            final Class<?> elementType = getArrayListType(field);
+                            final List list = new ArrayList(size);
+                            for (int i = 0; i < size; i++) {
+                                try {
+                                    final Object value = getValueFromResponseArray(responseValue, i);
+                                    if (value == null || isPrimitive(elementType)) {
+                                        list.add(value);
+                                    } else {
+                                        ResponseConverter converter = spawnConverter(elementType, value, response);
+                                        list.add(converter.convert(response, elementType));
+                                    }
+                                } catch (Throwable t) {
+                                    throw new RuntimeException(String.format("Failed to get value from response array of elements %s: %s",
+                                            elementType.getName(), t.getMessage()), t);
+                                }
+                            }
+                            field.set(object, list);
+                        }
                     } else {
                         if (responseValue == null) {
                             field.set(object, null);
                         } else {
                             try {
-                                ResponseConverter converter = spawnConverter(field, responseValue, response);
+                                ResponseConverter converter = spawnConverter(field.getType(), responseValue, response);
                                 field.set(object, converter.convert(response, field.getType()));
                             } catch (Exception e) {
                                 throw new RuntimeException(String.format("Failed to spawn a converter for field %s of type %s: %s",
@@ -201,123 +243,6 @@ public abstract class ResponseConverter extends Converter {
         return object;
     }
 
-//    @Nullable
-//    private Object convertArray(@NonNull Class<?> cls, @Nullable JSONArray responseBody) {
-//        if (responseBody == null)
-//            return null;
-//        else if (responseBody.length() == 0)
-//            return Array.newInstance(cls, 0);
-//        try {
-//            if (isShort(cls)) {
-//                short[] array = (short[]) Array.newInstance(cls, responseBody.length());
-//                for (int i = 0; i < responseBody.length(); i++)
-//                    array[i] = ((Integer) responseBody.getInt(i)).shortValue();
-//                return array;
-//            } else if (isInteger(cls)) {
-//                int[] array = (int[]) Array.newInstance(cls, responseBody.length());
-//                for (int i = 0; i < responseBody.length(); i++)
-//                    array[i] = responseBody.getInt(i);
-//                return array;
-//            } else if (isLong(cls)) {
-//                long[] array = (long[]) Array.newInstance(cls, responseBody.length());
-//                for (int i = 0; i < responseBody.length(); i++)
-//                    array[i] = responseBody.getLong(i);
-//                return array;
-//            } else if (isFloat((cls))) {
-//                float[] array = (float[]) Array.newInstance(cls, responseBody.length());
-//                for (int i = 0; i < responseBody.length(); i++)
-//                    array[i] = (float) responseBody.getDouble(i);
-//                return array;
-//            } else if (isDouble(cls)) {
-//                double[] array = (double[]) Array.newInstance(cls, responseBody.length());
-//                for (int i = 0; i < responseBody.length(); i++)
-//                    array[i] = responseBody.getDouble(i);
-//                return array;
-//            } else if (isBoolean(cls)) {
-//                boolean[] array = (boolean[]) Array.newInstance(cls, responseBody.length());
-//                for (int i = 0; i < responseBody.length(); i++) {
-//                    Object val = responseBody.get(i);
-//                    if (val instanceof Integer)
-//                        array[i] = (Integer) val == 1;
-//                    else array[i] = (Boolean) val;
-//                }
-//                return array;
-//            } else if (isString(cls)) {
-//                String[] array = (String[]) Array.newInstance(cls, responseBody.length());
-//                for (int i = 0; i < responseBody.length(); i++)
-//                    array[i] = responseBody.getString(i);
-//                return array;
-//            } else if (isArray(cls)) {
-//                Object[] array = (Object[]) Array.newInstance(cls, responseBody.length());
-//                for (int i = 0; i < responseBody.length(); i++)
-//                    array[i] = convertArray(cls.getComponentType(), responseBody.getJSONArray(i));
-//                return array;
-//            } else if (isArrayList(cls)) {
-//                Object[] array = (Object[]) Array.newInstance(cls, responseBody.length());
-//                for (int i = 0; i < responseBody.length(); i++)
-//                    array[i] = convertList(cls.getComponentType(), responseBody.getJSONArray(i));
-//                return array;
-//            } else {
-//                Object[] array = (Object[]) Array.newInstance(cls, responseBody.length());
-//                for (int i = 0; i < responseBody.length(); i++)
-//                    array[i] = convertObject(null, cls, null);
-//                return array;
-//            }
-//        } catch (JSONException e) {
-//            throw new RuntimeException(String.format("Failed to process array value of type %s: %s",
-//                    cls.getName(), e.getMessage()), e);
-//        }
-//    }
-//
-//    @SuppressWarnings("unchecked")
-//    @Nullable
-//    private ArrayList convertList(@NonNull Class<?> cls, @Nullable JSONArray responseBody) {
-//        if (responseBody == null) return null;
-//        final ArrayList list = new ArrayList(responseBody.length());
-//        if (responseBody.length() == 0) return list;
-//        try {
-//            if (isShort(cls)) {
-//                for (int i = 0; i < responseBody.length(); i++)
-//                    list.add(((Integer) responseBody.getInt(i)).shortValue());
-//            } else if (isInteger(cls)) {
-//                for (int i = 0; i < responseBody.length(); i++)
-//                    list.add(responseBody.getInt(i));
-//            } else if (isLong(cls)) {
-//                for (int i = 0; i < responseBody.length(); i++)
-//                    list.add(responseBody.getLong(i));
-//            } else if (isFloat((cls))) {
-//                for (int i = 0; i < responseBody.length(); i++)
-//                    list.add((float) responseBody.getDouble(i));
-//            } else if (isDouble(cls)) {
-//                for (int i = 0; i < responseBody.length(); i++)
-//                    list.add(responseBody.getDouble(i));
-//            } else if (isBoolean(cls)) {
-//                for (int i = 0; i < responseBody.length(); i++) {
-//                    Object val = responseBody.get(i);
-//                    if (val instanceof Integer)
-//                        list.add((Integer) val == 1);
-//                    else list.add(val);
-//                }
-//            } else if (isString(cls)) {
-//                for (int i = 0; i < responseBody.length(); i++)
-//                    list.add(responseBody.getString(i));
-//            } else if (isArray(cls)) {
-//                for (int i = 0; i < responseBody.length(); i++)
-//                    list.add(convertArray(cls.getComponentType(), responseBody.getJSONArray(i)));
-//            } else if (isArrayList(cls)) {
-//                for (int i = 0; i < responseBody.length(); i++)
-//                    list.add(convertList(cls.getComponentType(), responseBody.getJSONArray(i)));
-//            } else {
-//                for (int i = 0; i < responseBody.length(); i++)
-//                    list.add(convertObject(null, cls, null));
-//            }
-//            return list;
-//        } catch (JSONException e) {
-//            throw new RuntimeException(String.format("Failed to process array value of type %s: %s",
-//                    cls.getName(), e.getMessage()), e);
-//        }
-//    }
-
     public abstract void onPrepare(@NonNull Response response, @NonNull Object object) throws Exception;
 
     public abstract boolean canConvertField(@NonNull Field field) throws Exception;
@@ -325,8 +250,14 @@ public abstract class ResponseConverter extends Converter {
     @Nullable
     public abstract Object getValueFromResponse(@NonNull Field field, @FieldType int fieldType, @NonNull Class<?> cls) throws Exception;
 
+    @IntRange(from = 0, to = Integer.MAX_VALUE)
+    public abstract int getResponseArrayLength(@NonNull Object array);
+
+    @Nullable
+    public abstract Object getValueFromResponseArray(@NonNull Object array, @IntRange(from = 0, to = Integer.MAX_VALUE - 1) int index) throws Exception;
+
     @NonNull
-    public abstract ResponseConverter spawnConverter(@NonNull Field field, @NonNull Object responseValue, @NonNull Response response) throws Exception;
+    public abstract ResponseConverter spawnConverter(@NonNull Class<?> forType, @NonNull Object responseValue, @NonNull Response response) throws Exception;
 
     public abstract void onFinish(@NonNull Object object, @NonNull Response response) throws Exception;
 }
