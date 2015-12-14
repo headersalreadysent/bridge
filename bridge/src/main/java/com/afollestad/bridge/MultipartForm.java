@@ -15,10 +15,18 @@ public final class MultipartForm {
     private final byte[] LINE_FEED = "\r\n".getBytes();
     private ByteArrayOutputStream mBos;
     private int mCount;
+    private String mEncoding;
 
     public MultipartForm() {
         BOUNDARY = String.format("------%d------", System.currentTimeMillis());
         mBos = new ByteArrayOutputStream();
+        mEncoding = "UTF-8";
+    }
+
+    public MultipartForm(@NonNull String encoding) {
+        BOUNDARY = String.format("------%d------", System.currentTimeMillis());
+        mBos = new ByteArrayOutputStream();
+        mEncoding = encoding;
     }
 
     public MultipartForm add(@NonNull String fieldName, @NonNull final File file) throws IOException {
@@ -54,10 +62,10 @@ public final class MultipartForm {
             mBos.write(LINE_FEED);
             mBos.write(String.format("Content-Disposition: form-data; name=\"%s\"", fieldName).getBytes());
             mBos.write(LINE_FEED);
-            mBos.write("Content-Type: text/plain; charset=utf-8".getBytes());
+            mBos.write(("Content-Type: text/plain; charset=" + mEncoding).getBytes());
             mBos.write(LINE_FEED);
             mBos.write(LINE_FEED);
-            mBos.write((value + "").getBytes());
+            mBos.write((value + "").getBytes(mEncoding));
         } catch (Exception e) {
             // Shouldn't happen
             throw new RuntimeException(e);
