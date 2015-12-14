@@ -26,7 +26,8 @@ public abstract class RequestConverter<ObjectType, ArrayType> extends Converter 
         return (String) defaultType;
     }
 
-    public final byte[] convertObject(@NonNull Object object, @NonNull RequestBuilder request) {
+    public final byte[] convertObject(@Nullable Object object, @NonNull RequestBuilder request) {
+        if (object == null) return null;
         try {
             onPrepare(request, object);
         } catch (Exception e) {
@@ -42,12 +43,14 @@ public abstract class RequestConverter<ObjectType, ArrayType> extends Converter 
         }
     }
 
-    public final byte[] convertList(@NonNull List list, @NonNull RequestBuilder request) {
+    public final byte[] convertList(@Nullable List list, @NonNull RequestBuilder request) {
+        if (list == null || list.size() == 0) return null;
         Object[] array = list.toArray();
         return convertArray(array, request);
     }
 
-    public final byte[] convertArray(@NonNull Object[] objects, @NonNull RequestBuilder request) {
+    public final byte[] convertArray(@Nullable Object[] objects, @NonNull RequestBuilder request) {
+        if (objects == null || objects.length == 0) return null;
         try {
             onPrepare(request, objects);
         } catch (Exception e) {
