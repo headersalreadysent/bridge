@@ -75,12 +75,12 @@ public class JsonRequestConverter extends RequestConverter<JSONObject, JSONArray
     @Nullable
     @Override
     public byte[] onFinish(@NonNull JSONObject output, @NonNull RequestBuilder request, @NonNull Object object) throws Exception {
-        return output.toString(8).getBytes("UTF-8");
+        return output.toString(4).getBytes("UTF-8");
     }
 
     @Nullable
     @Override
     public byte[] onFinish(@NonNull JSONArray output, @NonNull RequestBuilder request, @NonNull Object[] objects) throws Exception {
-        return output.toString(8).getBytes("UTF-8");
+        return output.toString(4).getBytes("UTF-8");
     }
 }

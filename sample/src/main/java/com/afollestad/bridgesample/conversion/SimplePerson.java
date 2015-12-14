@@ -6,7 +6,7 @@ import com.afollestad.bridge.annotations.ContentType;
 /**
  * @author Aidan Follestad (afollestad)
  */
-@ContentType("application/json; testing")
+@ContentType("application/json")
 public class SimplePerson {
 
     public SimplePerson() {

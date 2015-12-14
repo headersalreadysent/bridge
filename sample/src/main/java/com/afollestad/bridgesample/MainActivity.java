@@ -14,6 +14,9 @@ import com.afollestad.bridge.Response;
 import com.afollestad.bridge.conversion.JsonResponseConverter;
 import com.afollestad.bridgesample.conversion.SimplePerson;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Aidan Follestad (afollestad)
  */
@@ -34,17 +37,17 @@ public class MainActivity extends AppCompatActivity {
         Bridge.config()
                 .responseConverter("text/plain", new JsonResponseConverter());
 
-        SimplePerson[] people = new SimplePerson[]{
-                new SimplePerson("Jeffrey Follestad", 42),
-                new SimplePerson("Natalie Micheal", 41)
-        };
+//        SimplePerson[] people = new SimplePerson[]{
+//                new SimplePerson("Jeffrey Follestad", 42),
+//                new SimplePerson("Natalie Micheal", 41)
+//        };
 
-//        person.friends = new ArrayList<>();
-//        person.friends.add(new SimplePerson("Anthony Cole", 18));
-//        person.friends.add(new SimplePerson("Waverly Moua", 18));
+        List<SimplePerson> friends = new ArrayList<>();
+        friends.add(new SimplePerson("Anthony Cole", 18));
+        friends.add(new SimplePerson("Waverly Moua", 18));
 
         Bridge.post("http://requestb.in/1khnw6o1")
-                .body(people)
+                .body(friends)
                 .request(new Callback() {
                     @Override
                     public void response(Request request, Response response, BridgeException e) {

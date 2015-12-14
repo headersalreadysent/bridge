@@ -176,6 +176,10 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
     }
 
     public RequestBuilder body(@Nullable Object object) {
+        if (object instanceof List) {
+            //noinspection unchecked
+            return body((List) object);
+        }
         if (object == null) {
             mBody = null;
         } else {
