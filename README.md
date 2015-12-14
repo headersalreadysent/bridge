@@ -3,6 +3,56 @@
 Bridge is a simple but powerful HTTP networking library for Android. It features a Fluent chainable API,
 powered by Java/Android's URLConnection classes for maximum compatibility and speed.
 
+# Table of Contents
+
+### Traditional
+
+1. [Gradle Dependency](https://github.com/afollestad/bridge#gradle-dependency)
+	1. [Repository](https://github.com/afollestad/bridge#repository)
+	2. [Dependency](https://github.com/afollestad/bridge#dependency)
+2. [Requests](https://github.com/afollestad/bridge#requests)
+	1. [Request Basics](https://github.com/afollestad/bridge#request-basics)
+	2. [Request Headers](https://github.com/afollestad/bridge#request-headers)
+	3. [Request Bodies](https://github.com/afollestad/bridge#request-bodies)
+		1. [Plain Bodies](https://github.com/afollestad/bridge#plain-bodies)
+		2. [Form Bodies](https://github.com/afollestad/bridge#plain-bodies)
+		3. [MultipartForm Bodies](https://github.com/afollestad/bridge#plain-bodies)
+	4. [Streaming Bodies](https://github.com/afollestad/bridge#plain-bodies)
+	4. [Info Callbacks](https://github.com/afollestad/bridge#info-callbacks)
+3. [Responses](https://github.com/afollestad/bridge#responses)
+	1. [Response Basics](https://github.com/afollestad/bridge#response-basics)
+	2. [Response Bodies](https://github.com/afollestad/bridge#response-bodies)
+4. [Error Handling](https://github.com/afollestad/bridge#error-handling)
+5. [Async](https://github.com/afollestad/bridge#async)
+	1. [Async Requests](https://github.com/afollestad/bridge#async-requests)
+	2. [Duplicate Avoidance](https://github.com/afollestad/bridge#duplicate-avoidance)
+	3. [Upload Progress](https://github.com/afollestad/bridge#upload-progress)
+	4. [Download Progress](https://github.com/afollestad/bridge#download-progress)
+6. [Request Cancellation](https://github.com/afollestad/bridge#request-cancellation)
+	1. [Cancelling Single Requests](https://github.com/afollestad/bridge#cancelling-single-requests)
+	2. [Cancelling Multiple Requests](https://github.com/afollestad/bridge#cancelling-multiple-requests)
+	3. [Preventing Cancellation](https://github.com/afollestad/bridge#preventing-cancellation)
+7. [Validation](https://github.com/afollestad/bridge#validation)
+8. [Configuration](https://github.com/afollestad/bridge#configuration)
+	1. [Host Configuration](https://github.com/afollestad/bridge#host-configuration)
+	2. [Default Headers](https://github.com/afollestad/bridge#default-headers)
+	3. [Timeout Configuration](https://github.com/afollestad/bridge#timeout-configuration)
+	4. [Buffer Size](https://github.com/afollestad/bridge#buffer-size)
+	5. [Logging](https://github.com/afollestad/bridge#logging)
+	6. [Global Validators](https://github.com/afollestad/bridge#global-validators)
+9. [Cleanup](https://github.com/afollestad/bridge#cleanup)
+
+### Conversion
+
+1. [Request Conversion](https://github.com/afollestad/bridge#request-conversion)
+	1. [JSON Request Conversion](https://github.com/afollestad/bridge#json-request-conversion)
+	2. [Request Conversion API](https://github.com/afollestad/bridge#request-conversion-api)
+2. [Response Conversion](https://github.com/afollestad/bridge#response-conversion)
+	1. [JSON Response Conversion](https://github.com/afollestad/bridge#json-response-conversion)
+	2. [Response Conversion API](https://github.com/afollestad/bridge#response-conversion-api)
+
+---
+
 # Gradle Dependency
 
 ### Repository
@@ -25,7 +75,7 @@ Add this to your module's `build.gradle` file:
 ```gradle
 dependencies {
 	...
-	compile 'com.github.afollestad:bridge:2.0.0'
+	compile 'com.github.afollestad:bridge:3.0.0'
 }
 ```
 
@@ -33,203 +83,103 @@ dependencies {
 
 ---
 
-# Table of Contents
-
-1. [Requests](https://github.com/afollestad/bridge#requests)
-    1. [Basics](https://github.com/afollestad/bridge#basics)
-    2. [URL Format Args](https://github.com/afollestad/bridge#url-format-args)
-    3. [Headers](https://github.com/afollestad/bridge#headers)
-    4. [Bodies](https://github.com/afollestad/bridge#bodies)
-        1. [Plain](https://github.com/afollestad/bridge#plain)
-        2. [Forms](https://github.com/afollestad/bridge#forms)
-        3. [MultipartForms](https://github.com/afollestad/bridge#multipartforms)
-        4. [Streaming (Pipe)](https://github.com/afollestad/bridge#streaming-pipe)
-        5. [Class Conversion](https://github.com/afollestad/bridge#class-conversion)
-        6. [Upload Progress](https://github.com/afollestad/bridge#upload-progress)
-    5. [Info Callback](https://github.com/afollestad/bridge#info-callback)
-2. [Responses](https://github.com/afollestad/bridge#responses)
-    1. [Headers](https://github.com/afollestad/bridge#headers-1)
-    2. [Bodies](https://github.com/afollestad/bridge#bodies-1)
-    3. [Class Conversion](https://github.com/afollestad/bridge#class-conversion-1)
-3. [Error Handling](https://github.com/afollestad/bridge#error-handling)
-4. [Async Requests, Duplicate Avoidance, and Progress Callbacks](https://github.com/afollestad/bridge#async-requests-and-duplicate-avoidance)
-    1. [Example](https://github.com/afollestad/bridge#example)
-    2. [Duplicate Avoidance](https://github.com/afollestad/bridge#duplicate-avoidance)
-    3. [Download Progress Callbacks](https://github.com/afollestad/bridge#download-progress-callbacks)
-5. [Request Cancellation](https://github.com/afollestad/bridge#request-cancellation)
-    1. [Cancelling Individual Requests](https://github.com/afollestad/bridge#cancelling-individual-requests)
-    2. [Cancelling Multiple Requests](https://github.com/afollestad/bridge#cancelling-multiple-requests)
-        1. [All Active](https://github.com/afollestad/bridge#all-active)
-        1. [Method, URL/Regex](https://github.com/afollestad/bridge#method-urlregex)
-        2. [Tags](https://github.com/afollestad/bridge#tags)
-    3. [Preventing Cancellation](https://github.com/afollestad/bridge#preventing-cancellation)
-6. [Validators](https://github.com/afollestad/bridge#validators)
-7. [Global Configuration](https://github.com/afollestad/bridge#global-configuration)
-    1. [Host](https://github.com/afollestad/bridge#host)
-    2. [Default Headers](https://github.com/afollestad/bridge#default-headers)
-    3. [Timeouts](https://github.com/afollestad/bridge#timeouts)
-    4. [Buffer Size](https://github.com/afollestad/bridge#buffer-size)
-    5. [Logging](https://github.com/afollestad/bridge#logging)
-    6. [Validators](https://github.com/afollestad/bridge#validators-1)
-7. [Cleanup](https://github.com/afollestad/bridge#cleanup)
-
-------
-
 # Requests
 
-### Basics
+The request API in Bridge is very easy to use. 
 
-Here's a very basic GET `Request` that retrieves Google's home page and saves the content to a `String`.
+### Request Basics
 
-```java
-Response response = Bridge
-    .get("http://www.google.com")
-    .response();
-
-if (!response.isSuccess()) {
-    // Response code was not 200-300,
-    // decide what to do in this case.
-} else {
-    String responseContent = response.asString();
-    // Do something with response
-}
-```
-
-This could be shortened to:
+The code below will request Google's homepage:
 
 ```java
-String content = Bridge
-    .get("http://www.google.com")
-    .asString();
+Request request = Bridge
+	.get("https://www.google.com")
+	.request();
 ```
-
-Behind the scenes, this is actually performing this:
-
-```java
-String content = Bridge
-    .get("http://www.google.com")
-    .throwIfNotSuccess()
-    .response()
-    .asString();
-```
-
-The shorter version makes use of `throwIfNotSuccess()` to automatically
-throw a `BridgeException` with the reason `REASON_RESPONSE_UNSUCCESSFUL`
-(see the [Error Handling](https://github.com/afollestad/bridge#error-handling) section) if `Response#isSuccess()` returns false.
 
 ---
 
-### URL Format Args
-
-When passing query parameters in a URL, you can use format args:
+Bridge allows you to pass format args into request URLs (this applies to `get()`, `post()`, `put()`, `delete()`, etc.):
 
 ```java
-String searchQuery = "hello, how are you?";
-String content = Bridge
-    .get("http://www.google.com/search?q=%s", searchQuery)
-    .asString();
-// Do something with response
+Request request = Bridge
+	.get("https://www.google.com/search?q=%s", searchQuery)
+	.request();
 ```
 
-This is using Java's `String.format()` method behind the scenes. The `searchQuery` variable replaces
-`%s` in your URL. You can have multiple format args, and they don't all have to be strings (e.g. `%d` for any number variable).
-Args that are strings will be automatically URL encoded for you.
+There are two advantages to doing this when your requests require query parameters: 
+code readability is improved, no string. concatenation is necessary. The contents of
+the `searchQuery` variable are automatically URL encoded for you, e.g spaces are 
+replaced with `%20`.
 
----
+### Request Headers
 
-### Headers
-
-Changing or adding `Request` headers is pretty simple. You just use the `header(String, String)` method
-which can be chained to add multiple headers.
+Adding or changing request headers is pretty simple:
 
 ```java
-String content = Bridge
-    .get("http://www.google.com")
-    .header("User-Agent", "BridgeSampleProject")
-    .header("CustomHeader", "Hello")
-    .asString();
-// Do something with response
+Request request = Bridge
+	.get("https://www.google.com")
+	.header("User-Agent", "My App!")
+	.header("CustomHeader", "HelloWorld")
+	.request();
 ```
 
-You can also set a `Map` of headers:
+If you had the need to do so, you could also set a Map of headers with
+the `headers(Map<String, Object>)` method.
 
-```java
-Map<String, Object> headersMap = new HashMap<>();
-headersMap.put("User-Agent", "BridgeSampleProject");
-headersMap.put("CustomHeader", "Hello");
+**Note**: the [Configuration](https://github.com/afollestad/bridge#configuration)
+goes over how you can set default headers for all requests.
 
-String content = Bridge
-    .get("http://www.google.com")
-    .headers(headersMap)
-    .asString();
-// Do something with response
-```
+### Request Bodies
 
-**Default headers**: see the [Configuration](https://github.com/afollestad/bridge#configuration) section
-for info on how to set default headers that are automatically included in every request.
+A lot of networking libraries make request bodies a bit difficult. Bridge aims
+to make them easy.
 
----
+##### Plain Bodies
 
-### Bodies
-
-##### Plain
-
-Here's a basic `POST` request that sends plain text in the body:
+A description shouldn't be necessary for this:
 
 ```java
 String postContent = "Hello, how are you?";
-String response = Bridge
-    .post("http://someurl.com/post")
+Request request = Bridge
+    .post("https://someurl.com/post.js")
     .body(postContent)
-    .asString();
+	.request();
 ```
 
-Passing a `String` will automatically set the `Content-Type` header to `text/plain`. The `body()`
-method takes other various forms of data, including:
+In addition to passing a `String`, other types of "plain" bodies include:
 
-* Raw `byte[]` data
-* `JSONObject`/`JSONArray`
-* `Form`
-* `MultipartForm`
-* `Pipe`
-* `File`
+* byte[]
+* JSONObject
+* JSONArray 
 
-Byte arrays are obviously raw data. Passing a `JSONObject` or `JSONArray` will automatically set the `Content-Type` header
-to `application/json`. `Form`, `MultipartForm`, and `Pipe` will be discussed in the next few sections.
-`File` relies on the `Pipe` feature, it reads the file and sets the request body to the raw contents.
+There are other types of bodies discussed in the next few sections, along with 
+in the [Request Conversion](https://github.com/afollestad/bridge#request-conversion)
+section at the bottom (which is a bit more advanced).
 
-------
+##### Form Bodies
 
-##### Forms
-
-`Form`'s are commonly used with PUT/POST requests. They're basically the same thing as query strings
-with get requests, but the parameters are included in the body of the request rather than the URL.
-
-Here's a basic example of how it's done:
+`Form`'s are commonly used with PUT/POST requests. They're basically the same 
+thing as query strings with get requests, but the parameters are included in 
+the body of the request rather than the URL.
 
 ```java
 Form form = new Form()
     .add("Username", "Aidan")
     .add("Password", "Hello");
-
-String response = Bridge
-    .post("http://someurl.com/login")
+Request request = Bridge
+    .post("https://someurl.com/login.js")
     .body(form)
-    .asString();
+	.request();
 ```
 
-This will automatically set the `Content-Type` header to `application/x-www-form-urlencoded`.
+##### MultipartForm Bodies
 
-------
-
-##### MultipartForms
-
-A `MultipartForm` is a bit different than a regular form. Content is added as a "part" to the request body.
-The content is included as raw data associated with a content type, allowing you to include entire files.
-Multipart forms are commonly used in HTML forms (e.g. a contact form on a website), and they can be used
-for uploading files to a website.
-
-Here's a basic example of how it's done:
+A `MultipartForm` is a bit different than a regular form. Content is added as 
+a "part" to the request body. The content is included as raw data associated with 
+a content type, allowing you to include entire files. Multipart forms are commonly 
+used in HTML forms (e.g. a contact form on a website), and they can be used for 
+uploading files to a website.
 
 ```java
 MultipartForm form = new MultipartForm()
@@ -237,34 +187,29 @@ MultipartForm form = new MultipartForm()
     .add("Body", "Hey, how are you?")
     .add("FileUpload", new File("/sdcard/Download/ToUpload.txt"))
     .add("FileUpload2", "ToUpload2.mp4", Pipe.forFile(new File("/sdcard/Download/ToUpload2.mp4")));
-
-String response = Bridge
-    .post("http://someurl.com/post")
+Request request = Bridge
+    .post("https://someurl.com/post.js")
     .body(form)
-    .asString();
+    .request();
 ```
 
 This will automatically set the `Content-Type` header to `multipart/form-data`.
 
-**Note**: `MultipartForm` has an `add()` method that accepts a `Pipe`. This can be used to add parts
-from streams (see the section below on how `Pipe` is used). `add()` for `File` objects is actually using
-this indirectly for you.
+**Note**: `MultipartForm` has an `add()` method that accepts a `Pipe`. This can 
+be used to add parts from streams (see the section below on how `Pipe` is used). 
+`add()` for `File` objects is actually using this indirectly for you.
 
-------
+##### Streaming Bodies
 
-##### Streaming (Pipe)
-
-Bridge allows you to stream data directly into a post body:
+Bridge's `Pipe` API allows you to easily stream data directly into a post body.
 
 ```java
 Pipe pipe = new Pipe() {
-
     byte[] content = "Hello, this is a streaming example".getBytes();
 
     @Override
     public void writeTo(@NonNull OutputStream os, @Nullable ProgressCallback progressListener) throws IOException {
         os.write(content);
-
         // Notify optional progress listener that all data was transferred
         if (progressListener != null)
             progressListener.publishProgress(content.length, content.length);
@@ -282,17 +227,18 @@ Pipe pipe = new Pipe() {
     }
 };
 
-String response = Bridge
-    .post("http://someurl.com/post")
+Request request = Bridge
+    .post("https://someurl.com/post.js")
     .body(pipe)
-    .asString();
+    .request();
 ```
 
-**Note**: when you use a `Pipe` as a body, the `Content-Type` header will automatically be set based
-on what `contentType()` in the `Pipe` implementation returns, same for `Content-Length`. If you want to override these headers,
-you can change it in the `Pipe` or manually set the header *after* setting the body.
+**Note**: the value returned for `contentType()` in the `Pipe` is automatically set
+to the value of the associated header. You can override that by changing the header 
+after the body is set.
 
-`Pipe` has three static convenience methods that create a pre-designed `Pipe` instance:
+`Pipe` has three static convenience methods that create a pre-built `Pipe` instance
+for certain uses:
 
 ```java
 Pipe uriPipe = Pipe.forUri(this, Uri.parse(
@@ -304,53 +250,15 @@ InputStream is = // ...
 Pipe transferPipe = Pipe.forStream(is, "text/plain");
 ```
 
-`forUri(Context, Uri)` will read from a File URI or content URI, so basically any file on an Android device can
-be read. `forFile(File)` indirectly uses `forUri(Context, Uri)` specifically for file:// URIs.
-`forStream(InputStream, String)` reads an `InputStream` and transfers the content into the Pipe,
-you need to specify a Content-Type value in the second parameter.
+They should be mostly self-explanatory.
 
-------
+### Info Callbacks
 
-##### Class Conversion
-
-TODO
-
-------
-
-##### Upload Progress
-
-You can monitor upload progress like this:
+You can set an info callback to receive various events, including a 
+connection being established, and request bodies being sent:
 
 ```java
-Bridge
-    .post("http://someurl.com/upload")
-    .body(Pipe.forUri(this, data.getData()))
-    .throwIfNotSuccess()
-    .uploadProgress(new ProgressCallback() {
-        @Override
-        public void progress(Request request, int current, int total, int percent) {
-            // Use progress
-        }
-    })
-    .request(new Callback() {
-        @Override
-        public void response(Request request, Response response, BridgeException e) {
-            // Use response
-        }
-    });
-```
-
-**Note**: this only works effectively with Pipes (streams). If you specify non-stream data, upload is one step and can't be monitored.
-
-------
-
-### Info Callback
-
-You can set an info callback to receive various events, including a connection being established, and request
-bodies being sent:
-
-```java
-Bridge
+Request request = Bridge
     .get("https://www.google.com")
     .infoCallback(new InfoCallback() {
         @Override
@@ -363,45 +271,83 @@ Bridge
             // This method is optional to override
             // Indicates request body was sent to Google
         }
-    })
-    .request(new Callback() {
-        @Override
-        public void response(Request request, Response response, BridgeException e) {
-            // Response received from Google
-        }
-    });
+    }).request();
 ```
+
+It's likely that more will be added to this later.
 
 ---
 
 # Responses
 
-### Headers
+Like requests, Bridge intends to make response interaction super easy.
 
-Retrieving response headers is simple:
+### Response Basics
+
+The code below should be mostly self explanatory:
+
+```java
+Request request = Bridge
+	.get("https://www.google.com")
+	.request();
+	
+Response response = request.response();
+if (response.isSuccessful()) {
+	// Request returned HTTP status 200-300
+} else {
+	// Request returned an HTTP error status
+}
+```
+
+You can also have Bridge throw an Exception in the event that `isSuccessful()`
+returns false:
+
+```java
+try {
+	Request request  = Bridge
+		.get("https://www.google.com")
+		.throwIfNotSuccess()
+		.request();
+	Response response = request.response();
+	// Use successful response
+} catch(BridgeException e) {
+	// See the error handling section
+}
+```
+
+If you don't need a reference to the `Request` object, you can immediately retrieve the `Response`:
+
+```java
+Response response = Bridge
+	.get("https://www.google.com")
+	.response();
+```
+
+---
+
+You can retrieve response headers similar to how request headers are set:
 
 ```java
 Response response = // ...
-String contentType = response.header("Content-Type");
+String headerValue = response.header("Header-Name");
 ```
 
 Headers can also have multiple values, separated by commas:
 
 ```java
 Response response = // ...
-List<String> values = response.headerList("header-name");
+List<String> values = response.headerList("Header-Name");
 ```
 
-You can even retrieve a Map containing all of the existing headers. The value portion of each Map entry
-contains a `List<String>` which will only have 1 entry unless a header has multiple values:
+You can even retrieve the full map of headers:
 
 ```java
 Response response = // ...
 Map<String, List<String>> headers = response.headers();
 ```
 
-Since *Content-Type* and *Content-Length* are commonly used response headers, there's convenience methods
-to get these values:
+Since *Content-Type* and *Content-Length* are commonly used response headers,
+there's two convenience methods for these values:
 
 ```java
 Response response = // ...
@@ -409,12 +355,10 @@ String contentType = response.contentType();
 int contentLength = response.contentLength();
 ```
 
----
+### Response Bodies
 
-### Bodies
-
-The above examples all use `asString()` to save response content as a `String`. There are many other
-formats that responses can be converted/saved to:
+Bridge includes many methods to make converting responses to object types you need
+easy. The code below should be self-explanatory:
 
 ```java
 Response response = // ...
@@ -448,107 +392,37 @@ response.asFile(new File("/sdcard/Download.extension"));
 Object suggested = response.asSuggested();
 ```
 
----
-
-### Class Conversion
-
-Bridge is capable of converting JSON responses directly to Java object or array instances.
-
-##### Object 
-
-Consider the following JSON response data:
-
-```json
-{
-    "full_name": "Aidan Follestad",
-    "age": 20,
-    "year": 2015
-}
-```
-
-First, you need a convertible class. Fields are marked up with `Header` or `Body` annotations,
-which can optionally include a `name` parameter *if* the you want the field name to be different 
-than the JSON field or HTTP Header name:
+If you're not interested in using the `Request` or `Response` object during
+requests, you can immediately retrieve the response body:
 
 ```java
-public class ExampleObject {
-
-    @Header(name = "Content-Type")
-    public String contentType;
-    @Header(name = "Content-Length")
-    public long contentLength;
-
-    @Body(name = "full_name")
-    public String name;
-    @Body
-    public int age;
-    @Body
-    public int year;
-}
+String responseBody = Bridge
+	.get("https://www.google.com")
+	.asString();
 ```
 
-You would retrieve the object like this:
-
-```java
-Bridge.get("http://www.example.com/test.json")
-    .asClass(Example.class, new ResponseConvertCallback<Example>() {
-        @Override
-        public void onResponse(@NonNull Response response, @Nullable Example object, @Nullable BridgeException e) {
-            // Use the object
-        }
-    });
-```
-
-**Note**: it's safe to have arrays and lists of custom classes. They'll be converted automatically like the object above.
+`asString()` could be replaced with any of the body conversion methods above.
+Using this will automatically use `throwIfNotSuccessful()`, so a `BridgeException`
+is thrown in case that the HTTP status code is not 200-300.
 
 ---
-
-##### Array
-
-Consider the following JSON response data:
-
-```json
-[
-    {
-        "full_name": "Aidan Follestad",
-        "age": 20,
-        "year": 2015
-    },
-    {
-        "full_name": "Jeff Follestad",
-        "age": 42,
-        "year": 2015
-    }
-]
-```
-
-Using the same class setup from the `Object` section, you could process the above JSON like this:
-
-```java
-Bridge.get("http://www.example.com/testarray.json")
-    .asClassArray(Example.class, new ResponseConvertCallback<Example[]>() {
-        @Override
-        public void onResponse(@NonNull Response response, @Nullable Example[] objects, @Nullable BridgeException e) {
-            // Use the objects
-        }
-    });
-```
-
-------
 
 # Error Handling
 
-The `BridgeException` class is used throughout the library and acts as a single exception provider.
-This helps avoid the need for different exception classes, or very unspecific Exceptions.
+The `BridgeException` class is used throughout the library and acts as a single 
+exception provider. This helps avoid the need for different exception classes, 
+or very unspecific Exceptions.
 
-If you wanted, you could just display errors to the user using `BridgeException#getMessage()`. However,
-`BridgeException` lets you know exactly what happened before the user sees anything.
+If you wanted, you could just display errors to the user using `BridgeException#getMessage()`. 
+However, `BridgeException` lets you know exactly what happened before the user 
+sees anything.
 
 ---
 
-The `BridgeException#reason()` method returns one of a set of constants that indicate why the exception
-was thrown. If the Exception is for a request, you can retrieve the `Request` with `BridgeException#request()`. 
-If the Exception is for a response, you can retrieve the `Response` with `BridgeException#response()`.
+The `BridgeException#reason()` method returns a constants that indicate why the exception 
+was thrown. If the Exception is for a request, you can retrieve the `Request` with 
+`BridgeException#request()`. If the `Exception` is for a response, you can retrieve the 
+`Response` with `BridgeException#response()`.
 
 ```java
 BridgeException e = // ...
@@ -597,20 +471,27 @@ switch (e.reason()) {
 }
 ```
 
-**Note**: you do not need to handle all of these cases everywhere a `BridgeException` is thrown. The comments
-within the above example code indicate where those reasons are generally used.
+**Note**: you do not need to handle all of these cases everywhere a `BridgeException` 
+is thrown. The comments within the above example code indicate where those reasons are generally used.
 
-------
+---
 
-# Async Requests, Duplicate Avoidance, and Progress Callbacks
+# Async
 
-### Example
+Up until now, all code has been syncronous, meaning it gets run on the calling thread.
+Android does not allow you to perform networking options on the UI thread, for good reasons.
+Asyncronous requests become very important when you don't want to handle threading yourself.
+Plus, Bridge comes with some huge advantages when using async methods.
 
-Here's a basic example of an asynchronous request:
+### Async Requests
+
+Here's a basic example of an async request. Obviously, `get()` can be replaced with the
+other HTTP methods such as `post()`.
 
 ```java
 Bridge
-    .get("http://www.google.com")
+	.get("https://www.google.com")
+	.throwIfNotSuccess() // optional
     .request(new Callback() {
         @Override
         public void response(Request request, Response response, BridgeException e) {
@@ -618,44 +499,18 @@ Bridge
                 // See the 'Error Handling' section for information on how to process BridgeExceptions
                 int reason = e.reason();
             } else {
-                String content = response.asString();
+                // Use the Response object
+				String responseContent = response.asString();
             }
         }
     });
 ```
 
-There's two major advantages to using async requests:
-
-1. Threads are not blocked. You can execute this code on UI thread (e.g. in an `Activity`) without freezing or errors.
-2. Duplicate avoidance (discussed below).
-
-**Note**: You can replace `get()` with `post()`, `put()` or `delete()` too.
-
-Like synchronous requests, you can use `throwIfNotSuccess` to receive a `BridgeException` with the
-reason `REASON_RESPONSE_UNSUCCESSFUL` if the status code is not successful:
+Like syncronous requests, there are shortcuts to response conversion:
 
 ```java
 Bridge
-    .get("http://www.google.com")
-    .throwIfNotSuccess()
-    .request(new Callback() {
-        @Override
-        public void response(Request request, Response response, BridgeException e) {
-            if (e != null) {
-                // See the 'Error Handling' section for information on how to process BridgeExceptions
-                int reason = e.reason();
-            } else {
-                String content = response.asString();
-            }
-        }
-    });
-```
-
-There's also a shortcuts to async response conversion:
- 
-```java
-Bridge
-    .get("http://www.google.com")
+	.get("http://www.google.com")
     .asString(new ResponseConvertCallback<String>() {
         @Override
         public void onResponse(@NonNull Response response, @Nullable String object, @Nullable BridgeException e) {
@@ -669,70 +524,73 @@ Bridge
     });
 ```
 
----
+Not only is the calling thread *not* blocked, duplicate avoidance also comes 
+into the picture (see the section below).
 
 ### Duplicate Avoidance
 
-Duplicate avoidance is a feature in this library that allows you to avoid making multiple requests to
-the same URL at the same time. For an example, if you were to do this...
+Duplicate avoidance is a feature of Bridge which allows you to avoid making multiple
+requests to a URL at the same time.
 
 ```java
-Bridge
-    .get("http://www.google.com")
+Bridge.get("http://www.google.com")
     .request(new Callback() {
         @Override
         public void response(Request request, Response response, BridgeException e) {
-            if (e != null) {
-                // See the 'Error Handling' section for information on how to process BridgeExceptions
-                int reason = e.reason();
-            } else {
-                // Use the Response object
-            }
+            // Use error or response
         }
     });
-
-Bridge
-    .get("http://www.google.com")
+Bridge.get("http://www.google.com")
     .request(new Callback() {
         @Override
         public void response(Request request, Response response, BridgeException e) {
-            if (e != null) {
-                // See the 'Error Handling' section for information on how to process BridgeExceptions
-                int reason = e.reason();
-            } else {
-                // Use the Response object
-            }
+            // Use error or response
         }
     });
 ```
 
-...Google would only be contacted once by the library. When that single request is complete, both callbacks
-would be called at the same time with the same response data.
+The above code requests Google's homepage in rapid succession. Since the first request
+will most likely not finish before the computer has a chance to begin requesting the second,
+Bridge will pool these requests together. The second request does not get exectued, instead, 
+it waits for the first to finish executing, and returns the response to both callbacks at the same time.
 
-This lets you be very efficient on bandwidth and resource usage. If this library was being used to load images
-into `ImageView`'s, you could display 100 `ImageView`'s in a list, make a single request, and immediately populate
-all 100 `ImageView`'s with the same image at the same time. Check out the sample project to see this in action.
+There is no limit to how many requests can be pooled. Bridge's sample project requests an entire
+page of images, but the image is only downloaded once.
 
----
+### Upload Progress
 
-### Download Progress Callbacks
-
-The `Callback` class has an optional `progress(Request, int, int, int)` method that can be overridden to receive
-progress updates for response downloading. `current` is how many bytes have been downloaded, `total` is how many
-bytes are available to be downloaded, and `percent` is the *current/total ratio times 100*.
+Upload progress is pretty straight forward:
 
 ```java
 Bridge
-    .get("http://someurl/bigfile.extension")
+    .post("https://someurl.com/upload.js")
+    .body(Pipe.forUri(this, data.getData()))
+    .uploadProgress(new ProgressCallback() {
+        @Override
+        public void progress(Request request, int current, int total, int percent) {
+            // Use progress
+        }
+    })
     .request(new Callback() {
         @Override
         public void response(Request request, Response response, BridgeException e) {
-            if (e != null || !response.isSuccess()) {
-                // See the 'Error Handling' section for information on how to process BridgeExceptions
-                int reason = e.reason();
-            } else {
-                // Use the Response object
-            }
+            // Use response
+        }
+    });
+```
+
+### Download Progress
+
+The callback used to receive asyncronous request results has an optional `progress` method
+that can be overidden in your callback:
+
+```java
+Bridge
+    .get("http://someurl.com/bigfile.extension")
+    .request(new Callback() {
+        @Override
+        public void response(Request request, Response response, BridgeException e) {
+            // Use Response or error
         }
 
         @Override
@@ -742,50 +600,44 @@ Bridge
     });
 ```
 
-**Note**: progress callbacks are only called if the library is able to determinate the size of the
-content being downloaded. Generally, this means the requested endpoint needs to return a `Content-Length`
-header.
-
-*Upload progress callbacks were discussed in [Upload Progress](https://github.com/afollestad/bridge#upload-progress) section.*
-
-------
-
-# Request Cancellation
-
-### Cancelling Individual Requests
-
-This library allows you easily cancel requests:
-
-```java
-Request request = Bridge
-    .get("http://www.google.com")
-    .request(new Callback() {
-        @Override
-        public void response(Request request, Response response, BridgeException e) {
-            if (e != null) {
-                // See the 'Error Handling' section for information on how to process BridgeExceptions
-                int reason = e.reason();
-            } else {
-                // Use the Response
-            }
-        }
-    });
-
-request.cancel();
-```
-
-When a request is cancelled, the `BridgeException` will *not* be null (it will say the request was cancelled),
-and `BridgeException#isCancelled()` will return true.
+**Note**: progress callbacks are only used if the library is able to deetermine the size 
+of the content being downloaded. Generally, this means the requested URL needs to return a 
+value for the *Content-Length* header. When it comes to `Pipe`'s, the `Pipe` handles reporting
+progress to the progress callback on its own.
 
 ---
 
+# Request Cancellation
+
+Request cancellation is another cool feature that Bridge specializes in.
+Note that it only works with asyncronous requests, syncronous requests
+can't be cancelled since they can block the main thread.
+
+### Cancelling Single Requests
+
+The `Request` object has a simple `cancel()` method:
+
+```java
+Request request = Bridge
+    .get("https://www.google.com")
+    .request(new Callback() {
+        @Override
+        public void response(Request request, Response response, BridgeException e) {
+            // Use error or response
+        }
+    });
+request.cancel();
+````
+
+When the request is cancelled, the callback receives a `BridgeException`. `reason()` will
+return `BridgeException.REASON_REQUEST_CANCELLED`. Most apps will probably ignore the error 
+in this case.
+
 ### Cancelling Multiple Requests
 
-The `Bridge` singleton allows you to cancel managed **async** requests.
+The `Bridge` class allows you to cancel multiple (or all) active async requests.
 
-------
-
-###### All Active
+##### All Active
 
 This code will cancel all active requests, regardless of method or URL:
 
@@ -793,14 +645,11 @@ This code will cancel all active requests, regardless of method or URL:
 Bridge.cancelAll().commit();
 ```
 
-------
+##### Method, URL/Regex
 
-###### Method, URL/Regex
+You can even cancel all active requests that match an HTTP method and a URL or regular expression pattern.
 
-You can even cancel all active requests that match an HTTP method
-*and* a URL or regular expression pattern.
-
-This will cancel all GET requests to any URL starting with http:// and ending with `.png`:
+This will cancel all GET requests to any URL starting with http:// and ending with .png:
 
 ```java
 int count = Bridge.cancelAll()
@@ -811,8 +660,7 @@ int count = Bridge.cancelAll()
 
 `.*` is a wildcard in regular expressions, `\\` escapes the period to make it literal.
 
-If you want to cancel all requests to a specific URL, you can use `Pattern.quote()` to specify a regex
-that matches literal text:
+If you want to cancel all requests to a specific URL, you can use `Pattern.quote()` to specify a regex that matches literal text:
 
 ```java
 int count = Bridge.cancelAll()
@@ -821,73 +669,49 @@ int count = Bridge.cancelAll()
     .commit();
 ```
 
-------
+##### Tags
 
-###### Tags
-
-When making a request, you can tag it with a value:
+When making a request, you can tag it with a value (of any type):
 
 ```java
-Bridge
-    .get("http://www.google.com")
+Bridge.get("http://www.google.com")
     .tag("Hello!")
     .request(new Callback() {
         @Override
         public void response(Request request, Response response, BridgeException e) {
-            if (e != null) {
-                // See the 'Error Handling' section for information on how to process BridgeExceptions
-                int reason = e.reason();
-            } else {
-                // Use the Response
-            }
+            // Use response or error
         }
     });
 ```
 
-By "a value", I mean literally any type of Object. It could be a `String`, `int`, `boolean`, etc.
-
-You can cancel all requests marked with a specific tag value:
+You can then cancel all requests which have that tag:
 
 ```java
-// Add a second parameter with a value of true to cancel un-cancellable requests
 Bridge.cancelAll()
     .tag("Hello!")
     .commit();
 ```
 
----
-
 ### Preventing Cancellation
 
-There are certain situations in which you wouldn't want to allow a request to be cancelled. For an example,
-your app may make calls to `Bridge.cancelAll().commit()` when an `Activity` pauses; that way, all requests
-that were active in that screen are cancelled. However, there may be a `Service` in your app that's making requests
-in the background that you would want to maintain. You can make those requests non-cancellable:
+There are certain situations in which you wouldn't want to allow a request to be cancelled. 
+For an example, your app may make calls to `Bridge.cancelAll().commit()` when an `Activity` pauses; 
+that way, all requests that were active in that screen are cancelled. However, there may be a 
+`Service` in your app that's making requests in the background that you would want to maintain. 
+You can make those requests non-cancellable:
 
 ```java
-Bridge
-    .get("http://www.google.com")
+Bridge.get("http://www.google.com")
     .cancellable(false)
     .request(new Callback() {
         @Override
         public void response(Request request, Response response, BridgeException e) {
-            if (e != null) {
-                // See the 'Error Handling' section for information on how to process BridgeExceptions
-                int reason = e.reason();
-            } else {
-                // Use the Response
-            }
+            // Use response or error
         }
     });
 ```
 
-If you tried to make a call to `cancelAll()` on this `Request`, an `IllegalStateException` would be thrown.
-If you really want to cancel an un-cancellable request (`Request.isCancellable()` returns true), you
-can force it to be cancelled with `cancel(true)`.
-
----
-
-Un-cancellable requests will be ignored by `Bridge.cancelAll()` unless cancellation is forced:
+This request will be ignored by `Bridge.cancelAll()` unless cancellation is forced:
 
 ```java
 Bridge.cancelAll()
@@ -895,13 +719,11 @@ Bridge.cancelAll()
     .commit();
 ```
 
-------
+---
 
-# Validators
+# Validation
 
 Validators allow you to provide consistent checking that certain conditions are true for a response.
-
-Here's a quick example:
 
 ```java
 ResponseValidator validator = new ResponseValidator() {
@@ -934,10 +756,9 @@ try {
 }
 ```
 
-The validator is passed before the request returns. Basically, the validator will check if a boolean field
-in the response JSON called `success` is equal to true. If you had an API on a server that returned true
-or false for this value, you could automatically check if it's true for every request with a single
-validator.
+The validator is passed before the request returns. Basically, the validator will check if a boolean 
+field in the response JSON called *success* is equal to true. If you had an API on a server that returned 
+true or false for this value, you could automatically check if it's true for every request with a single validator.
 
 You can even use multiple validators for a single request:
 
@@ -962,18 +783,17 @@ try {
 }
 ```
 
-**Note**: validators work with async requests too!
+**Notes**: validators work great with async requests too! You can even apply validators
+to every request in your application by setting global validators (discussed below).
 
-**Note:** you can apply validators to every request in your application with global configuration,
-which is discussed in the next section.
+---
 
-------
+# Configuration
 
-# Global Configuration
+Bridge allows you to set various parameters that are maintained
+as long as your app stays in memory.
 
-Bridge allows you configure various functions globally.
-
-### Host
+### Host Configuration
 
 You can set a host that is used as the base URL for every request.
 
@@ -989,16 +809,13 @@ Bridge
     .get("/search?q=%s", "Hello")
     .asString();
 ```
-
-Basically, the URL you pass with each request is appended to the end of the host. If you were to pass a full
-URL (beginning with *HTTP*) in `get()` above, it would skip using the host for just that request.
-
----
+	
+Basically, the URL you pass with each request is appended to the end of the host. If you were to pass a full URL 
+(beginning with HTTP) in `get()` above, it would skip using the host for just that request.
 
 ### Default Headers
 
-Default headers are headers that are automatically applied to every request. You don't have to do it
-yourself with every request in your app.
+Default headers are headers that are automatically applied to every request. You don't have to do it yourself with every request in your app.
 
 ```java
 Bridge.config()
@@ -1007,12 +824,9 @@ Bridge.config()
     .defaultHeader("Via", "My App");
 ```
 
-Every request, regardless of the method, will include those headers. You can override them at the
-individual request level by setting the header as you normally would.
+Every request, regardless of the method, will include those headers. You can override them at the individual request level by setting the header as you normally would.
 
----
-
-### Timeouts
+### Timeout Configuration
 
 You can configure how long the library will wait until timing out, either for connections or reading:
 
@@ -1022,25 +836,18 @@ Bridge.config()
     .readTimeout(15000);
 ```
 
-------
-
 You can set timeouts at the request level too:
 
 ```java
-Bridge
-    .get("http://someurl.com/bigVideo.mp4")
+Bridge.get("http://someurl.com/bigVideo.mp4")
     .connectTimeout(10000)
     .readTimeout(15000)
-    .asFile(new File("/sdcard/Download/bigVideo.mp4"));
+    .request();
 ```
-
----
 
 ### Buffer Size
 
-The default buffer size is *1024 * 4* (4096). Basically, when you download a webpage or file, the
-buffer size is how big the byte array is with each pass. A large buffer size will create a larger
-byte array, which can affect memory usage, but it also increases the pace in which the content is downloaded.
+The default buffer size is 1024 * 4 (4096). Basically, when you download a webpage or file, the buffer size is how big the byte array is with each pass. A large buffer size will create a larger byte array, which can affect memory usage, but it also increases the pace in which the content is downloaded.
 
 The buffer size can easily be configured:
 
@@ -1049,22 +856,16 @@ Bridge.config()
     .bufferSize(1024 * 10);
 ```
 
-Just remember to be careful with how much memory you consume, and test on various devices.
-
-------
-
+Just remember to be careful with how much memory you consume, and test on various devices. 
 You can set the buffer size at the request level too:
 
 ```java
-Bridge
-    .get("http://someurl.com/bigVideo.mp4")
+Bridge.get("http://someurl.com/bigVideo.mp4")
     .bufferSize(1024 * 10)
-    .asFile(new File("/sdcard/Download/bigVideo.mp4"));
+    .response();
 ```
 
-**Note**: the buffer size is used in a few other places, such as pre-built `Pipe`'s (`Pipe#forUri`, `Pipe#forStream`, etc.).
-
----
+**Note**: the buffer size is used in a few other places, such as pre-built Pipe's (Pipe#forUri, Pipe#forStream, etc.).
 
 ### Logging
 
@@ -1075,12 +876,9 @@ Bridge.config()
     .logging(true);
 ```
 
----
+### Global Validators
 
-### Validators
-
-Validators for individual requests were shown above. You can apply validators to every request
-in your application:
+Validators for individual requests were shown above. You can apply validators to every request in your application:
 
 ```java
 Bridge.config()
@@ -1099,19 +897,28 @@ Bridge.config()
     });
 ```
 
-**Note**: you can pass multiple validators into the `validators()` method just like the individual request
-version.
+**Note: you can pass multiple validators into the `validators()` method just like the individual request version.
 
-------
+---
 
 # Cleanup
 
-When you're done with Bridge (e.g. your app is terminating), you *should* call the destroy method to
-avoid any memory leaks. Your app would be fine without this, but this is good practice and it helps speed
-up Java's garbage collection.
+When you're done with Bridge (e.g. your app is terminating), you should call the `destroy()` method to avoid any memory leaks. Your app would be fine without this, but this is good practice and it helps speed up Java's garbage collection.
 
 ```java
 Bridge.destroy();
 ```
 
 **Note**: Calling this method will also cancel all active requests for you.
+
+---
+
+# Request Conversion
+
+TODO
+
+---
+
+# Response Conversion
+
+TODO
