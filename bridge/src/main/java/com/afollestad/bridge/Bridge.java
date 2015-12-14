@@ -83,6 +83,8 @@ public class Bridge implements Serializable {
 
     @NonNull
     public static Config config() {
+        if (mBridge == null)
+            mBridge = new Bridge();
         if (mConfig == null)
             mConfig = new Config();
         return mConfig;

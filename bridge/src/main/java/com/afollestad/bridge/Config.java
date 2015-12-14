@@ -3,6 +3,9 @@ package com.afollestad.bridge;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.afollestad.bridge.conversion.JsonResponseConverter;
+import com.afollestad.bridge.conversion.base.ResponseConverter;
+
 import java.util.HashMap;
 
 /**
@@ -14,6 +17,8 @@ public final class Config {
         mDefaultHeaders = new HashMap<>();
         mDefaultHeaders.put("User-Agent", "afollestad/Bridge");
         mDefaultHeaders.put("Content-Type", "text/plain");
+        mResponseConverters = new HashMap<>();
+        mResponseConverters.put("application/json", new JsonResponseConverter());
     }
 
     protected String mHost;
@@ -23,6 +28,7 @@ public final class Config {
     protected int mBufferSize = 1024 * 4;
     protected boolean mLogging = false;
     protected ResponseValidator[] mValidators;
+    protected HashMap<String, ResponseConverter> mResponseConverters;
 
     public Config host(@Nullable String host) {
         mHost = host;
@@ -64,6 +70,24 @@ public final class Config {
 
     public Config validators(ResponseValidator... validators) {
         mValidators = validators;
+        return this;
+    }
+
+    @NonNull
+    public ResponseConverter responseConverter(@NonNull String contentType) {
+        if (contentType.contains(";"))
+            contentType = contentType.split(";")[0];
+        ResponseConverter converter = mResponseConverters.get(contentType);
+        if (converter == null)
+            throw new IllegalStateException("No response converter available for content type " + contentType);
+        return converter;
+    }
+
+    public Config responseConverter(@NonNull String contentType, @Nullable ResponseConverter converter) {
+        if (converter == null)
+            mResponseConverters.remove(contentType);
+        else
+            mResponseConverters.put(contentType, converter);
         return this;
     }
 

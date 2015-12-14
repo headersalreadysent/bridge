@@ -170,12 +170,18 @@ public final class Response implements AsResults, Serializable {
 
     @Nullable
     public <T> T asClass(@NonNull Class<T> cls) {
-        return JsonConverter.convert(cls, this);
+        String contentType = contentType();
+        if (contentType == null)
+            throw new IllegalStateException("Response has no Content-Type, cannot determine appropriate response converter.");
+        return Bridge.config()
+                .responseConverter(contentType)
+                .convert(this, cls);
     }
 
     @Nullable
     public <T> T[] asClassArray(@NonNull Class<T> cls) {
-        return JsonConverter.convertArray(cls, this);
+//        return JsonResponseConverter.convertArray(cls, this);
+        return null; // TODO
     }
 
     @Nullable

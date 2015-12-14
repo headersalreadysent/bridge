@@ -7,6 +7,8 @@ import android.support.annotation.UiThread;
 import android.support.annotation.WorkerThread;
 import android.text.Spanned;
 
+import com.afollestad.bridge.conversion.JsonResponseConverter;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -175,26 +177,29 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
     }
 
     public RequestBuilder body(@Nullable Object object, boolean includeHeaders) {
-        header("Content-Type", "application/json");
-        JSONObject json = JsonConverter.convertToJsonObject(object, includeHeaders ? this : null);
-        if (json == null) mBody = null;
-        else body(json.toString());
+//        header("Content-Type", "application/json");
+//        JSONObject json = JsonResponseConverter.convertToJsonObject(object, includeHeaders ? this : null);
+//        if (json == null) mBody = null;
+//        else body(json.toString());
+        // TODO
         return this;
     }
 
     public RequestBuilder body(@Nullable Object[] objects) {
-        header("Content-Type", "application/json");
-        JSONArray json = JsonConverter.convertToJsonArray(objects);
-        if (json == null) mBody = null;
-        else body(json.toString());
+//        header("Content-Type", "application/json");
+//        JSONArray json = JsonResponseConverter.convertToJsonArray(objects);
+//        if (json == null) mBody = null;
+//        else body(json.toString());
+        // TODO
         return this;
     }
 
     public RequestBuilder body(@Nullable List<Object> objects) {
-        header("Content-Type", "application/json");
-        JSONArray json = JsonConverter.convertToJsonArray(objects);
-        if (json == null) mBody = null;
-        else body(json.toString());
+//        header("Content-Type", "application/json");
+//        JSONArray json = JsonResponseConverter.convertToJsonArray(objects);
+//        if (json == null) mBody = null;
+//        else body(json.toString());
+        // TODO
         return this;
     }
 

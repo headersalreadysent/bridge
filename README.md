@@ -1106,12 +1106,12 @@ version.
 
 # Cleanup
 
-When you're done with Bridge (e.g. your app is terminating), you *should* call the cleanup method to
+When you're done with Bridge (e.g. your app is terminating), you *should* call the destroy method to
 avoid any memory leaks. Your app would be fine without this, but this is good practice and it helps speed
 up Java's garbage collection.
 
 ```java
-Bridge.cleanup();
+Bridge.destroy();
 ```
 
 **Note**: Calling this method will also cancel all active requests for you.

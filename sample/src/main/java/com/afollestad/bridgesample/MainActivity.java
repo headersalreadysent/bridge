@@ -10,11 +10,10 @@ import android.util.Log;
 
 import com.afollestad.bridge.Bridge;
 import com.afollestad.bridge.BridgeException;
-import com.afollestad.bridge.Callback;
-import com.afollestad.bridge.Request;
 import com.afollestad.bridge.Response;
 import com.afollestad.bridge.ResponseConvertCallback;
-import com.afollestad.bridgesample.conversion.Example;
+import com.afollestad.bridge.conversion.JsonResponseConverter;
+import com.afollestad.bridgesample.conversion.Person;
 
 /**
  * @author Aidan Follestad (afollestad)
@@ -22,8 +21,7 @@ import com.afollestad.bridgesample.conversion.Example;
 public class MainActivity extends AppCompatActivity {
 
     @SuppressWarnings("FieldCanBeLocal")
-    private static String TEST_URL = "https://gist.githubusercontent.com/afollestad/97a52c5af3091a9d7c66/raw/6c305df8698df79a54033f3a8f37933bcef55979/hellobridge.json";
-//    private static String TEST_URL = "https://gist.githubusercontent.com/afollestad/a21a8456423aec64a3b4/raw/ed5aa53e7153bb1136ed1c489a58923f58be963b/test4.json";
+    private static String TEST_URL = "https://gist.githubusercontent.com/afollestad/d72de6a32804b0f6e1e6/raw/970d087f856d9c3aba34c4d52a251b6bf7c2e559/user2.json";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,20 +32,13 @@ public class MainActivity extends AppCompatActivity {
         list.setLayoutManager(new GridLayoutManager(this, 8));
         list.setAdapter(new MainAdapter());
 
+        Bridge.config()
+                .responseConverter("text/plain", new JsonResponseConverter());
         Bridge.get(TEST_URL)
-                .asClass(Example.class, new ResponseConvertCallback<Example>() {
+                .asClass(Person.class, new ResponseConvertCallback<Person>() {
                     @Override
-                    public void onResponse(@NonNull Response response, @Nullable Example object, @Nullable BridgeException e) {
+                    public void onResponse(@NonNull Response response, @Nullable Person object, @Nullable BridgeException e) {
                         Log.d("Test", "Test");
-
-                        Bridge.post("http://requestb.in/ssdw1xss")
-                                .body(object)
-                                .request(new Callback() {
-                                    @Override
-                                    public void response(Request request, Response response, BridgeException e) {
-                                        Log.d("Test", "Test");
-                                    }
-                                });
                     }
                 });
     }

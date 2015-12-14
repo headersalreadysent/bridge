@@ -85,7 +85,12 @@ public class CancelCriteria {
         }
     }
 
+    @Deprecated
     public void allAsync(@Nullable final CancelCallback callback) {
+        commitAsync(callback);
+    }
+
+    public void commitAsync(@Nullable final CancelCallback callback) {
         new Thread(new TimerTask() {
             @Override
             public void run() {
