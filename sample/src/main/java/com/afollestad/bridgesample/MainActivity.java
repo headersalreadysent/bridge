@@ -12,10 +12,7 @@ import com.afollestad.bridge.Callback;
 import com.afollestad.bridge.Request;
 import com.afollestad.bridge.Response;
 import com.afollestad.bridge.conversion.JsonResponseConverter;
-import com.afollestad.bridgesample.conversion.Person;
 import com.afollestad.bridgesample.conversion.SimplePerson;
-
-import java.util.ArrayList;
 
 /**
  * @author Aidan Follestad (afollestad)
@@ -37,31 +34,17 @@ public class MainActivity extends AppCompatActivity {
         Bridge.config()
                 .responseConverter("text/plain", new JsonResponseConverter());
 
-        Person person = new Person();
-        person.name = "Aidan Follestad";
-        person.age = 20;
-        person.year = 2015;
-        person.skill = 1000000;
-        person.rank = 10d;
-        person.fAge = 20.75f;
-        person.isProgrammer = true;
-
-        person.girlfriend = new SimplePerson();
-        person.girlfriend.name = "Waverly Moua";
-        person.girlfriend.age = 18;
-
-        person.parents = new SimplePerson[]{
+        SimplePerson[] people = new SimplePerson[]{
                 new SimplePerson("Jeffrey Follestad", 42),
                 new SimplePerson("Natalie Micheal", 41)
         };
 
-        person.friends = new ArrayList<>();
-        person.friends.add(new SimplePerson("Anthony Cole", 18));
-        person.friends.add(new SimplePerson("Waverly Moua", 18));
+//        person.friends = new ArrayList<>();
+//        person.friends.add(new SimplePerson("Anthony Cole", 18));
+//        person.friends.add(new SimplePerson("Waverly Moua", 18));
 
         Bridge.post("http://requestb.in/1khnw6o1")
-                .contentType("application/json")
-                .body(person)
+                .body(people)
                 .request(new Callback() {
                     @Override
                     public void response(Request request, Response response, BridgeException e) {

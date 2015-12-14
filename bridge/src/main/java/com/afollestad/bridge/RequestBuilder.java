@@ -179,27 +179,35 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
         if (object == null) {
             mBody = null;
         } else {
-            RequestConverter converter = Bridge.config().requestConverter((String) mHeaders.get("Content-Type"));
+            final String contentType = RequestConverter.getContentType(object.getClass(), mHeaders.get("Content-Type"));
+            contentType(contentType);
+            RequestConverter converter = Bridge.config().requestConverter(contentType);
             mBody = converter.convertObject(object, this);
         }
         return this;
     }
 
     public RequestBuilder body(@Nullable Object[] objects) {
-//        header("Content-Type", "application/json");
-//        JSONArray json = JsonResponseConverter.convertToJsonArray(objects);
-//        if (json == null) mBody = null;
-//        else body(json.toString());
-        // TODO
+        if (objects == null || objects.length == 0) {
+            mBody = null;
+        } else {
+            final String contentType = RequestConverter.getContentType(objects[0].getClass(), mHeaders.get("Content-Type"));
+            contentType(contentType);
+            RequestConverter converter = Bridge.config().requestConverter(contentType);
+            mBody = converter.convertArray(objects, this);
+        }
         return this;
     }
 
     public RequestBuilder body(@Nullable List<Object> objects) {
-//        header("Content-Type", "application/json");
-//        JSONArray json = JsonResponseConverter.convertToJsonArray(objects);
-//        if (json == null) mBody = null;
-//        else body(json.toString());
-        // TODO
+        if (objects == null || objects.size() == 0) {
+            mBody = null;
+        } else {
+            final String contentType = RequestConverter.getContentType(objects.get(0).getClass(), mHeaders.get("Content-Type"));
+            contentType(contentType);
+            RequestConverter converter = Bridge.config().requestConverter(contentType);
+            mBody = converter.convertList(objects, this);
+        }
         return this;
     }
 

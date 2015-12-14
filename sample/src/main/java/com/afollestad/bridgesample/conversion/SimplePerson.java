@@ -1,10 +1,12 @@
 package com.afollestad.bridgesample.conversion;
 
 import com.afollestad.bridge.annotations.Body;
+import com.afollestad.bridge.annotations.ContentType;
 
 /**
  * @author Aidan Follestad (afollestad)
  */
+@ContentType("application/json; testing")
 public class SimplePerson {
 
     public SimplePerson() {

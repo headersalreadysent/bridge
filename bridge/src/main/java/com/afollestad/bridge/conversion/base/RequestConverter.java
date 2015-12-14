@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.afollestad.bridge.RequestBuilder;
+import com.afollestad.bridge.annotations.ContentType;
 import com.afollestad.bridge.annotations.Header;
 
 import java.lang.reflect.Array;
@@ -14,6 +15,16 @@ import java.util.List;
  * @author Aidan Follestad (afollestad)
  */
 public abstract class RequestConverter<ObjectType, ArrayType> extends Converter {
+
+    @NonNull
+    public static String getContentType(@NonNull Class<?> forClass, @Nullable Object defaultType) {
+        ContentType contentTypeAnnotation = forClass.getAnnotation(ContentType.class);
+        if (contentTypeAnnotation != null && contentTypeAnnotation.value() != null && !contentTypeAnnotation.value().trim().isEmpty())
+            return contentTypeAnnotation.value();
+        if (defaultType == null || !(defaultType instanceof String) || ((String) defaultType).trim().isEmpty())
+            defaultType = "application/json";
+        return (String) defaultType;
+    }
 
     public final byte[] convertObject(@NonNull Object object, @NonNull RequestBuilder request) {
         try {
@@ -28,6 +39,35 @@ public abstract class RequestConverter<ObjectType, ArrayType> extends Converter 
         } catch (Exception e) {
             throw new RuntimeException(String.format("Failed to finish RequestConverter for object of class %s: %s",
                     object.getClass().getName(), e.getMessage()), e);
+        }
+    }
+
+    public final byte[] convertList(@NonNull List list, @NonNull RequestBuilder request) {
+        Object[] array = list.toArray();
+        return convertArray(array, request);
+    }
+
+    public final byte[] convertArray(@NonNull Object[] objects, @NonNull RequestBuilder request) {
+        try {
+            onPrepare(request, objects);
+        } catch (Exception e) {
+            throw new RuntimeException(String.format("Failed to prepare RequestConverter for objects (array) of class %s: %s",
+                    objects[0].getClass().getName(), e.getMessage()), e);
+        }
+        final ArrayType output = createOutputArray();
+        for (Object obj : objects) {
+            ObjectType element = processObject(obj, request);
+            try {
+                onAttachValueToArray(output, element, FIELD_OTHER);
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to attach value to output array: " + e.getMessage(), e);
+            }
+        }
+        try {
+            return onFinish(output, request, objects);
+        } catch (Exception e) {
+            throw new RuntimeException(String.format("Failed to finish RequestConverter for objects (array) of class %s: %s",
+                    objects[0].getClass().getName(), e.getMessage()), e);
         }
     }
 
@@ -129,6 +169,8 @@ public abstract class RequestConverter<ObjectType, ArrayType> extends Converter 
 
     public abstract void onPrepare(@NonNull RequestBuilder request, @NonNull Object object) throws Exception;
 
+    public abstract void onPrepare(@NonNull RequestBuilder request, @NonNull Object[] objects) throws Exception;
+
     public abstract ObjectType createOutputObject();
 
     public abstract ArrayType createOutputArray();
@@ -148,4 +190,7 @@ public abstract class RequestConverter<ObjectType, ArrayType> extends Converter 
 
     @Nullable
     public abstract byte[] onFinish(@NonNull ObjectType output, @NonNull RequestBuilder request, @NonNull Object object) throws Exception;
+
+    @Nullable
+    public abstract byte[] onFinish(@NonNull ArrayType output, @NonNull RequestBuilder request, @NonNull Object[] objects) throws Exception;
 }
