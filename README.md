@@ -897,7 +897,7 @@ Bridge.config()
     });
 ```
 
-**Note: you can pass multiple validators into the `validators()` method just like the individual request version.
+**Note**: you can pass multiple validators into the `validators()` method just like the individual request version.
 
 ---
 
