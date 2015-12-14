@@ -22,9 +22,11 @@ public final class Config {
 
         mRequestConverters = new HashMap<>();
         mRequestConverters.put("application/json", new JsonRequestConverter());
+        mRequestConverters.put("text/plain", new JsonRequestConverter());
 
         mResponseConverters = new HashMap<>();
         mResponseConverters.put("application/json", new JsonResponseConverter());
+        mResponseConverters.put("text/plain", new JsonResponseConverter());
     }
 
     protected String mHost;

@@ -986,6 +986,13 @@ Bridge comes stock with a JSON request converter, but the API is extensible for 
 See the [JsonRequestConverter](https://github.com/afollestad/bridge/blob/master/bridge/src/main/java/com/afollestad/bridge/conversion/JsonRequestConverter.java) 
 source code for an example of how a `RequestConverter` is made. It should come off as simple.
 
+When you have a custom converter made, you can register it to a Content-Type:
+
+```java
+Bridge.config()
+    .requestConverter("application/json", new JsonRequestConverter());
+```
+
 ---
 
 # Response Conversion
@@ -1081,3 +1088,10 @@ Bridge comes stock with a JSON response converter, but the API is extensible for
 
 See the [JsonResponseConverter](https://github.com/afollestad/bridge/blob/master/bridge/src/main/java/com/afollestad/bridge/conversion/JsonResponseConverter.java) 
 source code for an example of how a `ResponseConverter` is made. It should come off as simple.
+
+When you have a custom converter made, you can register it to a Content-Type:
+
+```java
+Bridge.config()
+    .responseConverter("application/json", new JsonResponseConverter());
+```
