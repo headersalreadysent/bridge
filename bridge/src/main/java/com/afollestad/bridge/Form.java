@@ -1,5 +1,7 @@
 package com.afollestad.bridge;
 
+import android.support.annotation.NonNull;
+
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,8 +24,15 @@ public final class Form {
 
     public Form() {
         mEntries = new ArrayList<>();
+        mEncoding = "UTF-8";
     }
 
+    public Form(@NonNull String encoding) {
+        mEntries = new ArrayList<>();
+        mEncoding = encoding;
+    }
+
+    private final String mEncoding;
     private final List<Entry> mEntries;
 
     public Form add(String name, Object value) {
@@ -38,9 +47,9 @@ public final class Form {
             if (i > 0) result.append("&");
             final Entry entry = mEntries.get(i);
             try {
-                result.append(URLEncoder.encode(entry.name, "UTF-8"));
+                result.append(URLEncoder.encode(entry.name, mEncoding));
                 result.append("=");
-                result.append(URLEncoder.encode(entry.value + "", "UTF-8"));
+                result.append(URLEncoder.encode(entry.value + "", mEncoding));
             } catch (Exception e) {
                 // This should never happen
                 throw new RuntimeException(e);
