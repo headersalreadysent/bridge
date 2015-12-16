@@ -55,6 +55,9 @@ powered by Java/Android's URLConnection classes for maximum compatibility and sp
 
 # Gradle Dependency
 
+[ ![JitPack](https://img.shields.io/github/release/afollestad/bridge.svg?label=bridge) ](https://jitpack.io/#afollestad/bridge)
+[![Build Status](https://travis-ci.org/afollestad/bridge.svg)](https://travis-ci.org/afollestad/bridge)
+
 ### Repository
 
 Add this in your root `build.gradle` file (**not** your module `build.gradle` file):
@@ -78,8 +81,6 @@ dependencies {
 	compile 'com.github.afollestad:bridge:3.0.0'
 }
 ```
-
-[ ![JitPack Badge](https://img.shields.io/github/release/afollestad/bridge.svg?label=bridge) ](https://jitpack.io/#afollestad/bridge)
 
 ---
 
