@@ -85,7 +85,7 @@ class Converter {
         return (Class<?>) stringListType.getActualTypeArguments()[0];
     }
 
-    protected Class<?> getArrayListType(@NonNull List<?> list) {
-        return list.toArray().getClass().getComponentType();
-    }
+//    protected Class<?> getArrayListType(@NonNull List<?> list) {
+//        return list.toArray().getClass().getComponentType();
+//    }
 }

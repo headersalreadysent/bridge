@@ -30,7 +30,8 @@ public abstract class ResponseConverter extends Converter {
             throw new RuntimeException(String.format("Failed to prepare ResponseConverter for target class %s: %s",
                     targetCls.getName(), e.getMessage()), e);
         }
-        object = convertObject(object, targetCls, response);
+        //noinspection unchecked
+        object = (T) convertObject(object, targetCls, response);
         try {
             onFinish(response, object);
         } catch (Exception e) {
@@ -75,12 +76,19 @@ public abstract class ResponseConverter extends Converter {
 
     @SuppressWarnings({"MismatchedQueryAndUpdateOfCollection", "unchecked"})
     @SuppressLint("SwitchIntDef")
-    private <T> T convertObject(@Nullable T object, @NonNull Class<T> targetCls, @NonNull Response response) {
+    private Object convertObject(@Nullable Object object, @NonNull Class<?> targetCls, @NonNull Response response) {
         if (object == null)
             object = BridgeUtil.newInstance(targetCls);
         final List<Field> fields = getAllFields(targetCls);
         for (Field field : fields) {
             field.setAccessible(true);
+            boolean canConvert;
+            try {
+                canConvert = canConvertField(field);
+            } catch (Exception e) {
+                throw new RuntimeException(String.format("Failed to check if field %s can be converted by %s: %s",
+                        field.getName(), getClass().getName(), e.getMessage()), e);
+            }
             @FieldType
             final int fieldType = getFieldType(field.getType());
 
@@ -138,28 +146,22 @@ public abstract class ResponseConverter extends Converter {
                 continue;
             }
 
-            boolean canConvert;
-            try {
-                canConvert = canConvertField(field);
-            } catch (Exception e) {
-                throw new RuntimeException(String.format("Failed to check if field %s can be converted by %s: %s",
-                        field.getName(), getClass().getName(), e.getMessage()), e);
-            }
             if (canConvert) {
+                final Object responseValue;
                 try {
-                    final Object responseValue;
-                    try {
-                        responseValue = getValueFromResponse(field, fieldType, field.getType());
-                    } catch (Exception e) {
-                        throw new RuntimeException(String.format("Failed to get value from response for field %s of type %s: %s",
-                                field.getName(), field.getType().getName(), e.getMessage()), e);
-                    }
+                    responseValue = getValueFromResponse(field, fieldType, field.getType());
+                } catch (Exception e) {
+                    throw new RuntimeException(String.format("Failed to get value from response for field %s of type %s: %s",
+                            field.getName(), field.getType().getName(), e.getMessage()), e);
+                }
 
-                    if (isPrimitive(field.getType())) {
+                Class<?> fieldCls = field.getType();
+                if (responseValue != null && field.getType() == Object.class)
+                    fieldCls = responseValue.getClass();
+
+                try {
+                    if (isPrimitive(fieldCls)) {
                         switch (fieldType) {
-                            default:
-                                // should never happen
-                                throw new RuntimeException("Unknown primitive field type: " + fieldType);
                             case FIELD_SHORT:
                                 if (responseValue == null)
                                     field.setShort(object, (short) 0);
@@ -199,15 +201,16 @@ public abstract class ResponseConverter extends Converter {
                                     field.setBoolean(object, (boolean) responseValue);
                                 break;
                             case FIELD_STRING:
+                            default:
                                 field.set(object, responseValue);
                                 break;
                         }
-                    } else if (isArray(field.getType())) {
+                    } else if (isArray(fieldCls)) {
                         if (responseValue == null) {
                             field.set(object, null);
                         } else {
                             final int size = getResponseArrayLength(responseValue);
-                            final Class<?> elementType = field.getType().getComponentType();
+                            final Class<?> elementType = fieldCls.getComponentType();
                             final Object array = Array.newInstance(elementType, size);
                             for (int i = 0; i < size; i++) {
                                 try {
@@ -225,7 +228,7 @@ public abstract class ResponseConverter extends Converter {
                             }
                             field.set(object, array);
                         }
-                    } else if (isArrayList(field.getType())) {
+                    } else if (isArrayList(fieldCls)) {
                         if (responseValue == null) {
                             field.set(object, null);
                         } else {
@@ -253,17 +256,17 @@ public abstract class ResponseConverter extends Converter {
                             field.set(object, null);
                         } else {
                             try {
-                                ResponseConverter converter = spawnConverter(field.getType(), responseValue, response);
-                                field.set(object, converter.convertObject(response, field.getType()));
+                                ResponseConverter converter = spawnConverter(fieldCls, responseValue, response);
+                                field.set(object, converter.convertObject(response, fieldCls));
                             } catch (Exception e) {
                                 throw new RuntimeException(String.format("Failed to spawn a converter for field %s of type %s: %s",
-                                        field.getName(), field.getType().getName(), e.getMessage()), e);
+                                        field.getName(), fieldCls.getName(), e.getMessage()), e);
                             }
                         }
                     }
                 } catch (IllegalAccessException e) {
                     throw new RuntimeException(String.format("Failed to set the value of field %s of class %s: %s",
-                            field.getName(), targetCls.getName(), e.getMessage()), e);
+                            field.getName(), field.getType().getName(), e.getMessage()), e);
                 }
             }
         }
