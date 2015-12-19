@@ -21,12 +21,12 @@ public final class Config {
         mDefaultHeaders.put("Content-Type", "text/plain");
 
         mRequestConverters = new HashMap<>();
-        mRequestConverters.put("application/json", new JsonRequestConverter());
-        mRequestConverters.put("text/plain", new JsonRequestConverter());
+        mRequestConverters.put("application/json", JsonRequestConverter.class);
+        mRequestConverters.put("text/plain", JsonRequestConverter.class);
 
         mResponseConverters = new HashMap<>();
-        mResponseConverters.put("application/json", new JsonResponseConverter());
-        mResponseConverters.put("text/plain", new JsonResponseConverter());
+        mResponseConverters.put("application/json", JsonResponseConverter.class);
+        mResponseConverters.put("text/plain", JsonResponseConverter.class);
     }
 
     protected String mHost;
@@ -36,8 +36,8 @@ public final class Config {
     protected int mBufferSize = 1024 * 4;
     protected boolean mLogging = false;
     protected ResponseValidator[] mValidators;
-    protected HashMap<String, RequestConverter> mRequestConverters;
-    protected HashMap<String, ResponseConverter> mResponseConverters;
+    protected HashMap<String, Class<? extends RequestConverter>> mRequestConverters;
+    protected HashMap<String, Class<? extends ResponseConverter>> mResponseConverters;
 
     public Config host(@Nullable String host) {
         mHost = host;
@@ -86,13 +86,18 @@ public final class Config {
     public ResponseConverter responseConverter(@NonNull String contentType) {
         if (contentType.contains(";"))
             contentType = contentType.split(";")[0];
-        ResponseConverter converter = mResponseConverters.get(contentType);
+        ResponseConverter converter = BridgeUtil.newInstance(mResponseConverters.get(contentType));
         if (converter == null)
             throw new IllegalStateException("No response converter available for content type " + contentType);
         return converter;
     }
 
+    @Deprecated
     public Config responseConverter(@NonNull String contentType, @Nullable ResponseConverter converter) {
+        return responseConverter(contentType, converter != null ? converter.getClass() : null);
+    }
+
+    public Config responseConverter(@NonNull String contentType, @Nullable Class<? extends ResponseConverter> converter) {
         if (converter == null)
             mResponseConverters.remove(contentType);
         else
@@ -104,13 +109,18 @@ public final class Config {
     public RequestConverter requestConverter(@NonNull String contentType) {
         if (contentType.contains(";"))
             contentType = contentType.split(";")[0];
-        RequestConverter converter = mRequestConverters.get(contentType);
+        RequestConverter converter = BridgeUtil.newInstance(mRequestConverters.get(contentType));
         if (converter == null)
             throw new IllegalStateException("No request converter available for content type " + contentType);
         return converter;
     }
 
+    @Deprecated
     public Config requestConverter(@NonNull String contentType, @Nullable RequestConverter converter) {
+        return requestConverter(contentType, converter != null ? converter.getClass() : null);
+    }
+
+    public Config requestConverter(@NonNull String contentType, @Nullable Class<? extends RequestConverter> converter) {
         if (converter == null)
             mRequestConverters.remove(contentType);
         else

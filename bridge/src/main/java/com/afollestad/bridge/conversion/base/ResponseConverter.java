@@ -19,6 +19,9 @@ import java.util.List;
  */
 public abstract class ResponseConverter extends Converter {
 
+    public ResponseConverter() {
+    }
+
     @Nullable
     public final <T> T convertObject(@NonNull Response response, @NonNull Class<T> targetCls) {
         final byte[] responseContent = response.asBytes();

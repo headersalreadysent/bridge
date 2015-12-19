@@ -16,6 +16,9 @@ import java.util.List;
  */
 public abstract class RequestConverter<ObjectType, ArrayType> extends Converter {
 
+    public RequestConverter() {
+    }
+
     @NonNull
     public static String getContentType(@NonNull Class<?> forClass, @Nullable Object defaultType) {
         ContentType contentTypeAnnotation = forClass.getAnnotation(ContentType.class);
