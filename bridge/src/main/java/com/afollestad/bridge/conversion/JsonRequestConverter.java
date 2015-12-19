@@ -57,27 +57,27 @@ public class JsonRequestConverter extends RequestConverter<JSONObject, JSONArray
 
     @NonNull
     @Override
-    public JSONObject getAttachTarget(@NonNull JSONObject parent, @NonNull String[] pathParts) {
+    public JSONObject getAttachTarget(@NonNull JSONObject parent, @NonNull String[] nameParts) {
         JSONObject currentObj = parent;
-        for (int i = 0; i < pathParts.length - 1; i++) {
-            if (currentObj.isNull(pathParts[i])) {
+        for (int i = 0; i < nameParts.length - 1; i++) {
+            if (currentObj.isNull(nameParts[i])) {
                 JSONObject newObj = new JSONObject();
                 try {
-                    currentObj.put(pathParts[i], newObj);
+                    currentObj.put(nameParts[i], newObj);
                 } catch (JSONException e) {
                     throw new RuntimeException("Failed to add new path part.", e);
                 }
                 currentObj = newObj;
             } else {
                 try {
-                    Object val = currentObj.get(pathParts[i]);
+                    Object val = currentObj.get(nameParts[i]);
                     if (val instanceof JSONObject)
                         currentObj = (JSONObject) val;
                     else {
-                        throw new RuntimeException("Path part " + pathParts[i] + " already exists in parent and is not a JSONObject.");
+                        throw new RuntimeException("Path part " + nameParts[i] + " already exists in parent and is not a JSONObject.");
                     }
                 } catch (JSONException e) {
-                    throw new RuntimeException("Failed to get" + pathParts[i] + " from the parent object.", e);
+                    throw new RuntimeException("Failed to get" + nameParts[i] + " from the parent object.", e);
                 }
             }
         }

@@ -158,12 +158,11 @@ public abstract class ResponseConverter extends Converter {
                             field.getName(), field.getType().getName(), e.getMessage()), e);
                 }
 
-                final Object responseValue;
+                Object responseValue;
                 try {
-                    if (name.contains("."))
+                    responseValue = getValueFromResponse(name, fieldType, field.getType());
+                    if (name.contains(".") && responseValue == null)
                         responseValue = getValueFromResponse(name.split("\\."), fieldType, field.getType());
-                    else
-                        responseValue = getValueFromResponse(name, fieldType, field.getType());
                 } catch (Exception e) {
                     throw new RuntimeException(String.format("Failed to get value from response for field %s of type %s: %s",
                             field.getName(), field.getType().getName(), e.getMessage()), e);

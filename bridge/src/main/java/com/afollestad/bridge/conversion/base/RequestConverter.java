@@ -197,7 +197,7 @@ public abstract class RequestConverter<ObjectType, ArrayType> extends Converter 
     public abstract String getFieldOutputName(@NonNull Field field) throws Exception;
 
     @NonNull
-    public abstract ObjectType getAttachTarget(@NonNull ObjectType parent, @NonNull String[] pathParts);
+    public abstract ObjectType getAttachTarget(@NonNull ObjectType parent, @NonNull String[] nameParts);
 
     public abstract void onAttachValueToObject(@NonNull String name, @NonNull ObjectType object, @Nullable Object value, @FieldType int fieldType) throws Exception;
 
