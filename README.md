@@ -59,6 +59,7 @@ powered by Java/Android's URLConnection classes for maximum compatibility and sp
 
 [ ![JitPack](https://img.shields.io/github/release/afollestad/bridge.svg?label=bridge) ](https://jitpack.io/#afollestad/bridge)
 [![Build Status](https://travis-ci.org/afollestad/bridge.svg)](https://travis-ci.org/afollestad/bridge)
+[![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg?style=flat-square)](https://www.apache.org/licenses/LICENSE-2.0.html)
 
 ### Repository
 
