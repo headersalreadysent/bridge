@@ -80,7 +80,7 @@ Add this to your module's `build.gradle` file:
 ```gradle
 dependencies {
 	...
-	compile 'com.github.afollestad:bridge:3.0.1'
+	compile 'com.github.afollestad:bridge:3.1.0'
 }
 ```
 
