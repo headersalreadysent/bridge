@@ -8,6 +8,7 @@ import com.afollestad.bridge.annotations.Body;
 import com.afollestad.bridge.conversion.base.RequestConverter;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Field;
@@ -52,6 +53,35 @@ public class JsonRequestConverter extends RequestConverter<JSONObject, JSONArray
         if (bodyAnnotation.name() != null && !bodyAnnotation.name().trim().isEmpty())
             return bodyAnnotation.name();
         return field.getName();
+    }
+
+    @NonNull
+    @Override
+    public JSONObject getAttachTarget(@NonNull JSONObject parent, @NonNull String[] pathParts) {
+        JSONObject currentObj = parent;
+        for (int i = 0; i < pathParts.length - 1; i++) {
+            if (currentObj.isNull(pathParts[i])) {
+                JSONObject newObj = new JSONObject();
+                try {
+                    currentObj.put(pathParts[i], newObj);
+                } catch (JSONException e) {
+                    throw new RuntimeException("Failed to add new path part.", e);
+                }
+                currentObj = newObj;
+            } else {
+                try {
+                    Object val = currentObj.get(pathParts[i]);
+                    if (val instanceof JSONObject)
+                        currentObj = (JSONObject) val;
+                    else {
+                        throw new RuntimeException("Path part " + pathParts[i] + " already exists in parent and is not a JSONObject.");
+                    }
+                } catch (JSONException e) {
+                    throw new RuntimeException("Failed to get" + pathParts[i] + " from the parent object.", e);
+                }
+            }
+        }
+        return currentObj;
     }
 
     @Override

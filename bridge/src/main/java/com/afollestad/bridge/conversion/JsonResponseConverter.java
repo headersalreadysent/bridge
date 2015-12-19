@@ -42,11 +42,8 @@ public class JsonResponseConverter extends ResponseConverter {
     @SuppressLint("SwitchIntDef")
     @Nullable
     @Override
-    public Object getValueFromResponse(@NonNull Field field, @FieldType int fieldType, @NonNull Class<?> cls) throws Exception {
-        final Body bodyAnnotation = field.getAnnotation(Body.class);
-        final String name = getName(field, bodyAnnotation);
+    public Object getValueFromResponse(@NonNull String name, @FieldType int fieldType, @NonNull Class<?> cls) throws Exception {
         if (mCurrentObject.isNull(name)) return null;
-
         switch (fieldType) {
             case FIELD_SHORT:
                 return ((Integer) mCurrentObject.getInt(name)).shortValue();
@@ -70,6 +67,58 @@ public class JsonResponseConverter extends ResponseConverter {
             default:
                 return mCurrentObject.get(name);
         }
+    }
+
+    @SuppressLint("SwitchIntDef")
+    @Nullable
+    @Override
+    public Object getValueFromResponse(@NonNull String[] nameParts, @FieldType int fieldType, @NonNull Class<?> cls) throws Exception {
+        JSONObject currentObj = null;
+        for (int i = 0; i < nameParts.length - 1; i++) {
+            Object val = currentObj != null ? currentObj.opt(nameParts[i]) : mCurrentObject.opt(nameParts[i]);
+            if (val == null)
+                return null;
+            if (val instanceof JSONObject) {
+                currentObj = (JSONObject) val;
+            } else {
+                throw new RuntimeException(String.format("Expected JSONObject for name part %s, but found %s.",
+                        nameParts[i], val.getClass().getName()));
+            }
+        }
+
+        final String name = nameParts[nameParts.length - 1];
+        final JSONObject pullObj = currentObj != null ? currentObj : mCurrentObject;
+        if (pullObj.isNull(name)) return null;
+        switch (fieldType) {
+            case FIELD_SHORT:
+                return ((Integer) pullObj.getInt(name)).shortValue();
+            case FIELD_INTEGER:
+                return pullObj.getInt(name);
+            case FIELD_LONG:
+                return pullObj.getLong(name);
+            case FIELD_FLOAT:
+                return ((Double) pullObj.getDouble(name)).floatValue();
+            case FIELD_DOUBLE:
+                return pullObj.getDouble(name);
+            case FIELD_BOOLEAN:
+                Object value = pullObj.get(name);
+                if (value instanceof Integer)
+                    return (Integer) value == 1;
+                else if (value instanceof Boolean)
+                    return value;
+                else throw new Exception("Unexpected type for JSON field " + value);
+            case FIELD_STRING:
+                return pullObj.getString(name);
+            default:
+                return pullObj.get(name);
+        }
+    }
+
+    @NonNull
+    @Override
+    public String getFieldInputName(@NonNull Field field) throws Exception {
+        final Body bodyAnnotation = field.getAnnotation(Body.class);
+        return getName(field, bodyAnnotation);
     }
 
     @Override

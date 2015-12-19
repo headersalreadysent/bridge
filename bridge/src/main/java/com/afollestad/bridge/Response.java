@@ -173,9 +173,14 @@ public final class Response implements AsResults, Serializable {
         String contentType = contentType();
         if (contentType == null)
             throw new IllegalStateException("Response has no Content-Type, cannot determine appropriate response converter.");
-        return Bridge.config()
+        final long start = System.currentTimeMillis();
+        T result = Bridge.config()
                 .responseConverter(contentType)
                 .convertObject(this, cls);
+        final long diff = System.currentTimeMillis() - start;
+        Log.d(this, "Response conversion to class %s took %d milliseconds (%d seconds).",
+                cls.getName(), diff, diff / 1000);
+        return result;
     }
 
     @Nullable
@@ -183,9 +188,14 @@ public final class Response implements AsResults, Serializable {
         String contentType = contentType();
         if (contentType == null)
             throw new IllegalStateException("Response has no Content-Type, cannot determine appropriate response converter.");
-        return Bridge.config()
+        final long start = System.currentTimeMillis();
+        T[] result = Bridge.config()
                 .responseConverter(contentType)
                 .convertArray(this, cls);
+        final long diff = System.currentTimeMillis() - start;
+        Log.d(this, "Response conversion to array of class %s took %d milliseconds (%d seconds).",
+                cls.getName(), diff, diff / 1000);
+        return result;
     }
 
     @Nullable

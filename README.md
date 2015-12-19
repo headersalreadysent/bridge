@@ -46,10 +46,12 @@ powered by Java/Android's URLConnection classes for maximum compatibility and sp
 
 1. [Request Conversion](https://github.com/afollestad/bridge#request-conversion)
 	1. [JSON Request Conversion](https://github.com/afollestad/bridge#json-request-conversion)
-	2. [Request Conversion API](https://github.com/afollestad/bridge#request-conversion-api)
+	2. [Dot Notation](https://github.com/afollestad/bridge#dot-notation)
+	3. [Request Conversion API](https://github.com/afollestad/bridge#request-conversion-api)
 2. [Response Conversion](https://github.com/afollestad/bridge#response-conversion)
 	1. [JSON Response Conversion](https://github.com/afollestad/bridge#json-response-conversion)
-	2. [Response Conversion API](https://github.com/afollestad/bridge#response-conversion-api)
+	2. [Dot Notation](https://github.com/afollestad/bridge#dot-notation-1)
+	3. [Response Conversion API](https://github.com/afollestad/bridge#response-conversion-api)
 
 ---
 
@@ -980,6 +982,46 @@ Request request = Bridge
     .request();
 ```
 
+### Dot Notation
+
+I thought this was worthy of its own section. Bridge supports dot notation, which is better explained by example. 
+Take this class:
+
+```java
+@ContentType("application/json")
+public static class Person {
+
+    public Person() {
+    }
+
+    public Person(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    @Body(name = "person.name")
+    public String name = "Aidan";
+    @Body(name = "person.age.$t")
+    public int age = 20;
+}
+```
+
+When converted to JSON, it will appear like this:
+
+```json
+{
+    "person": {
+        "name": "Aidan",
+        "age": {
+            "$t": 20
+        }
+    }
+}
+```
+
+The dots in the names of the `Body` annotation parameters indicate a path of objects that it takes
+to reach the value.
+
 ### Request Conversion API
 
 Bridge comes stock with a JSON request converter, but the API is extensible for people like you.
@@ -1082,6 +1124,11 @@ Bridge.get("https://www.someurl.com/person_array.json")
         }
     });
 ```
+
+### Dot Notation
+
+See [Dot Notation](https://github.com/afollestad/bridge#dot-notation) under the Request Conversion API
+ for details. It works the same way here, just in reverse.
 
 ### Response Conversion API
 

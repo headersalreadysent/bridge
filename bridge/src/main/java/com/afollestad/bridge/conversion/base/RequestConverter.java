@@ -103,26 +103,32 @@ public abstract class RequestConverter<ObjectType, ArrayType> extends Converter 
             }
 
             if (canConvert) {
-                final String name;
+                String name;
                 try {
                     name = getFieldOutputName(field);
                 } catch (Exception e) {
                     throw new RuntimeException(String.format("Failed to get output name for field %s of type %s: %s",
                             field.getName(), field.getType().getName(), e.getMessage()), e);
                 }
+                ObjectType attachTarget = output;
+                if (name.contains(".")) {
+                    final String[] splitName = name.split("\\.");
+                    attachTarget = getAttachTarget(attachTarget, splitName);
+                    name = splitName[splitName.length - 1];
+                }
                 try {
                     if (isPrimitive(field.getType())) {
-                        onAttachValueToObject(name, output, fieldValue, fieldType);
+                        onAttachValueToObject(name, attachTarget, fieldValue, fieldType);
                     } else if (isArray(field.getType())) {
-                        processArray(output, fieldValue, field, fieldType, request);
+                        processArray(attachTarget, fieldValue, field, fieldType, request);
                     } else if (isArrayList(field.getType())) {
-                        processList(output, fieldValue, field, fieldType, request);
+                        processList(attachTarget, fieldValue, field, fieldType, request);
                     } else {
                         if (fieldValue == null) {
-                            onAttachObjectToParent(name, null, output);
+                            onAttachObjectToParent(name, null, attachTarget);
                         } else {
                             ObjectType child = processObject(fieldValue, request);
-                            onAttachObjectToParent(name, child, output);
+                            onAttachObjectToParent(name, child, attachTarget);
                         }
                     }
                 } catch (Exception e) {
@@ -186,6 +192,9 @@ public abstract class RequestConverter<ObjectType, ArrayType> extends Converter 
 
     @NonNull
     public abstract String getFieldOutputName(@NonNull Field field) throws Exception;
+
+    @NonNull
+    public abstract ObjectType getAttachTarget(@NonNull ObjectType parent, @NonNull String[] pathParts);
 
     public abstract void onAttachValueToObject(@NonNull String name, @NonNull ObjectType object, @Nullable Object value, @FieldType int fieldType) throws Exception;
 

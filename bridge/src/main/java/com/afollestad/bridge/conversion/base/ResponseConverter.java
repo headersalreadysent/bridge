@@ -147,9 +147,20 @@ public abstract class ResponseConverter extends Converter {
             }
 
             if (canConvert) {
+                String name;
+                try {
+                    name = getFieldInputName(field);
+                } catch (Exception e) {
+                    throw new RuntimeException(String.format("Failed to get input name for field %s of type %s: %s",
+                            field.getName(), field.getType().getName(), e.getMessage()), e);
+                }
+
                 final Object responseValue;
                 try {
-                    responseValue = getValueFromResponse(field, fieldType, field.getType());
+                    if (name.contains("."))
+                        responseValue = getValueFromResponse(name.split("\\."), fieldType, field.getType());
+                    else
+                        responseValue = getValueFromResponse(name, fieldType, field.getType());
                 } catch (Exception e) {
                     throw new RuntimeException(String.format("Failed to get value from response for field %s of type %s: %s",
                             field.getName(), field.getType().getName(), e.getMessage()), e);
@@ -277,8 +288,14 @@ public abstract class ResponseConverter extends Converter {
 
     public abstract boolean canConvertField(@NonNull Field field) throws Exception;
 
+    @NonNull
+    public abstract String getFieldInputName(@NonNull Field field) throws Exception;
+
     @Nullable
-    public abstract Object getValueFromResponse(@NonNull Field field, @FieldType int fieldType, @NonNull Class<?> cls) throws Exception;
+    public abstract Object getValueFromResponse(@NonNull String name, @FieldType int fieldType, @NonNull Class<?> cls) throws Exception;
+
+    @Nullable
+    public abstract Object getValueFromResponse(@NonNull String[] nameParts, @FieldType int fieldType, @NonNull Class<?> cls) throws Exception;
 
     @IntRange(from = 0, to = Integer.MAX_VALUE)
     public abstract int getResponseArrayLength(@NonNull Response response) throws Exception;

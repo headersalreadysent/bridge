@@ -183,10 +183,14 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
         if (object == null) {
             mBody = null;
         } else {
+            final long start = System.currentTimeMillis();
             final String contentType = RequestConverter.getContentType(object.getClass(), mHeaders.get("Content-Type"));
             contentType(contentType);
             RequestConverter converter = Bridge.config().requestConverter(contentType);
             mBody = converter.convertObject(object, this);
+            final long diff = System.currentTimeMillis() - start;
+            Log.d(this, "Request conversion took %dms (%d seconds) for object of type %s.",
+                    diff, diff / 1000, object.getClass().getName());
         }
         return this;
     }
@@ -195,10 +199,14 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
         if (objects == null || objects.length == 0) {
             mBody = null;
         } else {
+            final long start = System.currentTimeMillis();
             final String contentType = RequestConverter.getContentType(objects[0].getClass(), mHeaders.get("Content-Type"));
             contentType(contentType);
             RequestConverter converter = Bridge.config().requestConverter(contentType);
             mBody = converter.convertArray(objects, this);
+            final long diff = System.currentTimeMillis() - start;
+            Log.d(this, "Request conversion took %dms (%d seconds) for array of %s objects.",
+                    diff, diff / 1000, objects[0].getClass().getName());
         }
         return this;
     }
@@ -207,10 +215,14 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
         if (objects == null || objects.size() == 0) {
             mBody = null;
         } else {
+            final long start = System.currentTimeMillis();
             final String contentType = RequestConverter.getContentType(objects.get(0).getClass(), mHeaders.get("Content-Type"));
             contentType(contentType);
             RequestConverter converter = Bridge.config().requestConverter(contentType);
             mBody = converter.convertList(objects, this);
+            final long diff = System.currentTimeMillis() - start;
+            Log.d(this, "Request conversion took %dms (%d seconds) for list of %s objects.",
+                    diff, diff / 1000, objects.get(0).getClass().getName());
         }
         return this;
     }
