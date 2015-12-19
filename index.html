@@ -112,6 +112,7 @@ powered by Java/Android's URLConnection classes for maximum compatibility and sp
 
 <ol>
 <li><a href="https://github.com/afollestad/bridge#json-request-conversion">JSON Request Conversion</a></li>
+<li><a href="https://github.com/afollestad/bridge#dot-notation">Dot Notation</a></li>
 <li><a href="https://github.com/afollestad/bridge#request-conversion-api">Request Conversion API</a></li>
 </ol>
 </li>
@@ -120,6 +121,7 @@ powered by Java/Android's URLConnection classes for maximum compatibility and sp
 
 <ol>
 <li><a href="https://github.com/afollestad/bridge#json-response-conversion">JSON Response Conversion</a></li>
+<li><a href="https://github.com/afollestad/bridge#dot-notation-1">Dot Notation</a></li>
 <li><a href="https://github.com/afollestad/bridge#response-conversion-api">Response Conversion API</a></li>
 </ol>
 </li>
@@ -129,6 +131,9 @@ powered by Java/Android's URLConnection classes for maximum compatibility and sp
 
 <h1>
 <a id="gradle-dependency" class="anchor" href="#gradle-dependency" aria-hidden="true"><span class="octicon octicon-link"></span></a>Gradle Dependency</h1>
+
+<p><a href="https://jitpack.io/#afollestad/bridge"> <img src="https://img.shields.io/github/release/afollestad/bridge.svg?label=bridge" alt="JitPack"> </a>
+<a href="https://travis-ci.org/afollestad/bridge"><img src="https://travis-ci.org/afollestad/bridge.svg" alt="Build Status"></a></p>
 
 <h3>
 <a id="repository" class="anchor" href="#repository" aria-hidden="true"><span class="octicon octicon-link"></span></a>Repository</h3>
@@ -149,10 +154,8 @@ powered by Java/Android's URLConnection classes for maximum compatibility and sp
 
 <div class="highlight highlight-source-groovy-gradle"><pre><span class="pl-en">dependencies</span> {
     <span class="pl-k">..</span>.
-    compile <span class="pl-s"><span class="pl-pds">'</span>com.github.afollestad:bridge:3.0.0<span class="pl-pds">'</span></span>
+    compile <span class="pl-s"><span class="pl-pds">'</span>com.github.afollestad:bridge:3.1.0<span class="pl-pds">'</span></span>
 }</pre></div>
-
-<p><a href="https://jitpack.io/#afollestad/bridge"> <img src="https://img.shields.io/github/release/afollestad/bridge.svg?label=bridge" alt="JitPack Badge"> </a></p>
 
 <hr>
 
@@ -997,6 +1000,43 @@ person<span class="pl-k">.</span>girlfriend <span class="pl-k">=</span> <span cl
     .request();</pre></div>
 
 <h3>
+<a id="dot-notation" class="anchor" href="#dot-notation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Dot Notation</h3>
+
+<p>I thought this was worthy of its own section. Bridge supports dot notation, which is better explained by example. 
+Take this class:</p>
+
+<div class="highlight highlight-source-java"><pre>@ContentType(<span class="pl-s"><span class="pl-pds">"</span>application/json<span class="pl-pds">"</span></span>)
+<span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-k">class</span> <span class="pl-en">Person</span> {
+
+    <span class="pl-k">public</span> <span class="pl-en">Person</span>() {
+    }
+
+    <span class="pl-k">public</span> <span class="pl-en">Person</span>(<span class="pl-smi">String</span> <span class="pl-v">name</span>, <span class="pl-k">int</span> <span class="pl-v">age</span>) {
+        <span class="pl-v">this</span><span class="pl-k">.</span>name <span class="pl-k">=</span> name;
+        <span class="pl-v">this</span><span class="pl-k">.</span>age <span class="pl-k">=</span> age;
+    }
+
+    <span class="pl-k">@Body</span>(<span class="pl-c1">name</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>person.name<span class="pl-pds">"</span></span>)
+    <span class="pl-k">public</span> <span class="pl-smi">String</span> name <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>Aidan<span class="pl-pds">"</span></span>;
+    <span class="pl-k">@Body</span>(<span class="pl-c1">name</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>person.age.$t<span class="pl-pds">"</span></span>)
+    <span class="pl-k">public</span> <span class="pl-k">int</span> age <span class="pl-k">=</span> <span class="pl-c1">20</span>;
+}</pre></div>
+
+<p>When converted to JSON, it will appear like this:</p>
+
+<div class="highlight highlight-source-json"><pre>{
+    <span class="pl-s"><span class="pl-pds">"</span>person<span class="pl-pds">"</span></span>: {
+        <span class="pl-s"><span class="pl-pds">"</span>name<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Aidan<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>age<span class="pl-pds">"</span></span>: {
+            <span class="pl-s"><span class="pl-pds">"</span>$t<span class="pl-pds">"</span></span>: <span class="pl-c1">20</span>
+        }
+    }
+}</pre></div>
+
+<p>The dots in the names of the <code>Body</code> annotation parameters indicate a path of objects that it takes
+to reach the value.</p>
+
+<h3>
 <a id="request-conversion-api" class="anchor" href="#request-conversion-api" aria-hidden="true"><span class="octicon octicon-link"></span></a>Request Conversion API</h3>
 
 <p>Bridge comes stock with a JSON request converter, but the API is extensible for people like you.</p>
@@ -1089,6 +1129,12 @@ conversion, but it should be left there if you plan on using request conversion)
             <span class="pl-c">// Use response objects</span>
         }
     });</pre></div>
+
+<h3>
+<a id="dot-notation-1" class="anchor" href="#dot-notation-1" aria-hidden="true"><span class="octicon octicon-link"></span></a>Dot Notation</h3>
+
+<p>See <a href="https://github.com/afollestad/bridge#dot-notation">Dot Notation</a> under the Request Conversion API
+ for details. It works the same way here, just in reverse.</p>
 
 <h3>
 <a id="response-conversion-api" class="anchor" href="#response-conversion-api" aria-hidden="true"><span class="octicon octicon-link"></span></a>Response Conversion API</h3>
