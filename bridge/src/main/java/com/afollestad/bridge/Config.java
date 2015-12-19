@@ -83,13 +83,15 @@ public final class Config {
     }
 
     @NonNull
-    public ResponseConverter responseConverter(@NonNull String contentType) {
-        if (contentType.contains(";"))
+    public ResponseConverter responseConverter(@Nullable String contentType) {
+        if (contentType == null || contentType.trim().isEmpty())
+            contentType = "application/json";
+        else if (contentType.contains(";"))
             contentType = contentType.split(";")[0];
-        ResponseConverter converter = BridgeUtil.newInstance(mResponseConverters.get(contentType));
-        if (converter == null)
+        final Class<? extends ResponseConverter> converterCls = mResponseConverters.get(contentType);
+        if (converterCls == null)
             throw new IllegalStateException("No response converter available for content type " + contentType);
-        return converter;
+        return BridgeUtil.newInstance(converterCls);
     }
 
     @Deprecated
@@ -106,13 +108,15 @@ public final class Config {
     }
 
     @NonNull
-    public RequestConverter requestConverter(@NonNull String contentType) {
-        if (contentType.contains(";"))
+    public RequestConverter requestConverter(@Nullable String contentType) {
+        if (contentType == null || contentType.trim().isEmpty())
+            contentType = "application/json";
+        else if (contentType.contains(";"))
             contentType = contentType.split(";")[0];
-        RequestConverter converter = BridgeUtil.newInstance(mRequestConverters.get(contentType));
-        if (converter == null)
+        final Class<? extends RequestConverter> converterCls = mRequestConverters.get(contentType);
+        if (converterCls == null)
             throw new IllegalStateException("No request converter available for content type " + contentType);
-        return converter;
+        return BridgeUtil.newInstance(converterCls);
     }
 
     @Deprecated
