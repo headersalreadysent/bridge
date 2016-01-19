@@ -35,6 +35,7 @@ public final class Config {
     protected int mReadTimeout = 15000;
     protected int mBufferSize = 1024 * 4;
     protected boolean mLogging = false;
+    protected boolean mDetailedRequestLogging = false;
     protected ResponseValidator[] mValidators;
     protected HashMap<String, Class<? extends RequestConverter>> mRequestConverters;
     protected HashMap<String, Class<? extends ResponseConverter>> mResponseConverters;
@@ -46,6 +47,11 @@ public final class Config {
 
     public Config logging(boolean enabled) {
         mLogging = enabled;
+        return this;
+    }
+
+    public Config advancedRequestLogging(boolean enabled) {
+        mDetailedRequestLogging = enabled;
         return this;
     }
 

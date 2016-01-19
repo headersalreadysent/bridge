@@ -1,6 +1,7 @@
 package com.afollestad.bridge;
 
 import android.support.annotation.IntDef;
+import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 
 import java.io.ByteArrayOutputStream;
@@ -38,9 +39,25 @@ public final class Request implements Serializable {
         return mBuilder;
     }
 
+    private String valueToString(@Nullable Object value) {
+        if (value == null) return null;
+        else if (value instanceof String) return (String) value;
+        else if (value instanceof Character) return Character.toString((Character) value);
+        else if (value instanceof Short) return Short.toString((Short) value);
+        else if (value instanceof Integer) return Integer.toString((Integer) value);
+        else if (value instanceof Long) return Long.toString((Long) value);
+        else if (value instanceof Boolean) return Boolean.toString((Boolean) value);
+        else if (value instanceof Double) return Double.toString((Double) value);
+        else if (value instanceof Float) return Float.toString((Float) value);
+        else if (value instanceof Byte) return Byte.toString((Byte) value);
+        else if (value instanceof byte[]) return new String((byte[]) value);
+        else return value.toString();
+    }
+
     @WorkerThread
     protected Request makeRequest() throws BridgeException {
         try {
+            Log2.d(this, "");
             URL url = new URL(mBuilder.mUrl);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             int responseCode = -1;
@@ -55,14 +72,18 @@ public final class Request implements Serializable {
 
                 if (mBuilder.mHeaders != null && mBuilder.mHeaders.size() > 0) {
                     for (final String key : mBuilder.mHeaders.keySet()) {
-                        final Object value = mBuilder.mHeaders.get(key);
-                        conn.setRequestProperty(key, value + "");
+                        final String value = valueToString(mBuilder.mHeaders.get(key));
+                        conn.setRequestProperty(key, value);
+                        Log2.d(this, "HEADER %s = %s", key, value);
                     }
                 }
-                if (mBuilder.mPipe != null)
+                if (mBuilder.mPipe != null) {
+                    Log2.d(this, "HEADER Content-Length = %d", mBuilder.mPipe.contentLength());
                     conn.setRequestProperty("Content-Length", mBuilder.mPipe.contentLength() + "");
-                else if (mBuilder.mBody != null)
+                } else if (mBuilder.mBody != null) {
+                    Log2.d(this, "HEADER Content-Length = %d", mBuilder.mBody.length);
                     conn.setRequestProperty("Content-Length", mBuilder.mBody.length + "");
+                }
                 conn.setDoInput(true);
 
                 checkCancelled();
@@ -71,6 +92,8 @@ public final class Request implements Serializable {
                         mBuilder.mUploadProgress.mRequest = this;
                     conn.setDoOutput(true);
                     conn.connect();
+
+                    Log2.d(this, "Connection established");
                     if (mBuilder.mInfoCallback != null)
                         mBuilder.mInfoCallback.onConnected(this);
 
@@ -78,14 +101,16 @@ public final class Request implements Serializable {
                     try {
                         os = conn.getOutputStream();
                         if (mBuilder.mPipe != null) {
+                            Log2.d(this, "Uploading content from Pipe %s", mBuilder.mPipe.getClass().getSimpleName());
                             mBuilder.mPipe.writeTo(os, mBuilder.mUploadProgress);
-                            Log.d(Request.this, "Wrote pipe content to %s %s request.",
+                            Log2.d(Request.this, "Wrote pipe content to %s %s request.",
                                     Method.name(method()), url());
                         } else {
+                            Log2.d(this, "Uploading content from raw body.");
                             os.write(mBuilder.mBody);
                             if (mBuilder.mUploadProgress != null)
                                 mBuilder.mUploadProgress.publishProgress(mBuilder.mBody.length, mBuilder.mBody.length);
-                            Log.d(Request.this, "Wrote %d bytes to %s %s request.",
+                            Log2.d(Request.this, "Wrote %d bytes to %s %s request.",
                                     mBuilder.mBody.length, Method.name(method()), url());
                         }
                         os.flush();
@@ -96,6 +121,7 @@ public final class Request implements Serializable {
                     }
                 } else {
                     conn.connect();
+                    Log2.d(this, "Connection established");
                     if (mBuilder.mInfoCallback != null)
                         mBuilder.mInfoCallback.onConnected(this);
                 }
@@ -111,6 +137,7 @@ public final class Request implements Serializable {
                 Log.d(Request.this, "%s %s status: %s %s", Method.name(method()), url(), responseCode, responseMessage);
 
                 try {
+                    Log2.d(this, "Preparing to receive data...");
                     is = conn.getInputStream();
                     bos = new ByteArrayOutputStream();
                     byte[] buf = new byte[Bridge.config().mBufferSize];
@@ -120,6 +147,7 @@ public final class Request implements Serializable {
                     if (conn.getHeaderField("Content-Length") != null)
                         totalAvailable = Integer.parseInt(conn.getHeaderField("Content-Length"));
                     else totalAvailable = is.available();
+                    Log2.d(this, "Server reported %d bytes available for download.", totalAvailable);
                     if (totalAvailable != 0)
                         mBuilder.mContext.fireProgress(Request.this, 0, totalAvailable);
                     while ((read = is.read(buf)) != -1) {
@@ -128,6 +156,7 @@ public final class Request implements Serializable {
                         totalRead += read;
                         if (totalAvailable != 0)
                             mBuilder.mContext.fireProgress(Request.this, totalRead, totalAvailable);
+                        Log2.d(this, "Received %d/%d bytes...", totalRead, totalAvailable);
                     }
                     if (totalAvailable == 0)
                         mBuilder.mContext.fireProgress(Request.this, 100, 100);
@@ -175,6 +204,7 @@ public final class Request implements Serializable {
         }
         if (mBuilder.mValidators != null) {
             for (ResponseValidator val : mBuilder.mValidators) {
+                Log2.d(this, "Checking with validator %s...", val.id());
                 try {
                     if (!val.validate(mResponse))
                         throw new BridgeException(mResponse, val);

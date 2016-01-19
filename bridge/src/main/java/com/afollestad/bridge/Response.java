@@ -85,6 +85,7 @@ public final class Response implements AsResults, Serializable {
     }
 
     public boolean isSuccess() {
+        Log2.d(this, "HTTP status %d was considered unsuccessful.", mCode);
         //noinspection PointlessBooleanExpression
         return mCode == -1 || mCode >= 200 && mCode < 300;
     }
