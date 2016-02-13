@@ -40,6 +40,8 @@ public class BridgeException extends Exception {
     private Response mResponse;
     @Nullable
     private String mValidatorId;
+    @Nullable
+    private Exception mUnderlyingException;
 
     // Request constructors
 
@@ -84,6 +86,7 @@ public class BridgeException extends Exception {
         super(e.getLocalizedMessage(), e);
         if (e instanceof BridgeException)
             throw new IllegalArgumentException("BridgeException cannot wrap a BridgeException.");
+        mUnderlyingException = e;
         mResponse = response;
         mReason = REASON_RESPONSE_VALIDATOR_ERROR;
         mValidatorId = validator.id();
@@ -97,6 +100,7 @@ public class BridgeException extends Exception {
         super(String.format("%s: %s", forceString ? response.asString() : response.toString(), e.getLocalizedMessage()), e);
         if (e instanceof BridgeException)
             throw new IllegalArgumentException("BridgeException cannot wrap a BridgeException.");
+        mUnderlyingException = e;
         mResponse = response;
         mReason = reason;
     }
@@ -116,6 +120,11 @@ public class BridgeException extends Exception {
     @Reason
     public int reason() {
         return mReason;
+    }
+
+    @Nullable
+    public Exception underlyingException() {
+        return mUnderlyingException;
     }
 
     @Nullable
