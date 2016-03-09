@@ -8,6 +8,4 @@ import android.support.annotation.NonNull;
 public interface LineCallback {
 
     void onLine(@NonNull String line);
-
-    void onResponse(@NonNull Response response);
 }
