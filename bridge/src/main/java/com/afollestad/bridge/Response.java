@@ -64,6 +64,12 @@ public final class Response implements AsResults, Serializable {
         return header.get(0);
     }
 
+    public boolean headerEquals(String name, String value) {
+        String headerVal = header(name);
+        return headerVal == null && value == null ||
+                (headerVal != null && headerVal.equals(value));
+    }
+
     public Map<String, List<String>> headers() {
         return mHeaders;
     }
