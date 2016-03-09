@@ -332,7 +332,7 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
     }
 
     @Override
-    public void asLineStream(@NonNull LineCallback cb) throws BridgeException {
+    public void asLineStream(@NonNull LineCallback cb) {
         mLineCallback = cb;
     }
 
