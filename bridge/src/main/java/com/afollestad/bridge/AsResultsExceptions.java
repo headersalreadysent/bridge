@@ -27,6 +27,8 @@ interface AsResultsExceptions {
 
     void asString(@NonNull ResponseConvertCallback<String> callback);
 
+    void asLineStream(@NonNull LineCallback cb);
+
     @Nullable
     Spanned asHtml() throws BridgeException;
 
@@ -60,6 +62,7 @@ interface AsResultsExceptions {
     <T> T[] asClassArray(@NonNull Class<T> cls) throws BridgeException;
 
     <T> void asClassArray(@NonNull Class<T> cls, @NonNull ResponseConvertCallback<T[]> callback);
+
 
     @Nullable
     Object asSuggested() throws BridgeException;

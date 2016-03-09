@@ -4,9 +4,11 @@ import android.support.annotation.IntDef;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.lang.annotation.Retention;
@@ -139,7 +141,6 @@ public final class Request implements Serializable {
                 try {
                     Log2.d(this, "Preparing to receive data...");
                     is = conn.getInputStream();
-                    bos = new ByteArrayOutputStream();
                     byte[] buf = new byte[Bridge.config().mBufferSize];
                     int read;
                     int totalRead = 0;
@@ -147,22 +148,40 @@ public final class Request implements Serializable {
                     if (conn.getHeaderField("Content-Length") != null)
                         totalAvailable = Integer.parseInt(conn.getHeaderField("Content-Length"));
                     else totalAvailable = is.available();
-                    Log2.d(this, "Server reported %d bytes available for download.", totalAvailable);
-                    if (totalAvailable != 0)
-                        mBuilder.mContext.fireProgress(Request.this, 0, totalAvailable);
-                    while ((read = is.read(buf)) != -1) {
-                        checkCancelled();
-                        bos.write(buf, 0, read);
-                        totalRead += read;
+
+                    if (mBuilder.mLineCallback != null) {
+                        BufferedReader reader = null;
+                        try {
+                            reader = new BufferedReader(new InputStreamReader(is));
+                            String line;
+                            int count = 0;
+                            while ((line = reader.readLine()) != null) {
+                                mBuilder.mLineCallback.onLine(line);
+                                count++;
+                            }
+                            Log2.d(this, "Read %d lines from the server.", count);
+                        } finally {
+                            BridgeUtil.closeQuietly(reader);
+                        }
+                    } else {
+                        bos = new ByteArrayOutputStream();
+                        Log2.d(this, "Server reported %d bytes available for download.", totalAvailable);
                         if (totalAvailable != 0)
-                            mBuilder.mContext.fireProgress(Request.this, totalRead, totalAvailable);
-                        Log2.d(this, "Received %d/%d bytes...", totalRead, totalAvailable);
+                            mBuilder.mContext.fireProgress(Request.this, 0, totalAvailable);
+                        while ((read = is.read(buf)) != -1) {
+                            checkCancelled();
+                            bos.write(buf, 0, read);
+                            totalRead += read;
+                            if (totalAvailable != 0)
+                                mBuilder.mContext.fireProgress(Request.this, totalRead, totalAvailable);
+                            Log2.d(this, "Received %d/%d bytes...", totalRead, totalAvailable);
+                        }
+                        if (totalAvailable == 0)
+                            mBuilder.mContext.fireProgress(Request.this, 100, 100);
+                        data = bos.toByteArray();
+                        Log.d(Request.this, "Read %d bytes from the %s %s response.", data != null ?
+                                data.length : 0, Method.name(method()), url());
                     }
-                    if (totalAvailable == 0)
-                        mBuilder.mContext.fireProgress(Request.this, 100, 100);
-                    data = bos.toByteArray();
-                    Log.d(Request.this, "Read %d bytes from the %s %s response.", data != null ?
-                            data.length : 0, Method.name(method()), url());
                 } finally {
                     BridgeUtil.closeQuietly(is);
                     BridgeUtil.closeQuietly(bos);

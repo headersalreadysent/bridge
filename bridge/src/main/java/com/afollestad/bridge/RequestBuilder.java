@@ -42,6 +42,7 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
     protected ResponseValidator[] mValidators;
     protected ProgressCallback mUploadProgress;
     protected InfoCallback mInfoCallback;
+    protected LineCallback mLineCallback;
 
     protected RequestBuilder(String url, @Request.MethodInt int method, Bridge context) {
         mContext = context;
@@ -328,6 +329,11 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
                 else callback.onResponse(response, response.asString(), null);
             }
         });
+    }
+
+    @Override
+    public void asLineStream(@NonNull LineCallback cb) throws BridgeException {
+        mLineCallback = cb;
     }
 
     @Nullable
