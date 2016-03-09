@@ -27,7 +27,9 @@ interface AsResultsExceptions {
 
     void asString(@NonNull ResponseConvertCallback<String> callback);
 
-    void asLineStream(@NonNull LineCallback cb);
+    Response asLineStream(@NonNull LineCallback cb) throws BridgeException;
+
+    void asLineStream(@NonNull LineCallback cb, @NonNull Callback callback);
 
     @Nullable
     Spanned asHtml() throws BridgeException;
