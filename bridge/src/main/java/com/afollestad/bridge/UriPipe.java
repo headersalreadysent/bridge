@@ -32,6 +32,7 @@ public final class UriPipe extends Pipe {
             byte[] buffer = new byte[Bridge.config().mBufferSize];
             int read;
             int totalRead = 0;
+            getStream();
             final int totalAvailable = mStream.available();
             while ((read = mStream.read(buffer)) != -1) {
                 os.write(buffer, 0, read);
