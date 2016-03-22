@@ -81,7 +81,7 @@ Add this to your module's `build.gradle` file:
 ```gradle
 dependencies {
 	...
-	compile 'com.github.afollestad:bridge:37c14baeb2'
+	compile 'com.github.afollestad:bridge:dc0b29887e'
 }
 ```
 
