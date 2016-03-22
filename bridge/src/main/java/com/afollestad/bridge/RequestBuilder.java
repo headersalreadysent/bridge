@@ -488,10 +488,15 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
         request(new Callback() {
             @Override
             public void response(Request request, Response response, BridgeException e) {
-                if (e != null)
+                if (e != null) {
                     callback.onResponse(response, null, e);
-                else
-                    callback.onResponse(response, response.asClass(cls), null);
+                } else {
+                    try {
+                        callback.onResponse(response, response.asClass(cls), null);
+                    } catch (BridgeException e1) {
+                        callback.onResponse(response, null, e1);
+                    }
+                }
             }
         });
     }
@@ -510,10 +515,15 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
         request(new Callback() {
             @Override
             public void response(Request request, Response response, BridgeException e) {
-                if (e != null)
+                if (e != null) {
                     callback.onResponse(response, null, e);
-                else
-                    callback.onResponse(response, response.asClassArray(cls), null);
+                } else {
+                    try {
+                        callback.onResponse(response, response.asClassArray(cls), null);
+                    } catch (BridgeException e1) {
+                        callback.onResponse(response, null, e1);
+                    }
+                }
             }
         });
     }

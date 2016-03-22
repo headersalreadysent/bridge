@@ -36,10 +36,10 @@ interface AsResults {
     void asFile(File destination) throws BridgeException;
 
     @Nullable
-    <T> T asClass(@NonNull Class<T> cls);
+    <T> T asClass(@NonNull Class<T> cls) throws BridgeException;
 
     @Nullable
-    <T> T[] asClassArray(@NonNull Class<T> cls);
+    <T> T[] asClassArray(@NonNull Class<T> cls) throws BridgeException;
 
     @Nullable
     Object asSuggested() throws BridgeException;

@@ -185,14 +185,14 @@ public final class Response implements AsResults, Serializable {
     }
 
     @Nullable
-    public <T> T asClass(@NonNull Class<T> cls) {
+    public <T> T asClass(@NonNull Class<T> cls) throws BridgeException {
         String contentType = contentType();
         if (contentType == null) {
             String msg = String.format(Locale.getDefault(),
                     "Response has no Content-Type, cannot determine appropriate response converter. Response status: %d.", mCode);
             for (String key : mHeaders.keySet())
                 msg += String.format(Locale.getDefault(), "\n    %s = %s", key, mHeaders.get(key).get(0));
-            throw new IllegalStateException(msg);
+            throw new BridgeException(this, msg, BridgeException.REASON_RESPONSE_UNPARSEABLE);
         }
         final long start = System.currentTimeMillis();
         T result = Bridge.config()
@@ -205,14 +205,14 @@ public final class Response implements AsResults, Serializable {
     }
 
     @Nullable
-    public <T> T[] asClassArray(@NonNull Class<T> cls) {
+    public <T> T[] asClassArray(@NonNull Class<T> cls) throws BridgeException {
         String contentType = contentType();
         if (contentType == null) {
             String msg = String.format(Locale.getDefault(),
                     "Response has no Content-Type, cannot determine appropriate response converter. Response status: %d.", mCode);
             for (String key : mHeaders.keySet())
                 msg += String.format(Locale.getDefault(), "\n    %s = %s", key, mHeaders.get(key).get(0));
-            throw new IllegalStateException(msg);
+            throw new BridgeException(this, msg, BridgeException.REASON_RESPONSE_UNPARSEABLE);
         }
         final long start = System.currentTimeMillis();
         T[] result = Bridge.config()
