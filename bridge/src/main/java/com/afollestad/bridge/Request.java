@@ -59,7 +59,6 @@ public final class Request implements Serializable {
     @WorkerThread
     protected Request makeRequest() throws BridgeException {
         try {
-            Log2.d(this, "");
             URL url = new URL(mBuilder.mUrl);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             int responseCode = -1;
@@ -192,6 +191,17 @@ public final class Request implements Serializable {
                 if (mBuilder.mThrowIfNotSuccess)
                     BridgeUtil.throwIfNotSuccess(mResponse);
                 conn.disconnect();
+
+                if (responseCode == 301) {
+                    // Follow redirect
+                    final List<String> locHeader = responseHeaders.get("Location");
+                    if (locHeader.size() > 0) {
+                        Log.d(Request.this, "Following redirect: " + locHeader.get(0));
+                        mBuilder.mUrl = locHeader.get(0);
+                        return makeRequest(); // chain redirected request
+                    }
+                }
+
                 Log.d(Request.this, "%s %s request completed successfully.", Method.name(method()), url());
             } catch (Exception fnf) {
                 Log.e(Request.this, "Processing exception... %s, %s", fnf.getClass().getName(), fnf.getMessage());

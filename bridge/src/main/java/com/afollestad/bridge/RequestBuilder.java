@@ -25,10 +25,9 @@ import java.util.Map;
 public final class RequestBuilder implements AsResultsExceptions, Serializable {
 
     protected final Bridge mContext;
-    protected final String mUrl;
-    protected final
+    protected String mUrl;
     @Request.MethodInt
-    int mMethod;
+    protected final int mMethod;
     protected HashMap<String, Object> mHeaders;
     protected byte[] mBody;
     protected Pipe mPipe;
