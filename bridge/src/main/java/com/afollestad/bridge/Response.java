@@ -88,13 +88,16 @@ public final class Response implements AsResults, Serializable {
 
     public int contentLength() {
         String contentLength = header("Content-Length");
+        if (contentLength == null) contentLength = header("content-length");
         if (contentLength == null) return -1;
         return Integer.parseInt(contentLength);
     }
 
     @Nullable
     public String contentType() {
-        return header("Content-Type");
+        String contentType = header("Content-Type");
+        if (contentType == null) contentType = header("content-type");
+        return contentType;
     }
 
     public boolean isSuccess() {

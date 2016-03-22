@@ -146,9 +146,13 @@ public final class Request implements Serializable {
                     int read;
                     int totalRead = 0;
                     int totalAvailable;
-                    if (conn.getHeaderField("Content-Length") != null)
-                        totalAvailable = Integer.parseInt(conn.getHeaderField("Content-Length"));
-                    else totalAvailable = is.available();
+                    if (conn.getHeaderField("Content-Length") != null) {
+                        String clStr = conn.getHeaderField("Content-Length");
+                        if (clStr == null) clStr = conn.getHeaderField("content-length");
+                        totalAvailable = Integer.parseInt(clStr);
+                    } else {
+                        totalAvailable = is.available();
+                    }
 
                     if (mBuilder.mLineCallback != null) {
                         BufferedReader reader = null;
