@@ -68,7 +68,9 @@ public final class Request implements Serializable {
             try {
                 conn.setReadTimeout(mBuilder.mReadTimeout);
                 conn.setConnectTimeout(mBuilder.mConnectTimeout);
-                conn.setRequestMethod(Method.name(mBuilder.mMethod));
+                final String method = Method.name(mBuilder.mMethod);
+                Log2.d(Request.this, "Resolved HTTP method %d to %s", mBuilder.mMethod, method);
+                conn.setRequestMethod(method);
                 conn.setInstanceFollowRedirects(true);
 
                 if (mBuilder.mHeaders != null && mBuilder.mHeaders.size() > 0) {
