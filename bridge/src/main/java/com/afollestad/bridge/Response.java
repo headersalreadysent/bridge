@@ -35,13 +35,19 @@ public final class Response implements AsResults, Serializable {
     private transient JSONObject mJsonObjCache;
     private transient JSONArray mJsonArrayCache;
     private HashMap<String, List<String>> mHeaders;
+    private boolean mDidRedirect;
 
-    protected Response(byte[] data, String url, int code, String message, HashMap<String, List<String>> headers) throws IOException {
+    protected Response(byte[] data, String url, int code, String message, HashMap<String, List<String>> headers, boolean didRedirect) throws IOException {
         mData = data;
         mUrl = url;
         mCode = code;
         mMessage = message;
         mHeaders = headers;
+        mDidRedirect = didRedirect;
+    }
+
+    public boolean didRedirect() {
+        return mDidRedirect;
     }
 
     public String url() {

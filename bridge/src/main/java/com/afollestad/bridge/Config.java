@@ -39,6 +39,7 @@ public final class Config {
     protected ResponseValidator[] mValidators;
     protected HashMap<String, Class<? extends RequestConverter>> mRequestConverters;
     protected HashMap<String, Class<? extends ResponseConverter>> mResponseConverters;
+    protected boolean mAutoFollowRedirects = true;
 
     public Config host(@Nullable String host) {
         mHost = host;
@@ -135,6 +136,11 @@ public final class Config {
             mRequestConverters.remove(contentType);
         else
             mRequestConverters.put(contentType, converter);
+        return this;
+    }
+
+    public Config autoFollowRedirects(boolean follow) {
+        mAutoFollowRedirects = follow;
         return this;
     }
 

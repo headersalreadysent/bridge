@@ -42,6 +42,12 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
     protected ProgressCallback mUploadProgress;
     protected InfoCallback mInfoCallback;
     protected LineCallback mLineCallback;
+    protected boolean mDidRedirect = false;
+
+    protected void prepareRedirect(String url) {
+        mUrl = url;
+        mDidRedirect = true;
+    }
 
     protected RequestBuilder(String url, @Request.MethodInt int method, Bridge context) {
         mContext = context;

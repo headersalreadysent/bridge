@@ -187,18 +187,22 @@ public final class Request implements Serializable {
                 }
 
                 checkCancelled();
-                mResponse = new Response(data, url(), responseCode, responseMessage, responseHeaders);
+                mResponse = new Response(data, url(), responseCode, responseMessage, responseHeaders, mBuilder.mDidRedirect);
                 if (mBuilder.mThrowIfNotSuccess)
                     BridgeUtil.throwIfNotSuccess(mResponse);
                 conn.disconnect();
 
                 if (responseCode == 301) {
-                    // Follow redirect
                     final List<String> locHeader = responseHeaders.get("Location");
                     if (locHeader.size() > 0) {
-                        Log.d(Request.this, "Following redirect: " + locHeader.get(0));
-                        mBuilder.mUrl = locHeader.get(0);
-                        return makeRequest(); // chain redirected request
+                        if (Bridge.config().mAutoFollowRedirects) {
+                            // Follow redirect
+                            Log.d(Request.this, "Following redirect: " + locHeader.get(0));
+                            mBuilder.prepareRedirect(locHeader.get(0));
+                            return makeRequest(); // chain redirected request
+                        } else {
+                            Log2.d(Request.this, "Redirect NOT followed: " + locHeader.get(0));
+                        }
                     }
                 }
 
@@ -214,11 +218,11 @@ public final class Request implements Serializable {
                 try {
                     es = conn.getErrorStream();
                     mResponse = new Response(BridgeUtil.readEntireStream(es), url(),
-                            responseCode, responseMessage, responseHeaders);
+                            responseCode, responseMessage, responseHeaders, mBuilder.mDidRedirect);
                 } catch (Throwable e3) {
                     Log.e(Request.this, "Unable to get error stream... %s", e3.getMessage());
                     mResponse = new Response(null, url(), responseCode,
-                            responseMessage, responseHeaders);
+                            responseMessage, responseHeaders, mBuilder.mDidRedirect);
                 } finally {
                     BridgeUtil.closeQuietly(es);
                     conn.disconnect();
