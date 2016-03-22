@@ -20,6 +20,7 @@ import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -186,8 +187,13 @@ public final class Response implements AsResults, Serializable {
     @Nullable
     public <T> T asClass(@NonNull Class<T> cls) {
         String contentType = contentType();
-        if (contentType == null)
-            throw new IllegalStateException("Response has no Content-Type, cannot determine appropriate response converter.");
+        if (contentType == null) {
+            String msg = String.format(Locale.getDefault(),
+                    "Response has no Content-Type, cannot determine appropriate response converter. Response status: %d.", mCode);
+            for (String key : mHeaders.keySet())
+                msg += String.format(Locale.getDefault(), "\n    %s = %s", key, mHeaders.get(key).get(0));
+            throw new IllegalStateException(msg);
+        }
         final long start = System.currentTimeMillis();
         T result = Bridge.config()
                 .responseConverter(contentType)
@@ -201,8 +207,13 @@ public final class Response implements AsResults, Serializable {
     @Nullable
     public <T> T[] asClassArray(@NonNull Class<T> cls) {
         String contentType = contentType();
-        if (contentType == null)
-            throw new IllegalStateException("Response has no Content-Type, cannot determine appropriate response converter.");
+        if (contentType == null) {
+            String msg = String.format(Locale.getDefault(),
+                    "Response has no Content-Type, cannot determine appropriate response converter. Response status: %d.", mCode);
+            for (String key : mHeaders.keySet())
+                msg += String.format(Locale.getDefault(), "\n    %s = %s", key, mHeaders.get(key).get(0));
+            throw new IllegalStateException(msg);
+        }
         final long start = System.currentTimeMillis();
         T[] result = Bridge.config()
                 .responseConverter(contentType)
