@@ -1,7 +1,29 @@
 apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 
-group='com.afollestad'
+ext {
+    bintrayRepo = 'maven'
+    bintrayName = 'bridge'
+
+    publishedGroupId = 'com.afollestad'
+    libraryName = 'Bridge'
+    artifact = 'bridge'
+
+    libraryDescription = 'A simple but powerful HTTP networking library for Android. It features a Fluent chainable API, powered by Java/Android\'s URLConnection classes for maximum compatibility and speed.'
+
+    siteUrl = 'https://github.com/afollestad/material-cab'
+    gitUrl = 'https://github.com/afollestad/material-cab.git'
+
+    libraryVersion = '3.2.1'
+
+    developerId = 'afollestad'
+    developerName = 'Aidan Follestad'
+    developerEmail = 'drummer.aidan@gmail.com'
+
+    licenseName = 'Apache 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0'
+    allLicenses = ["apache-2.0"]
+}
 
 android {
     compileSdkVersion 23
@@ -22,3 +44,6 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:support-annotations:23.3.0'
 }
+
+apply from: 'https://raw.githubusercontent.com/afollestad/aidanfollestad.com/master/bintrayInstall.gradle'
+apply from: 'https://raw.githubusercontent.com/afollestad/aidanfollestad.com/master/bintrayUpload.gradle'

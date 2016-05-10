@@ -57,22 +57,12 @@ powered by Java/Android's URLConnection classes for maximum compatibility and sp
 
 # Gradle Dependency
 
-[![Release](https://jitpack.io/v/afollestad/bridge.svg)](https://jitpack.io/#afollestad/bridge)
+[ ![Download](https://api.bintray.com/packages/drummer-aidan/maven/bridge/images/download.svg) ](https://bintray.com/drummer-aidan/maven/bridge/_latestVersion)
 [![Build Status](https://travis-ci.org/afollestad/bridge.svg)](https://travis-ci.org/afollestad/bridge)
 [![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg?style=flat-square)](https://www.apache.org/licenses/LICENSE-2.0.html)
 
-### Repository
-
-Add this in your root `build.gradle` file (**not** your module `build.gradle` file):
-
-```gradle
-allprojects {
-	repositories {
-		...
-		maven { url "https://jitpack.io" }
-	}
-}
-```
+The Gradle dependency is available via [jCenter](https://bintray.com/drummer-aidan/maven/bridge/view).
+jCenter is the default Maven repository used by Android Studio.
 
 ### Dependency
 
@@ -80,8 +70,9 @@ Add this to your module's `build.gradle` file:
 
 ```gradle
 dependencies {
-	...
-	compile 'com.github.afollestad:bridge:3.2.1'
+	// ... other dependencies
+
+	compile 'com.afollestad:bridge:3.2.1'
 }
 ```
 
