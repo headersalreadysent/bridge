@@ -57,7 +57,7 @@ powered by Java/Android's URLConnection classes for maximum compatibility and sp
 
 # Gradle Dependency
 
-[ ![Download](https://api.bintray.com/packages/drummer-aidan/maven/bridge/images/download.svg) ](https://bintray.com/drummer-aidan/maven/bridge/_latestVersion)
+[ ![jCenter](https://api.bintray.com/packages/drummer-aidan/maven/bridge/images/download.svg) ](https://bintray.com/drummer-aidan/maven/bridge/_latestVersion)
 [![Build Status](https://travis-ci.org/afollestad/bridge.svg)](https://travis-ci.org/afollestad/bridge)
 [![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg?style=flat-square)](https://www.apache.org/licenses/LICENSE-2.0.html)
 
