@@ -1054,7 +1054,7 @@ public class Person {
     @Header(name = "Custom-Header")
     public String customHeader;
 
-    @Body(name = "full_name")
+    @Body(name = "name")
     public String name;
     @Body
     public int age;
