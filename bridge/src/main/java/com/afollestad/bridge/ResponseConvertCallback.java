@@ -8,5 +8,5 @@ import android.support.annotation.Nullable;
  */
 public interface ResponseConvertCallback<T> {
 
-    void onResponse(@NonNull Response response, @Nullable T object, @Nullable BridgeException e);
+    void onResponse(@Nullable Response response, @Nullable T object, @Nullable BridgeException e);
 }
