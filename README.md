@@ -72,7 +72,7 @@ Add this to your module's `build.gradle` file:
 dependencies {
 	// ... other dependencies
 
-	compile 'com.afollestad:bridge:3.2.4'
+	compile 'com.afollestad:bridge:3.2.5'
 }
 ```
 

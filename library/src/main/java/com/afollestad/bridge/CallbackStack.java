@@ -1,5 +1,6 @@
 package com.afollestad.bridge;
 
+import android.annotation.SuppressLint;
 import android.os.Handler;
 
 import java.util.ArrayList;
@@ -11,8 +12,9 @@ import java.util.List;
  */
 final class CallbackStack {
 
+    @SuppressLint("DefaultLocale")
     public static String createKey(Request req) {
-        return String.format("%d\0%s\0%s", req.method(), req.url(),
+        return String.format("%d\0%s\0%s", req.method(), req.url().replace("http://", "").replace("https://", ""),
                 req.builder().mBody != null ? req.builder().mBody.length + "" : "");
     }
 
