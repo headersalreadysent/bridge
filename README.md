@@ -1068,10 +1068,10 @@ Imagine a URL that returns JSON like this:
 ```json
 {
     "name": "Aidan Follestad",
-    "age": 20,
+    "age": 21,
     "spouse": {
         "name": "Waverly Moua",
-        "age": 18
+        "age": 19
     }
 }
 ```
@@ -1126,7 +1126,7 @@ See [Dot Notation](https://github.com/afollestad/bridge#dot-notation) under the 
 
 Bridge comes stock with a JSON response converter, but the API is extensible for people like you.
 
-See the [JsonResponseConverter](https://github.com/afollestad/bridge/blob/master/bridge/src/main/java/com/afollestad/bridge/conversion/JsonResponseConverter.java) 
+See the [JsonResponseConverter](https://github.com/afollestad/bridge/blob/master/library/src/main/java/com/afollestad/bridge/conversion/JsonResponseConverter.java) 
 source code for an example of how a `ResponseConverter` is made. It should come off as simple.
 
 When you have a custom converter made, you can register it to a Content-Type:
