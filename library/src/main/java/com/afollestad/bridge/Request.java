@@ -198,7 +198,7 @@ public final class Request implements Serializable {
                     BridgeUtil.throwIfNotSuccess(mResponse);
                 conn.disconnect();
 
-                if (responseCode == 301) {
+                if (responseCode >= 300 && responseCode <= 303) {
                     final List<String> locHeader = responseHeaders.get("Location");
                     if (locHeader.size() > 0) {
                         if (Bridge.config().mAutoFollowRedirects) {
