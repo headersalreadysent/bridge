@@ -19,6 +19,8 @@ public abstract class Pipe implements Serializable {
     public Pipe() {
     }
 
+    public abstract String hash();
+
     public abstract void writeTo(@NonNull OutputStream os, @Nullable ProgressCallback progressListener) throws IOException;
 
     @NonNull
@@ -43,7 +45,9 @@ public abstract class Pipe implements Serializable {
     /**
      * Creates a Pipe that reads an InputStream and transfers the content into the Pipe.
      */
-    public static Pipe forStream(@NonNull InputStream is, @NonNull String contentType) {
-        return new TransferPipe(is, contentType);
+    public static Pipe forStream(@NonNull InputStream is, @NonNull String contentType, @NonNull String hash) {
+        return new TransferPipe(is, contentType, hash);
     }
+
+    public abstract void close();
 }

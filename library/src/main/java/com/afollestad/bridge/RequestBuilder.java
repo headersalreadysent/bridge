@@ -121,7 +121,7 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
             mBody = null;
             return this;
         }
-        header("Content-Type", "text/plain");
+        contentType("text/plain");
         try {
             mBody = textBody.getBytes("UTF-8");
         } catch (UnsupportedEncodingException e) {
@@ -137,7 +137,7 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
             return this;
         }
         body(json.toString());
-        header("Content-Type", "application/json");
+        contentType("application/json");
         return this;
     }
 
@@ -147,7 +147,7 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
             return this;
         }
         body(json.toString());
-        header("Content-Type", "application/json");
+        contentType("application/json");
         return this;
     }
 
@@ -157,7 +157,7 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
             return this;
         }
         body(form.toString());
-        header("Content-Type", "application/x-www-form-urlencoded");
+        contentType("application/x-www-form-urlencoded");
         return this;
     }
 
@@ -167,13 +167,13 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
             return this;
         }
         body(form.data());
-        header("Content-Type", String.format("multipart/form-data; boundary=%s", form.BOUNDARY));
+        contentType(String.format("multipart/form-data; boundary=%s", form.BOUNDARY));
         return this;
     }
 
     public RequestBuilder body(@NonNull Pipe pipe) {
         mPipe = pipe;
-        header("Content-Type", pipe.contentType());
+        contentType(pipe.contentType());
         return this;
     }
 

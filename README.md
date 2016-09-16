@@ -72,7 +72,7 @@ Add this to your module's `build.gradle` file:
 dependencies {
 	// ... other dependencies
 
-	compile 'com.afollestad:bridge:3.2.5'
+	compile 'com.afollestad:bridge:3.3.0'
 }
 ```
 
@@ -200,7 +200,15 @@ Bridge's `Pipe` API allows you to easily stream data directly into a post body.
 
 ```java
 Pipe pipe = new Pipe() {
+
     byte[] content = "Hello, this is a streaming example".getBytes();
+
+    @Override
+    public String hash() {
+        // Creates a unique identifier based on the content being sent,
+        // Used for duplicate request handling.
+        return HashUtil.hash(content);
+    }
 
     @Override
     public void writeTo(@NonNull OutputStream os, @Nullable ProgressCallback progressListener) throws IOException {
@@ -213,6 +221,7 @@ Pipe pipe = new Pipe() {
     @NonNull
     @Override
     public String contentType() {
+        // text/plain since we are sending bytes that represent a string, or plain text.
         return "text/plain";
     }
 
@@ -220,10 +229,15 @@ Pipe pipe = new Pipe() {
     public int contentLength() throws IOException {
         return content.length;
     }
+
+    @Override
+    public void close() {
+        // Unused for this simple example, usually you would close streams and release resources
+    }
 };
 
 Request request = Bridge
-    .post("https://someurl.com/post.js")
+    .post("https://someurl.com/post.php")
     .body(pipe)
     .request();
 ```
@@ -242,7 +256,7 @@ Pipe uriPipe = Pipe.forUri(this, Uri.parse(
 Pipe filePipe = Pipe.forFile(new File("/sdcard/myfile.txt"));
 
 InputStream is = // ...
-Pipe transferPipe = Pipe.forStream(is, "text/plain");
+Pipe transferPipe = Pipe.forStream(is, "text/plain", "unique-identifier-such-as-file-name");
 ```
 
 They should be mostly self-explanatory.

@@ -120,6 +120,8 @@ public final class Request implements Serializable {
                         if (mBuilder.mInfoCallback != null)
                             mBuilder.mInfoCallback.onRequestSent(this);
                     } finally {
+                        if (mBuilder.mPipe != null)
+                            mBuilder.mPipe.close();
                         BridgeUtil.closeQuietly(os);
                     }
                 } else {

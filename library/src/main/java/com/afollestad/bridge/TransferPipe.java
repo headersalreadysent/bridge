@@ -2,7 +2,6 @@ package com.afollestad.bridge;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.text.InputType;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,26 +14,30 @@ public final class TransferPipe extends Pipe {
 
     private final InputStream mIs;
     private final String mContentType;
+    private String mHash;
 
-    protected TransferPipe(@NonNull InputStream is, @NonNull String contentType) {
+    protected TransferPipe(@NonNull InputStream is, @NonNull String contentType, @NonNull String hash) {
         mIs = is;
         mContentType = contentType;
+        mHash = hash;
+    }
+
+    @Override
+    public String hash() {
+        return mHash;
     }
 
     @Override
     public void writeTo(@NonNull OutputStream os, @Nullable ProgressCallback progressCallback) throws IOException {
-        try {
-            byte[] buffer = new byte[Bridge.config().mBufferSize];
-            int read;
-            int totalRead = 0;
-            while ((read = mIs.read(buffer)) != -1) {
-                os.write(buffer, 0, read);
-                totalRead += read;
-                if (progressCallback != null)
-                    progressCallback.publishProgress(totalRead, mIs.available());
-            }
-        } finally {
-            BridgeUtil.closeQuietly(mIs);
+        byte[] buffer = new byte[Bridge.config().mBufferSize];
+        int read;
+        int totalRead = 0;
+        final int available = mIs.available();
+        while ((read = mIs.read(buffer)) != -1) {
+            os.write(buffer, 0, read);
+            totalRead += read;
+            if (progressCallback != null)
+                progressCallback.publishProgress(totalRead, available);
         }
     }
 
@@ -46,12 +49,12 @@ public final class TransferPipe extends Pipe {
 
     @Override
     public int contentLength() throws IOException {
-        if (mIs == null)
-            return -1;
+
         return mIs.available();
     }
 
-    public InputStream getStream() {
-        return mIs;
+    @Override
+    public void close() {
+        BridgeUtil.closeQuietly(mIs);
     }
 }

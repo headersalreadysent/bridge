@@ -20,10 +20,24 @@ public final class UriPipe extends Pipe {
     private final Context mContext;
     private final Uri mUri;
     private InputStream mStream;
+    private String mHash;
 
     protected UriPipe(Context context, Uri uri) {
         mContext = context;
         mUri = uri;
+    }
+
+    @Override
+    public String hash() {
+        if (mHash == null) {
+            try {
+                getStream();
+                mHash = HashUtil.hash(mUri.toString() + "/" + mStream.available());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return mHash;
     }
 
     @Override
@@ -37,6 +51,7 @@ public final class UriPipe extends Pipe {
             while ((read = mStream.read(buffer)) != -1) {
                 os.write(buffer, 0, read);
                 totalRead += read;
+                Log2.d(this, "Wrote %d bytes into the destination stream (%d/%d).", read, totalRead, totalAvailable);
                 if (progressCallback != null)
                     progressCallback.publishProgress(totalRead, totalAvailable);
             }
@@ -73,5 +88,10 @@ public final class UriPipe extends Pipe {
             else mStream = mContext.getContentResolver().openInputStream(mUri);
         }
         return mStream;
+    }
+
+    @Override
+    public void close() {
+        BridgeUtil.closeQuietly(mStream);
     }
 }
