@@ -566,6 +566,9 @@ it waits for the first to finish executing, and returns the response to both cal
 There is no limit to how many requests can be pooled. Bridge's sample project requests an entire
 page of images, but the image is only downloaded once.
 
+**With POST/PUT requests, duplicate avoidance will also account for request bodies using MD5 hashes.
+If request bodies are different, they will be considered two different requests that should both execute.**
+
 ### Upload Progress
 
 Upload progress is pretty straight forward:
