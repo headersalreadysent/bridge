@@ -287,14 +287,14 @@ Request request = Bridge
 	.request();
 	
 Response response = request.response();
-if (response.isSuccessful()) {
+if (response.isSuccess()) {
 	// Request returned HTTP status 200-300
 } else {
 	// Request returned an HTTP error status
 }
 ```
 
-You can also have Bridge throw an Exception in the event that `isSuccessful()`
+You can also have Bridge throw an Exception in the event that `isSuccess()`
 returns false:
 
 ```java
