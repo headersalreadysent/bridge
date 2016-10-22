@@ -970,8 +970,8 @@ You can use instances of this class as a request body. Fields not marked with th
 annotation are ignored.
 
 ```java
-Person person = new Person("Aidan Follestad", 20);
-person.girlfriend = new Person("Waverly Moua", 18);
+Person person = new Person("Aidan Follestad", 21);
+person.girlfriend = new Person("Waverly Moua", 19);
 Request request = Bridge
     .post("https://someurl.com/post.js")
     .body(person)
@@ -982,8 +982,8 @@ You can even send arrays or lists of this object as a request body (and it gets 
 
 ```java
 Person[] people = new People[] {
-    new Person("Aidan Follestad", 20),
-    new Person("Waverly Moua", 18)
+    new Person("Aidan Follestad", 21),
+    new Person("Waverly Moua", 19)
 };
 Request request = Bridge
     .post("https://someurl.com/post.js")
@@ -1011,7 +1011,7 @@ public static class Person {
     @Body(name = "person.name")
     public String name = "Aidan";
     @Body(name = "person.age.$t")
-    public int age = 20;
+    public int age = 21;
 }
 ```
 
@@ -1022,7 +1022,7 @@ When converted to JSON, it will appear like this:
     "person": {
         "name": "Aidan",
         "age": {
-            "$t": 20
+            "$t": 21
         }
     }
 }
