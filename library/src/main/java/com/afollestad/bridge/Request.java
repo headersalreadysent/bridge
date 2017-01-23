@@ -5,8 +5,10 @@ import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -86,6 +88,7 @@ public final class Request implements Serializable {
                 } else if (mBuilder.mBody != null) {
                     Log2.d(this, "HEADER Content-Length = %d", mBuilder.mBody.length);
                     conn.setRequestProperty("Content-Length", mBuilder.mBody.length + "");
+                    conn.setFixedLengthStreamingMode(mBuilder.mBody.length); // Disable internal buffering to make upload progress work properly
                 }
                 conn.setDoInput(true);
 
@@ -110,7 +113,7 @@ public final class Request implements Serializable {
                                     Method.name(method()), url());
                         } else {
                             Log2.d(this, "Uploading content from raw body.");
-                            os.write(mBuilder.mBody);
+                            writeTo(mBuilder.mBody, os, mBuilder.mUploadProgress);
                             if (mBuilder.mUploadProgress != null)
                                 mBuilder.mUploadProgress.publishProgress(mBuilder.mBody.length, mBuilder.mBody.length);
                             Log2.d(Request.this, "Wrote %d bytes to %s %s request.",
@@ -259,6 +262,21 @@ public final class Request implements Serializable {
         if (mBuilder.mThrowIfNotSuccess)
             BridgeUtil.throwIfNotSuccess(mResponse);
         return this;
+    }
+
+    private void writeTo(byte[] bytes, OutputStream os, ProgressCallback progressCallback) throws IOException {
+        byte[] buffer = new byte[Bridge.config().mBufferSize];
+        InputStream is = new ByteArrayInputStream(bytes);
+        int read;
+        int totalRead = 0;
+        final int available = is.available();
+        while ((read = is.read(buffer)) != -1) {
+            os.write(buffer, 0, read);
+            totalRead += read;
+            if (progressCallback != null)
+                progressCallback.publishProgress(totalRead, available);
+        }
+        // ByteArrayInputStream doesn't have to be closed
     }
 
     private void checkCancelled() throws BridgeException {
