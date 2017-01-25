@@ -1,32 +1,34 @@
 package com.afollestad.bridge;
 
+import android.annotation.SuppressLint;
 import android.support.annotation.NonNull;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.Locale;
 
 /**
  * @author Aidan Follestad (afollestad)
  */
-public final class MultipartForm {
+@SuppressWarnings({"WeakerAccess", "unused"}) public final class MultipartForm {
 
-    protected final String BOUNDARY;
+    final String BOUNDARY;
     private final byte[] LINE_FEED = "\r\n".getBytes();
-    private ByteArrayOutputStream mBos;
-    private int mCount;
-    private String mEncoding;
+    private ByteArrayOutputStream byteArrayOutputStream;
+    private int count;
+    private String encoding;
 
     public MultipartForm() {
-        BOUNDARY = String.format("------%d------", System.currentTimeMillis());
-        mBos = new ByteArrayOutputStream();
-        mEncoding = "UTF-8";
+        BOUNDARY = String.format(Locale.US, "------%d------", System.currentTimeMillis());
+        byteArrayOutputStream = new ByteArrayOutputStream();
+        encoding = "UTF-8";
     }
 
     public MultipartForm(@NonNull String encoding) {
-        BOUNDARY = String.format("------%d------", System.currentTimeMillis());
-        mBos = new ByteArrayOutputStream();
-        mEncoding = encoding;
+        BOUNDARY = String.format(Locale.US, "------%d------", System.currentTimeMillis());
+        byteArrayOutputStream = new ByteArrayOutputStream();
+        this.encoding = encoding;
     }
 
     public MultipartForm add(@NonNull String fieldName, @NonNull final File file) throws IOException {
@@ -35,57 +37,57 @@ public final class MultipartForm {
     }
 
     public MultipartForm add(@NonNull String fieldName, @NonNull String fileName, @NonNull Pipe pipe) throws IOException {
-        if (mBos == null)
+        if (byteArrayOutputStream == null)
             throw new IllegalStateException("This MultipartForm is already consumed.");
-        if (mCount > 0) mBos.write(LINE_FEED);
-        mBos.write(("--" + BOUNDARY).getBytes());
-        mBos.write(LINE_FEED);
-        mBos.write(("Content-Disposition: form-data; name=\"" + fieldName
+        if (count > 0) byteArrayOutputStream.write(LINE_FEED);
+        byteArrayOutputStream.write(("--" + BOUNDARY).getBytes());
+        byteArrayOutputStream.write(LINE_FEED);
+        byteArrayOutputStream.write(("Content-Disposition: form-data; name=\"" + fieldName
                 + "\"; filename=\"" + fileName + "\"").getBytes());
-        mBos.write(LINE_FEED);
-        mBos.write(("Content-Type: " + pipe.contentType()).getBytes());
-        mBos.write(LINE_FEED);
-        mBos.write("Content-Transfer-Encoding: binary".getBytes());
-        mBos.write(LINE_FEED);
-        mBos.write(LINE_FEED);
-        pipe.writeTo(mBos, null);
-        mCount++;
+        byteArrayOutputStream.write(LINE_FEED);
+        byteArrayOutputStream.write(("Content-Type: " + pipe.contentType()).getBytes());
+        byteArrayOutputStream.write(LINE_FEED);
+        byteArrayOutputStream.write("Content-Transfer-Encoding: binary".getBytes());
+        byteArrayOutputStream.write(LINE_FEED);
+        byteArrayOutputStream.write(LINE_FEED);
+        pipe.writeTo(byteArrayOutputStream, null);
+        count++;
         return this;
     }
 
     public MultipartForm add(@NonNull String fieldName, @NonNull Object value) {
-        if (mBos == null)
+        if (byteArrayOutputStream == null)
             throw new IllegalStateException("This MultipartForm is already consumed.");
         try {
-            if (mCount > 0) mBos.write(LINE_FEED);
-            mBos.write(("--" + BOUNDARY).getBytes());
-            mBos.write(LINE_FEED);
-            mBos.write(String.format("Content-Disposition: form-data; name=\"%s\"", fieldName).getBytes());
-            mBos.write(LINE_FEED);
-            mBos.write(("Content-Type: text/plain; charset=" + mEncoding).getBytes());
-            mBos.write(LINE_FEED);
-            mBos.write(LINE_FEED);
-            mBos.write((value + "").getBytes(mEncoding));
+            if (count > 0) byteArrayOutputStream.write(LINE_FEED);
+            byteArrayOutputStream.write(("--" + BOUNDARY).getBytes());
+            byteArrayOutputStream.write(LINE_FEED);
+            byteArrayOutputStream.write(String.format("Content-Disposition: form-data; name=\"%s\"", fieldName).getBytes());
+            byteArrayOutputStream.write(LINE_FEED);
+            byteArrayOutputStream.write(("Content-Type: text/plain; charset=" + encoding).getBytes());
+            byteArrayOutputStream.write(LINE_FEED);
+            byteArrayOutputStream.write(LINE_FEED);
+            byteArrayOutputStream.write((value + "").getBytes(encoding));
         } catch (Exception e) {
             // Shouldn't happen
             throw new RuntimeException(e);
         }
-        mCount++;
+        count++;
         return this;
     }
 
-    protected byte[] data() {
+    byte[] data() {
         try {
-            mBos.write(LINE_FEED);
-            mBos.write(String.format("--%s--", BOUNDARY).getBytes());
-            mBos.write(LINE_FEED);
+            byteArrayOutputStream.write(LINE_FEED);
+            byteArrayOutputStream.write(String.format("--%s--", BOUNDARY).getBytes());
+            byteArrayOutputStream.write(LINE_FEED);
         } catch (Exception e) {
             // Shouldn't happen
             throw new RuntimeException(e);
         }
-        final byte[] data = mBos.toByteArray();
-        BridgeUtil.closeQuietly(mBos);
-        mBos = null;
+        final byte[] data = byteArrayOutputStream.toByteArray();
+        BridgeUtil.closeQuietly(byteArrayOutputStream);
+        byteArrayOutputStream = null;
         return data;
     }
 }

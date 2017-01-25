@@ -13,7 +13,7 @@ import java.util.List;
 final class CallbackStack {
 
     @SuppressLint("DefaultLocale")
-    public static String createKey(Request req) {
+    static String createKey(Request req) {
         String key = String.format("%d\0%s\0%s", req.method(), req.url().replace("http://", "").replace("https://", ""),
                 req.builder().mBody != null ? req.builder().mBody.length + "" : "");
         if (req.builder().mMethod == Method.POST ||
@@ -31,65 +31,65 @@ final class CallbackStack {
     }
 
     private final Object LOCK = new Object();
-    private List<Callback> mCallbacks;
-    private Request mDriverRequest;
-    private int mPercent = -1;
-    private Handler mHandler;
+    private List<Callback> callbacks;
+    private Request driverRequest;
+    private int percent = -1;
+    private Handler handler;
 
-    public CallbackStack() {
-        mCallbacks = new ArrayList<>();
-        mHandler = new Handler();
+    CallbackStack() {
+        callbacks = new ArrayList<>();
+        handler = new Handler();
     }
 
     public int size() {
         synchronized (LOCK) {
-            if (mCallbacks == null) return -1;
-            return mCallbacks.size();
+            if (callbacks == null) return -1;
+            return callbacks.size();
         }
     }
 
-    public void push(Callback callback, Request request) {
+    void push(Callback callback, Request request) {
         synchronized (LOCK) {
-            if (mCallbacks == null)
+            if (callbacks == null)
                 throw new IllegalStateException("This stack has already been fired or cancelled.");
             callback.isCancellable = request.isCancellable();
-            callback.mTag = request.builder().mTag;
-            mCallbacks.add(callback);
-            if (mDriverRequest == null)
-                mDriverRequest = request;
+            callback.tag = request.builder().mTag;
+            callbacks.add(callback);
+            if (driverRequest == null)
+                driverRequest = request;
         }
     }
 
-    public void fireAll(final Response response, final BridgeException error) {
+    void fireAll(final Response response, final BridgeException error) {
         synchronized (LOCK) {
-            if (mCallbacks == null)
+            if (callbacks == null)
                 throw new IllegalStateException("This stack has already been fired.");
-            for (final Callback cb : mCallbacks) {
-                mHandler.post(new Runnable() {
+            for (final Callback cb : callbacks) {
+                handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        cb.response(mDriverRequest, response, error);
+                        cb.response(driverRequest, response, error);
                     }
                 });
             }
-            mCallbacks.clear();
-            mCallbacks = null;
+            callbacks.clear();
+            callbacks = null;
         }
     }
 
-    public void fireAllProgress(final Request request, final int current, final int total) {
+    void fireAllProgress(final Request request, final int current, final int total) {
         synchronized (LOCK) {
-            if (mCallbacks == null)
+            if (callbacks == null)
                 throw new IllegalStateException("This stack has already been fired.");
             int newPercent = (int) (((float) current / (float) total) * 100f);
-            if (newPercent != mPercent) {
-                mPercent = newPercent;
+            if (newPercent != percent) {
+                percent = newPercent;
                 synchronized (LOCK) {
-                    for (final Callback cb : mCallbacks) {
-                        mHandler.post(new Runnable() {
+                    for (final Callback cb : callbacks) {
+                        handler.post(new Runnable() {
                             @Override
                             public void run() {
-                                cb.progress(request, current, total, mPercent);
+                                cb.progress(request, current, total, percent);
                             }
                         });
                     }
@@ -98,29 +98,29 @@ final class CallbackStack {
         }
     }
 
-    public boolean cancelAll(Object tag, boolean force) {
+    boolean cancelAll(Object tag, boolean force) {
         synchronized (LOCK) {
-            if (mCallbacks == null)
+            if (callbacks == null)
                 throw new IllegalStateException("This stack has already been cancelled.");
-            final Iterator<Callback> callIter = mCallbacks.iterator();
-            while (callIter.hasNext()) {
-                final Callback callback = callIter.next();
-                if (tag != null && !tag.equals(callback.mTag))
+            final Iterator<Callback> callbackIterator = callbacks.iterator();
+            while (callbackIterator.hasNext()) {
+                final Callback callback = callbackIterator.next();
+                if (tag != null && !tag.equals(callback.tag))
                     continue;
                 if (callback.isCancellable || force) {
-                    callIter.remove();
-                    mHandler.post(new Runnable() {
+                    callbackIterator.remove();
+                    handler.post(new Runnable() {
                         @Override
                         public void run() {
-                            callback.response(mDriverRequest, null, new BridgeException(mDriverRequest));
+                            callback.response(driverRequest, null, new BridgeException(driverRequest));
                         }
                     });
                 }
             }
-            if (mCallbacks.size() == 0) {
-                mDriverRequest.mCancelCallbackFired = true;
-                mDriverRequest.cancel(force);
-                mCallbacks = null;
+            if (callbacks.size() == 0) {
+                driverRequest.cancelCallbackFired = true;
+                driverRequest.cancel(force);
+                callbacks = null;
                 return true;
             } else {
                 return false;

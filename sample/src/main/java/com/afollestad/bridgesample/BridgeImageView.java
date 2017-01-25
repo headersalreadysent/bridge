@@ -2,6 +2,7 @@ package com.afollestad.bridgesample;
 
 import android.content.Context;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 
@@ -46,7 +47,7 @@ public class BridgeImageView extends ImageView {
                 .tag(mTag)
                 .request(new Callback() {
                     @Override
-                    public void response(Request request, Response response, BridgeException e) {
+                    public void response(@NonNull Request request, Response response, BridgeException e) {
                         if (response != null)
                             setImageBitmap(response.asBitmap());
                     }

@@ -31,18 +31,15 @@ public class JsonRequestConverter extends RequestConverter<JSONObject, JSONArray
         // not used in the JsonRequestConverter, called before conversion of an object array begins
     }
 
-    @Override
-    public JSONObject createOutputObject() {
+    @Override public JSONObject createOutputObject() {
         return new JSONObject();
     }
 
-    @Override
-    public JSONArray createOutputArray() {
+    @Override public JSONArray createOutputArray() {
         return new JSONArray();
     }
 
-    @Override
-    public boolean canConvertField(@NonNull Field field) throws Exception {
+    @Override public boolean canConvertField(@NonNull Field field) throws Exception {
         return field.getAnnotation(Body.class) != null;
     }
 

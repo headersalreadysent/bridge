@@ -14,7 +14,7 @@ import java.io.Serializable;
 /**
  * @author Aidan Follestad (afollestad)
  */
-public abstract class Pipe implements Serializable {
+@SuppressWarnings({"WeakerAccess", "unused"}) public abstract class Pipe implements Serializable {
 
     public Pipe() {
     }

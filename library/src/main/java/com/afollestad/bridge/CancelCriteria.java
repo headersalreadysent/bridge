@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 /**
  * @author Aidan Follestad (afollestad)
  */
-public class CancelCriteria {
+@SuppressWarnings("WeakerAccess") public class CancelCriteria {
 
     private Bridge mClient;
     private final Object LOCK;
@@ -23,7 +23,7 @@ public class CancelCriteria {
     private Object mTag = null;
     private boolean mForce = false;
 
-    protected CancelCriteria(Bridge client, Object lock) {
+    CancelCriteria(Bridge client, Object lock) {
         mClient = client;
         LOCK = lock;
         mHandler = new Handler();
@@ -67,20 +67,20 @@ public class CancelCriteria {
 
     public int commit() {
         synchronized (LOCK) {
-            if (mClient.mRequestMap == null) return 0;
+            if (mClient.requestMap == null) return 0;
             int cancelledCount = 0;
-            final Iterator<Map.Entry<String, CallbackStack>> iter = mClient.mRequestMap.entrySet().iterator();
+            final Iterator<Map.Entry<String, CallbackStack>> iter = mClient.requestMap.entrySet().iterator();
             while (iter.hasNext()) {
                 final Map.Entry<String, CallbackStack> entry = iter.next();
                 if (passesMethod(entry) && passesUrlRegex(entry)) {
-                    if (mClient.mRequestMap.get(entry.getKey()).cancelAll(mTag, mForce)) {
+                    if (mClient.requestMap.get(entry.getKey()).cancelAll(mTag, mForce)) {
                         iter.remove();
                         cancelledCount++;
                     }
                 }
             }
-            if (mClient.mRequestMap.size() == 0)
-                mClient.mRequestMap = null;
+            if (mClient.requestMap.size() == 0)
+                mClient.requestMap = null;
             return cancelledCount;
         }
     }
@@ -107,7 +107,7 @@ public class CancelCriteria {
         }).start();
     }
 
-    public interface CancelCallback {
+    @SuppressWarnings("WeakerAccess") public interface CancelCallback {
         void onRequestsCancelled(int count);
     }
 }

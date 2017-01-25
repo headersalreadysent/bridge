@@ -27,46 +27,47 @@ import java.util.Map;
 /**
  * @author Aidan Follestad (afollestad)
  */
+@SuppressWarnings({"WeakerAccess", "unused"})
 public final class Response implements AsResults, Serializable {
 
-    private final String mUrl;
-    private final byte[] mData;
-    private int mCode = -1;
-    private String mMessage;
-    private transient Bitmap mBitmapCache;
-    private transient JSONObject mJsonObjCache;
-    private transient JSONArray mJsonArrayCache;
-    private HashMap<String, List<String>> mHeaders;
-    private boolean mDidRedirect;
+    private final String url;
+    private final byte[] data;
+    private int code = -1;
+    private String message;
+    private transient Bitmap bitmapCache;
+    private transient JSONObject jsonObjCache;
+    private transient JSONArray jsonArrayCache;
+    private HashMap<String, List<String>> headers;
+    private boolean didRedirect;
 
     protected Response(byte[] data, String url, int code, String message, HashMap<String, List<String>> headers, boolean didRedirect) throws IOException {
-        mData = data;
-        mUrl = url;
-        mCode = code;
-        mMessage = message;
-        mHeaders = headers;
-        mDidRedirect = didRedirect;
+        this.data = data;
+        this.url = url;
+        this.code = code;
+        this.message = message;
+        this.headers = headers;
+        this.didRedirect = didRedirect;
     }
 
     public boolean didRedirect() {
-        return mDidRedirect;
+        return didRedirect;
     }
 
     public String url() {
-        return mUrl;
+        return url;
     }
 
     public int code() {
-        return mCode;
+        return code;
     }
 
     public String phrase() {
-        return mMessage;
+        return message;
     }
 
     @Nullable
     public String header(String name) {
-        List<String> header = mHeaders.get(name);
+        List<String> header = headers.get(name);
         if (header == null || header.isEmpty())
             return null;
         return header.get(0);
@@ -79,12 +80,12 @@ public final class Response implements AsResults, Serializable {
     }
 
     public Map<String, List<String>> headers() {
-        return mHeaders;
+        return headers;
     }
 
     @Nullable
     public List<String> headerList(String name) {
-        return mHeaders.get(name);
+        return headers.get(name);
     }
 
     public int contentLength() {
@@ -103,15 +104,15 @@ public final class Response implements AsResults, Serializable {
 
     public boolean isSuccess() {
         //noinspection PointlessBooleanExpression
-        boolean success = mCode == -1 || mCode >= 200 && mCode <= 303;
+        boolean success = code == -1 || code >= 200 && code <= 303;
         if (!success)
-            Log2.d(this, "HTTP status %d was considered unsuccessful.", mCode);
+            Log2.d(this, "HTTP status %d was considered unsuccessful.", code);
         return success;
     }
 
     @Nullable
     public byte[] asBytes() {
-        return mData;
+        return data;
     }
 
     @Nullable
@@ -138,12 +139,12 @@ public final class Response implements AsResults, Serializable {
     @Nullable
     @Override
     public Bitmap asBitmap() {
-        if (mBitmapCache == null) {
+        if (bitmapCache == null) {
             final InputStream is = new ByteArrayInputStream(asBytes());
-            mBitmapCache = BitmapFactory.decodeStream(is);
+            bitmapCache = BitmapFactory.decodeStream(is);
             BridgeUtil.closeQuietly(is);
         }
-        return mBitmapCache;
+        return bitmapCache;
     }
 
     @Nullable
@@ -151,9 +152,9 @@ public final class Response implements AsResults, Serializable {
         final String content = asString();
         if (content == null) return null;
         try {
-            if (mJsonObjCache == null)
-                mJsonObjCache = new JSONObject(content);
-            return mJsonObjCache;
+            if (jsonObjCache == null)
+                jsonObjCache = new JSONObject(content);
+            return jsonObjCache;
         } catch (JSONException e) {
             throw new BridgeException(this, e, BridgeException.REASON_RESPONSE_UNPARSEABLE);
         }
@@ -164,9 +165,9 @@ public final class Response implements AsResults, Serializable {
         final String content = asString();
         if (content == null) return null;
         try {
-            if (mJsonArrayCache == null)
-                mJsonArrayCache = new JSONArray(content);
-            return mJsonArrayCache;
+            if (jsonArrayCache == null)
+                jsonArrayCache = new JSONArray(content);
+            return jsonArrayCache;
         } catch (JSONException e) {
             throw new BridgeException(this, e, BridgeException.REASON_RESPONSE_UNPARSEABLE);
         }
@@ -193,9 +194,9 @@ public final class Response implements AsResults, Serializable {
         String contentType = contentType();
         if (contentType == null) {
             String msg = String.format(Locale.getDefault(),
-                    "Response has no Content-Type, cannot determine appropriate response converter. Response status: %d.", mCode);
-            for (String key : mHeaders.keySet())
-                msg += String.format(Locale.getDefault(), "\n    %s = %s", key, mHeaders.get(key).get(0));
+                    "Response has no Content-Type, cannot determine appropriate response converter. Response status: %d.", code);
+            for (String key : headers.keySet())
+                msg += String.format(Locale.getDefault(), "\n    %s = %s", key, headers.get(key).get(0));
             throw new BridgeException(this, msg, BridgeException.REASON_RESPONSE_UNPARSEABLE);
         }
         final long start = System.currentTimeMillis();
@@ -213,9 +214,9 @@ public final class Response implements AsResults, Serializable {
         String contentType = contentType();
         if (contentType == null) {
             String msg = String.format(Locale.getDefault(),
-                    "Response has no Content-Type, cannot determine appropriate response converter. Response status: %d.", mCode);
-            for (String key : mHeaders.keySet())
-                msg += String.format(Locale.getDefault(), "\n    %s = %s", key, mHeaders.get(key).get(0));
+                    "Response has no Content-Type, cannot determine appropriate response converter. Response status: %d.", code);
+            for (String key : headers.keySet())
+                msg += String.format(Locale.getDefault(), "\n    %s = %s", key, headers.get(key).get(0));
             throw new BridgeException(this, msg, BridgeException.REASON_RESPONSE_UNPARSEABLE);
         }
         final long start = System.currentTimeMillis();
@@ -271,8 +272,8 @@ public final class Response implements AsResults, Serializable {
             suggested = asBytes();
         }
         String bodyDescriptor = suggested instanceof byte[] ?
-                String.format("%d bytes", ((byte[]) suggested).length) :
+                String.format(Locale.US, "%d bytes", ((byte[]) suggested).length) :
                 suggested != null ? suggested.toString() : "(null)";
-        return String.format("%s, %d %s, %s", mUrl, mCode, mMessage, bodyDescriptor);
+        return String.format(Locale.US, "%s, %d %s, %s", url, code, message, bodyDescriptor);
     }
 }

@@ -16,35 +16,25 @@ import java.util.List;
  */
 interface AsResults {
 
-    @Nullable
-    byte[] asBytes();
+    @Nullable byte[] asBytes();
 
-    @Nullable
-    String asString();
+    @Nullable String asString();
 
-    @Nullable
-    Spanned asHtml();
+    @Nullable Spanned asHtml();
 
-    @Nullable
-    Bitmap asBitmap();
+    @Nullable Bitmap asBitmap();
 
-    @Nullable
-    JSONObject asJsonObject() throws BridgeException;
+    @Nullable JSONObject asJsonObject() throws BridgeException;
 
-    @Nullable
-    JSONArray asJsonArray() throws BridgeException;
+    @Nullable JSONArray asJsonArray() throws BridgeException;
 
     void asFile(File destination) throws BridgeException;
 
-    @Nullable
-    <T> T asClass(@NonNull Class<T> cls) throws BridgeException;
+    @Nullable <T> T asClass(@NonNull Class<T> cls) throws BridgeException;
 
-    @Nullable
-    <T> T[] asClassArray(@NonNull Class<T> cls) throws BridgeException;
+    @Nullable <T> T[] asClassArray(@NonNull Class<T> cls) throws BridgeException;
 
-    @Nullable
-    <T> List<T> asClassList(@NonNull Class<T> cls) throws BridgeException;
+    @Nullable <T> List<T> asClassList(@NonNull Class<T> cls) throws BridgeException;
 
-    @Nullable
-    Object asSuggested() throws BridgeException;
+    @Nullable Object asSuggested() throws BridgeException;
 }

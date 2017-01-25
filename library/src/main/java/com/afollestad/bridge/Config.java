@@ -13,141 +13,137 @@ import java.util.HashMap;
 /**
  * @author Aidan Follestad (afollestad)
  */
-public final class Config {
+@SuppressWarnings({"WeakerAccess", "unused"}) public final class Config {
 
-    protected Config() {
-        mDefaultHeaders = new HashMap<>();
-        mDefaultHeaders.put("User-Agent", "afollestad/Bridge");
-        mDefaultHeaders.put("Content-Type", "text/plain");
+    Config() {
+        defaultHeaders = new HashMap<>();
+        defaultHeaders.put("User-Agent", "afollestad/Bridge");
+        defaultHeaders.put("Content-Type", "text/plain");
 
-        mRequestConverters = new HashMap<>();
-        mRequestConverters.put("application/json", JsonRequestConverter.class);
-        mRequestConverters.put("text/plain", JsonRequestConverter.class);
+        requestConverters = new HashMap<>();
+        requestConverters.put("application/json", JsonRequestConverter.class);
+        requestConverters.put("text/plain", JsonRequestConverter.class);
 
-        mResponseConverters = new HashMap<>();
-        mResponseConverters.put("application/json", JsonResponseConverter.class);
-        mResponseConverters.put("text/plain", JsonResponseConverter.class);
+        responseConverters = new HashMap<>();
+        responseConverters.put("application/json", JsonResponseConverter.class);
+        responseConverters.put("text/plain", JsonResponseConverter.class);
     }
 
-    protected String mHost;
-    protected HashMap<String, Object> mDefaultHeaders;
-    protected int mConnectTimeout = 10000;
-    protected int mReadTimeout = 15000;
-    protected int mBufferSize = 1024 * 4;
-    protected boolean mLogging = false;
-    protected boolean mDetailedRequestLogging = false;
-    protected ResponseValidator[] mValidators;
-    protected HashMap<String, Class<? extends RequestConverter>> mRequestConverters;
-    protected HashMap<String, Class<? extends ResponseConverter>> mResponseConverters;
-    protected boolean mAutoFollowRedirects = true;
+    String host;
+    HashMap<String, Object> defaultHeaders;
+    int connectTimeout = 10000;
+    int readTimeout = 15000;
+    int bufferSize = 1024 * 4;
+    boolean logging = false;
+    boolean detailedRequestLogging = false;
+    ResponseValidator[] validators;
+    private HashMap<String, Class<? extends RequestConverter>> requestConverters;
+    private HashMap<String, Class<? extends ResponseConverter>> responseConverters;
+    boolean autoFollowRedirects = true;
 
     public Config host(@Nullable String host) {
-        mHost = host;
+        this.host = host;
         return this;
     }
 
     public Config logging(boolean enabled) {
-        mLogging = enabled;
+        logging = enabled;
         return this;
     }
 
     public Config advancedRequestLogging(boolean enabled) {
-        mDetailedRequestLogging = enabled;
+        detailedRequestLogging = enabled;
         return this;
     }
 
     public Config defaultHeader(@NonNull String name, @Nullable Object value) {
         if (value == null)
-            mDefaultHeaders.remove(name);
-        else mDefaultHeaders.put(name, value);
+            defaultHeaders.remove(name);
+        else defaultHeaders.put(name, value);
         return this;
     }
 
     public Config connectTimeout(int timeout) {
         if (timeout <= 0)
             throw new IllegalArgumentException("Connect timeout must be greater than 0.");
-        mConnectTimeout = timeout;
+        connectTimeout = timeout;
         return this;
     }
 
     public Config readTimeout(int timeout) {
         if (timeout <= 0)
             throw new IllegalArgumentException("Read timeout must be greater than 0.");
-        mReadTimeout = timeout;
+        readTimeout = timeout;
         return this;
     }
 
     public Config bufferSize(int size) {
         if (size <= 0)
             throw new IllegalArgumentException("The buffer size must be greater than 0.");
-        mBufferSize = size;
+        bufferSize = size;
         return this;
     }
 
     public Config validators(ResponseValidator... validators) {
-        mValidators = validators;
+        this.validators = validators;
         return this;
     }
 
-    @NonNull
-    public ResponseConverter responseConverter(@Nullable String contentType) {
+    @NonNull public ResponseConverter responseConverter(@Nullable String contentType) {
         if (contentType == null || contentType.trim().isEmpty())
             contentType = "application/json";
         else if (contentType.contains(";"))
             contentType = contentType.split(";")[0];
-        final Class<? extends ResponseConverter> converterCls = mResponseConverters.get(contentType);
+        final Class<? extends ResponseConverter> converterCls = responseConverters.get(contentType);
         if (converterCls == null)
             throw new IllegalStateException("No response converter available for content type " + contentType);
         return BridgeUtil.newInstance(converterCls);
     }
 
-    @Deprecated
-    public Config responseConverter(@NonNull String contentType, @Nullable ResponseConverter converter) {
+    @Deprecated public Config responseConverter(@NonNull String contentType, @Nullable ResponseConverter converter) {
         return responseConverter(contentType, converter != null ? converter.getClass() : null);
     }
 
     public Config responseConverter(@NonNull String contentType, @Nullable Class<? extends ResponseConverter> converter) {
         if (converter == null)
-            mResponseConverters.remove(contentType);
+            responseConverters.remove(contentType);
         else
-            mResponseConverters.put(contentType, converter);
+            responseConverters.put(contentType, converter);
         return this;
     }
 
-    @NonNull
-    public RequestConverter requestConverter(@Nullable String contentType) {
+    @NonNull public RequestConverter requestConverter(@Nullable String contentType) {
         if (contentType == null || contentType.trim().isEmpty())
             contentType = "application/json";
         else if (contentType.contains(";"))
             contentType = contentType.split(";")[0];
-        final Class<? extends RequestConverter> converterCls = mRequestConverters.get(contentType);
+        final Class<? extends RequestConverter> converterCls = requestConverters.get(contentType);
         if (converterCls == null)
             throw new IllegalStateException("No request converter available for content type " + contentType);
         return BridgeUtil.newInstance(converterCls);
     }
 
-    @Deprecated
-    public Config requestConverter(@NonNull String contentType, @Nullable RequestConverter converter) {
+    @Deprecated public Config requestConverter(@NonNull String contentType, @Nullable RequestConverter converter) {
         return requestConverter(contentType, converter != null ? converter.getClass() : null);
     }
 
     public Config requestConverter(@NonNull String contentType, @Nullable Class<? extends RequestConverter> converter) {
         if (converter == null)
-            mRequestConverters.remove(contentType);
+            requestConverters.remove(contentType);
         else
-            mRequestConverters.put(contentType, converter);
+            requestConverters.put(contentType, converter);
         return this;
     }
 
     public Config autoFollowRedirects(boolean follow) {
-        mAutoFollowRedirects = follow;
+        autoFollowRedirects = follow;
         return this;
     }
 
-    protected void destroy() {
-        mHost = null;
-        mDefaultHeaders.clear();
-        mDefaultHeaders = null;
-        mBufferSize = 0;
+    void destroy() {
+        host = null;
+        defaultHeaders.clear();
+        defaultHeaders = null;
+        bufferSize = 0;
     }
 }

@@ -14,7 +14,7 @@ import java.lang.reflect.Constructor;
  */
 public class BridgeUtil {
 
-    public static void closeQuietly(@Nullable Closeable c) {
+    static void closeQuietly(@Nullable Closeable c) {
         if (c != null) {
             try {
                 c.close();
@@ -23,12 +23,12 @@ public class BridgeUtil {
         }
     }
 
-    public static byte[] readEntireStream(@Nullable InputStream is) throws IOException {
+    static byte[] readEntireStream(@Nullable InputStream is) throws IOException {
         if (is == null) return null;
         ByteArrayOutputStream os = null;
         try {
             os = new ByteArrayOutputStream();
-            byte[] buffer = new byte[Bridge.config().mBufferSize];
+            byte[] buffer = new byte[Bridge.config().bufferSize];
             int read;
             while ((read = is.read(buffer)) != -1)
                 os.write(buffer, 0, read);
@@ -40,7 +40,7 @@ public class BridgeUtil {
         }
     }
 
-    protected static void throwIfNotSuccess(Response response) throws BridgeException {
+    static void throwIfNotSuccess(Response response) throws BridgeException {
         if (!response.isSuccess())
             throw new BridgeException(response,
                     String.format("Response was unsuccessful: %s %s", response.code(), response.phrase()),
@@ -58,7 +58,7 @@ public class BridgeUtil {
         }
     }
 
-    public static Constructor<?> getDefaultConstructor(@NonNull Class<?> cls) {
+    private static Constructor<?> getDefaultConstructor(@NonNull Class<?> cls) {
         final Constructor[] ctors = cls.getDeclaredConstructors();
         Constructor ctor = null;
         for (Constructor ct : ctors) {

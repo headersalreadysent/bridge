@@ -52,18 +52,18 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
     protected RequestBuilder(String url, @Request.MethodInt int method, Bridge context) {
         mContext = context;
         final Config cf = Bridge.config();
-        if (!url.startsWith("http") && cf.mHost != null)
-            url = cf.mHost + url;
+        if (!url.startsWith("http") && cf.host != null)
+            url = cf.host + url;
 
         Log.d(this, "%s %s", Method.name(method), url);
         mUrl = url;
         mMethod = method;
 
-        mHeaders = cf.mDefaultHeaders;
-        mConnectTimeout = cf.mConnectTimeout;
-        mReadTimeout = cf.mReadTimeout;
-        mBufferSize = cf.mBufferSize;
-        mValidators = cf.mValidators;
+        mHeaders = cf.defaultHeaders;
+        mConnectTimeout = cf.connectTimeout;
+        mReadTimeout = cf.readTimeout;
+        mBufferSize = cf.bufferSize;
+        mValidators = cf.validators;
     }
 
     public RequestBuilder header(@NonNull String name, @NonNull Object value) {
@@ -272,11 +272,11 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
                 public void run() {
                     try {
                         mRequest.makeRequest();
-                        if (mRequest.mCancelCallbackFired) return;
+                        if (mRequest.cancelCallbackFired) return;
                         final Response response = mRequest.response();
                         mContext.fireCallbacks(mRequest, response, null);
                     } catch (final BridgeException e) {
-                        if (mRequest.mCancelCallbackFired) return;
+                        if (mRequest.cancelCallbackFired) return;
                         mContext.fireCallbacks(mRequest, mRequest.response(), e);
                     }
                 }
@@ -306,7 +306,7 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
     public void asBytes(final @NonNull ResponseConvertCallback<byte[]> callback) {
         request(new Callback() {
             @Override
-            public void response(Request request, Response response, BridgeException e) {
+            public void response(@NonNull Request request, Response response, BridgeException e) {
                 if (e != null)
                     callback.onResponse(response, null, e);
                 else callback.onResponse(response, response.asBytes(), null);
@@ -328,7 +328,7 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
     public void asString(final @NonNull ResponseConvertCallback<String> callback) {
         request(new Callback() {
             @Override
-            public void response(Request request, Response response, BridgeException e) {
+            public void response(@NonNull Request request, Response response, BridgeException e) {
                 if (e != null)
                     callback.onResponse(response, null, e);
                 else callback.onResponse(response, response.asString(), null);
@@ -362,7 +362,7 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
     public void asHtml(final @NonNull ResponseConvertCallback<Spanned> callback) {
         request(new Callback() {
             @Override
-            public void response(Request request, Response response, BridgeException e) {
+            public void response(@NonNull Request request, Response response, BridgeException e) {
                 if (e != null)
                     callback.onResponse(response, null, e);
                 else callback.onResponse(response, response.asHtml(), null);
@@ -384,7 +384,7 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
     public void asBitmap(final @NonNull ResponseConvertCallback<Bitmap> callback) {
         request(new Callback() {
             @Override
-            public void response(Request request, Response response, BridgeException e) {
+            public void response(@NonNull Request request, Response response, BridgeException e) {
                 if (e != null)
                     callback.onResponse(response, null, e);
                 else callback.onResponse(response, response.asBitmap(), null);
@@ -405,7 +405,7 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
     public void asJsonObject(final @NonNull ResponseConvertCallback<JSONObject> callback) {
         request(new Callback() {
             @Override
-            public void response(Request request, Response response, BridgeException e) {
+            public void response(@NonNull Request request, Response response, BridgeException e) {
                 if (e != null) {
                     callback.onResponse(response, null, e);
                 } else {
@@ -432,7 +432,7 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
     public void asJsonArray(final @NonNull ResponseConvertCallback<JSONArray> callback) {
         request(new Callback() {
             @Override
-            public void response(Request request, Response response, BridgeException e) {
+            public void response(@NonNull Request request, Response response, BridgeException e) {
                 if (e != null) {
                     callback.onResponse(response, null, e);
                 } else {
@@ -459,7 +459,7 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
     public <T> void asClassList(final @NonNull Class<T> cls, final @NonNull ResponseConvertCallback<List<T>> callback) {
         request(new Callback() {
             @Override
-            public void response(Request request, Response response, BridgeException e) {
+            public void response(@NonNull Request request, Response response, BridgeException e) {
                 if (e != null) {
                     callback.onResponse(response, null, e);
                 } else {
@@ -486,7 +486,7 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
     public void asFile(final @NonNull File destination, final @NonNull ResponseConvertCallback<File> callback) {
         request(new Callback() {
             @Override
-            public void response(Request request, Response response, BridgeException e) {
+            public void response(@NonNull Request request, Response response, BridgeException e) {
                 if (e != null) {
                     callback.onResponse(response, null, e);
                 } else {
@@ -514,7 +514,7 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
     public <T> void asClass(final @NonNull Class<T> cls, final @NonNull ResponseConvertCallback<T> callback) {
         request(new Callback() {
             @Override
-            public void response(Request request, Response response, BridgeException e) {
+            public void response(@NonNull Request request, Response response, BridgeException e) {
                 if (e != null) {
                     callback.onResponse(response, null, e);
                 } else {
@@ -541,7 +541,7 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
     public <T> void asClassArray(final @NonNull Class<T> cls, final @NonNull ResponseConvertCallback<T[]> callback) {
         request(new Callback() {
             @Override
-            public void response(Request request, Response response, BridgeException e) {
+            public void response(@NonNull Request request, Response response, BridgeException e) {
                 if (e != null) {
                     callback.onResponse(response, null, e);
                 } else {
@@ -569,7 +569,7 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
     public void asSuggested(final @NonNull ResponseConvertCallback<Object> callback) {
         request(new Callback() {
             @Override
-            public void response(Request request, Response response, BridgeException e) {
+            public void response(@NonNull Request request, Response response, BridgeException e) {
                 if (e != null) {
                     callback.onResponse(response, null, e);
                 } else {

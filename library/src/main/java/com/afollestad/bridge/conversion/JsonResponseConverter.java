@@ -19,23 +19,22 @@ import java.lang.reflect.Field;
  */
 public class JsonResponseConverter extends ResponseConverter {
 
-    private JSONObject mCurrentObject;
+    private JSONObject currentObject;
 
-    public JsonResponseConverter() {
+    @SuppressWarnings("unused") public JsonResponseConverter() {
     }
 
-    public JsonResponseConverter(JSONObject currentObject) {
-        mCurrentObject = currentObject;
+    @SuppressWarnings("WeakerAccess") public JsonResponseConverter(JSONObject currentObject) {
+        this.currentObject = currentObject;
     }
 
     @Override
     public void onPrepare(@NonNull Response response, @NonNull Object object) throws Exception {
-        if (mCurrentObject == null)
-            mCurrentObject = response.asJsonObject();
+        if (currentObject == null)
+            currentObject = response.asJsonObject();
     }
 
-    @Override
-    public boolean canConvertField(@NonNull Field field) throws Exception {
+    @Override public boolean canConvertField(@NonNull Field field) throws Exception {
         return field.getAnnotation(Body.class) != null;
     }
 
@@ -43,29 +42,29 @@ public class JsonResponseConverter extends ResponseConverter {
     @Nullable
     @Override
     public Object getValueFromResponse(@NonNull String name, @FieldType int fieldType, @NonNull Class<?> cls) throws Exception {
-        if (mCurrentObject.isNull(name)) return null;
+        if (currentObject.isNull(name)) return null;
         switch (fieldType) {
             case FIELD_SHORT:
-                return ((Integer) mCurrentObject.getInt(name)).shortValue();
+                return ((Integer) currentObject.getInt(name)).shortValue();
             case FIELD_INTEGER:
-                return mCurrentObject.getInt(name);
+                return currentObject.getInt(name);
             case FIELD_LONG:
-                return mCurrentObject.getLong(name);
+                return currentObject.getLong(name);
             case FIELD_FLOAT:
-                return ((Double) mCurrentObject.getDouble(name)).floatValue();
+                return ((Double) currentObject.getDouble(name)).floatValue();
             case FIELD_DOUBLE:
-                return mCurrentObject.getDouble(name);
+                return currentObject.getDouble(name);
             case FIELD_BOOLEAN:
-                Object value = mCurrentObject.get(name);
+                Object value = currentObject.get(name);
                 if (value instanceof Integer)
                     return (Integer) value == 1;
                 else if (value instanceof Boolean)
                     return value;
                 else throw new Exception("Unexpected type for JSON field " + value);
             case FIELD_STRING:
-                return mCurrentObject.getString(name);
+                return currentObject.getString(name);
             default:
-                return mCurrentObject.get(name);
+                return currentObject.get(name);
         }
     }
 
@@ -75,7 +74,7 @@ public class JsonResponseConverter extends ResponseConverter {
     public Object getValueFromResponse(@NonNull String[] nameParts, @FieldType int fieldType, @NonNull Class<?> cls) throws Exception {
         JSONObject currentObj = null;
         for (int i = 0; i < nameParts.length - 1; i++) {
-            Object val = currentObj != null ? currentObj.opt(nameParts[i]) : mCurrentObject.opt(nameParts[i]);
+            Object val = currentObj != null ? currentObj.opt(nameParts[i]) : currentObject.opt(nameParts[i]);
             if (val == null)
                 return null;
             if (val instanceof JSONObject) {
@@ -87,7 +86,7 @@ public class JsonResponseConverter extends ResponseConverter {
         }
 
         final String name = nameParts[nameParts.length - 1];
-        final JSONObject pullObj = currentObj != null ? currentObj : mCurrentObject;
+        final JSONObject pullObj = currentObj != null ? currentObj : currentObject;
         if (pullObj.isNull(name)) return null;
         switch (fieldType) {
             case FIELD_SHORT:

@@ -10,30 +10,30 @@ import java.io.OutputStream;
 /**
  * @author Aidan Follestad (afollestad)
  */
-public final class TransferPipe extends Pipe {
+@SuppressWarnings("WeakerAccess") public final class TransferPipe extends Pipe {
 
-    private final InputStream mIs;
-    private final String mContentType;
-    private String mHash;
+    private final InputStream inputStream;
+    private final String contentType;
+    private String hash;
 
-    protected TransferPipe(@NonNull InputStream is, @NonNull String contentType, @NonNull String hash) {
-        mIs = is;
-        mContentType = contentType;
-        mHash = hash;
+    TransferPipe(@NonNull InputStream is, @NonNull String contentType, @NonNull String hash) {
+        inputStream = is;
+        this.contentType = contentType;
+        this.hash = hash;
     }
 
     @Override
     public String hash() {
-        return mHash;
+        return hash;
     }
 
     @Override
     public void writeTo(@NonNull OutputStream os, @Nullable ProgressCallback progressCallback) throws IOException {
-        byte[] buffer = new byte[Bridge.config().mBufferSize];
+        byte[] buffer = new byte[Bridge.config().bufferSize];
         int read;
         int totalRead = 0;
-        final int available = mIs.available();
-        while ((read = mIs.read(buffer)) != -1) {
+        final int available = inputStream.available();
+        while ((read = inputStream.read(buffer)) != -1) {
             os.write(buffer, 0, read);
             totalRead += read;
             if (progressCallback != null)
@@ -44,17 +44,16 @@ public final class TransferPipe extends Pipe {
     @Override
     @NonNull
     public String contentType() {
-        return mContentType;
+        return contentType;
     }
 
     @Override
     public int contentLength() throws IOException {
-
-        return mIs.available();
+        return inputStream.available();
     }
 
     @Override
     public void close() {
-        BridgeUtil.closeQuietly(mIs);
+        BridgeUtil.closeQuietly(inputStream);
     }
 }

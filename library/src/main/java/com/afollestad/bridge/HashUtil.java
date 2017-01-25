@@ -5,7 +5,7 @@ import java.security.MessageDigest;
 /**
  * @author Aidan Follestad (afollestad)
  */
-public final class HashUtil {
+final class HashUtil {
 
     private static String toHexString(byte[] bytes) {
         StringBuilder hexString = new StringBuilder();
@@ -19,7 +19,7 @@ public final class HashUtil {
         return hexString.toString();
     }
 
-    public static String hash(byte[] data) {
+    static String hash(byte[] data) {
         try {
             final MessageDigest md = MessageDigest.getInstance("MD5");
             final byte[] digest = md.digest(data);
@@ -29,7 +29,7 @@ public final class HashUtil {
         }
     }
 
-    public static String hash(String str) {
+    static String hash(String str) {
         try {
             final byte[] bytes = str.getBytes("UTF-8");
             return hash(bytes);

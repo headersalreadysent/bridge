@@ -12,7 +12,7 @@ import java.util.concurrent.TimeoutException;
 /**
  * @author Aidan Follestad (afollestad)
  */
-public class BridgeException extends Exception {
+@SuppressWarnings({"WeakerAccess", "unused"}) public class BridgeException extends Exception {
 
     public static final int REASON_REQUEST_CANCELLED = 1;
     public static final int REASON_REQUEST_FAILED = 2;
@@ -32,16 +32,11 @@ public class BridgeException extends Exception {
     public @interface Reason {
     }
 
-    @Reason
-    private int mReason;
-    @Nullable
-    protected Request mRequest;
-    @Nullable
-    private Response mResponse;
-    @Nullable
-    private String mValidatorId;
-    @Nullable
-    private Exception mUnderlyingException;
+    @Reason private int reason;
+    @Nullable protected Request request;
+    @Nullable private Response response;
+    @Nullable private String validatorId;
+    @Nullable private Exception underlyingException;
 
     // Request constructors
 
@@ -49,47 +44,47 @@ public class BridgeException extends Exception {
         super(wrap);
         if (wrap instanceof BridgeException)
             throw new IllegalArgumentException("BridgeException cannot wrap a BridgeException.");
-        mRequest = request;
+        this.request = request;
         if (wrap instanceof TimeoutException || wrap instanceof SocketTimeoutException)
-            mReason = REASON_REQUEST_TIMEOUT;
-        else mReason = REASON_REQUEST_FAILED;
+            reason = REASON_REQUEST_TIMEOUT;
+        else reason = REASON_REQUEST_FAILED;
     }
 
     protected BridgeException(@SuppressWarnings("NullableProblems") @NonNull Request cancelledRequest) {
         super("Request was cancelled.");
-        mRequest = cancelledRequest;
-        mReason = REASON_REQUEST_CANCELLED;
+        request = cancelledRequest;
+        reason = REASON_REQUEST_CANCELLED;
     }
 
     // Response constructors
 
     protected BridgeException(@Nullable Response response, @NonNull String message, @Reason int reason) {
         super(message);
-        mResponse = response;
-        mReason = reason;
+        this.response = response;
+        this.reason = reason;
     }
 
     protected BridgeException(@Nullable Request request, @NonNull String message, @Reason int reason) {
         super(message);
-        mRequest = request;
-        mReason = reason;
+        this.request = request;
+        this.reason = reason;
     }
 
     protected BridgeException(@Nullable Response response, ResponseValidator validator) {
         super(String.format("Validation %s didn't pass.", validator.id()));
-        mResponse = response;
-        mReason = REASON_RESPONSE_VALIDATOR_FALSE;
-        mValidatorId = validator.id();
+        this.response = response;
+        reason = REASON_RESPONSE_VALIDATOR_FALSE;
+        validatorId = validator.id();
     }
 
     protected BridgeException(@Nullable Response response, ResponseValidator validator, @NonNull Exception e) {
         super(e.getLocalizedMessage(), e);
         if (e instanceof BridgeException)
             throw new IllegalArgumentException("BridgeException cannot wrap a BridgeException.");
-        mUnderlyingException = e;
-        mResponse = response;
-        mReason = REASON_RESPONSE_VALIDATOR_ERROR;
-        mValidatorId = validator.id();
+        underlyingException = e;
+        this.response = response;
+        reason = REASON_RESPONSE_VALIDATOR_ERROR;
+        validatorId = validator.id();
     }
 
     protected BridgeException(@NonNull Response response, @NonNull Exception e, @Reason int reason) {
@@ -100,35 +95,30 @@ public class BridgeException extends Exception {
         super(String.format("%s: %s", forceString ? response.asString() : response.toString(), e.getLocalizedMessage()), e);
         if (e instanceof BridgeException)
             throw new IllegalArgumentException("BridgeException cannot wrap a BridgeException.");
-        mUnderlyingException = e;
-        mResponse = response;
-        mReason = reason;
+        underlyingException = e;
+        this.response = response;
+        this.reason = reason;
     }
 
     // Getters
 
-    @Nullable
-    public Request request() {
-        return mRequest;
+    @Nullable public Request request() {
+        return request;
     }
 
-    @Nullable
-    public Response response() {
-        return mResponse;
+    @Nullable public Response response() {
+        return response;
     }
 
-    @Reason
-    public int reason() {
-        return mReason;
+    @Reason public int reason() {
+        return reason;
     }
 
-    @Nullable
-    public Exception underlyingException() {
-        return mUnderlyingException;
+    @Nullable public Exception underlyingException() {
+        return underlyingException;
     }
 
-    @Nullable
-    public String validatorId() {
-        return mValidatorId;
+    @Nullable public String validatorId() {
+        return validatorId;
     }
 }

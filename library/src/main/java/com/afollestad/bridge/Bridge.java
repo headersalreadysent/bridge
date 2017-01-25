@@ -11,20 +11,20 @@ import java.util.HashMap;
 /**
  * @author Aidan Follestad (afollestad)
  */
-public class Bridge implements Serializable {
+@SuppressWarnings({"WeakerAccess", "unused"}) public class Bridge implements Serializable {
 
-    private static Bridge mBridge;
-    private static Config mConfig;
+    private static Bridge bridge;
+    private static Config config;
 
-    protected static final Object LOCK = new Object();
-    protected HashMap<String, CallbackStack> mRequestMap;
+    private static final Object LOCK = new Object();
+    HashMap<String, CallbackStack> requestMap;
 
-    protected boolean pushCallback(Request request, Callback callback) {
+    boolean pushCallback(Request request, Callback callback) {
         synchronized (LOCK) {
-            if (mRequestMap == null)
-                mRequestMap = new HashMap<>();
+            if (requestMap == null)
+                requestMap = new HashMap<>();
             final String key = CallbackStack.createKey(request);
-            CallbackStack cbs = mRequestMap.get(key);
+            CallbackStack cbs = requestMap.get(key);
             if (cbs != null) {
                 Log.d(this, "Pushing callback to EXISTING stack for %s", key);
                 cbs.push(callback, request);
@@ -33,37 +33,37 @@ public class Bridge implements Serializable {
                 Log.d(this, "Pushing callback to NEW stack for %s", key);
                 cbs = new CallbackStack();
                 cbs.push(callback, request);
-                mRequestMap.put(key, cbs);
+                requestMap.put(key, cbs);
                 return true;
             }
         }
     }
 
-    protected void fireProgress(Request request, int current, int total) {
+    void fireProgress(Request request, int current, int total) {
         synchronized (LOCK) {
-            if (mRequestMap == null) return;
+            if (requestMap == null) return;
             final String key = CallbackStack.createKey(request);
-            final CallbackStack cbs = mRequestMap.get(key);
+            final CallbackStack cbs = requestMap.get(key);
             if (cbs != null)
                 cbs.fireAllProgress(request, current, total);
         }
     }
 
-    protected void fireCallbacks(final Request request, final Response response, final BridgeException error) {
+    void fireCallbacks(final Request request, final Response response, final BridgeException error) {
         synchronized (LOCK) {
             final String key = CallbackStack.createKey(request);
             Log.d(this, "Attempting to fire callbacks for %s", key);
-            if (mRequestMap == null) {
+            if (requestMap == null) {
                 Log.d(this, "Request map is null, can't fire callbacks.");
                 return;
             }
-            final CallbackStack cbs = mRequestMap.get(key);
+            final CallbackStack cbs = requestMap.get(key);
             if (cbs != null) {
                 Log.d(this, "Firing %d callback(s) for %s", cbs.size(), key);
                 cbs.fireAll(response, error);
-                mRequestMap.remove(key);
-                if (mRequestMap.size() == 0)
-                    mRequestMap = null;
+                requestMap.remove(key);
+                if (requestMap.size() == 0)
+                    requestMap = null;
             } else {
                 Log.d(this, "No callback stack found for %s", key);
             }
@@ -71,23 +71,21 @@ public class Bridge implements Serializable {
     }
 
     private Bridge() {
-        mConfig = new Config();
+        config = new Config();
     }
 
-    @NonNull
-    private static Bridge client() {
-        if (mBridge == null)
-            mBridge = new Bridge();
-        return mBridge;
+    @NonNull private static Bridge client() {
+        if (bridge == null)
+            bridge = new Bridge();
+        return bridge;
     }
 
-    @NonNull
-    public static Config config() {
-        if (mBridge == null)
-            mBridge = new Bridge();
-        if (mConfig == null)
-            mConfig = new Config();
-        return mConfig;
+    @NonNull public static Config config() {
+        if (bridge == null)
+            bridge = new Bridge();
+        if (config == null)
+            config = new Config();
+        return config;
     }
 
     private static String processUrl(String url, @Nullable Object... formatArgs) {
@@ -127,13 +125,13 @@ public class Bridge implements Serializable {
     }
 
     public static void destroy() {
-        if (mBridge != null) {
-            if (mConfig != null) {
-                mConfig.destroy();
-                mConfig = null;
+        if (bridge != null) {
+            if (config != null) {
+                config.destroy();
+                config = null;
             }
             cancelAll().commit();
-            Log.d(mBridge, "Bridge singleton was destroyed.");
+            Log.d(bridge, "Bridge singleton was destroyed.");
         }
     }
 }

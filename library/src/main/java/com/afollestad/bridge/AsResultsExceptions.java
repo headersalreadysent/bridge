@@ -16,15 +16,13 @@ import java.util.List;
  *
  * @author Aidan Follestad (afollestad)
  */
-interface AsResultsExceptions {
+@SuppressWarnings("unused") interface AsResultsExceptions {
 
-    @Nullable
-    byte[] asBytes() throws BridgeException;
+    @Nullable byte[] asBytes() throws BridgeException;
 
     void asBytes(@NonNull ResponseConvertCallback<byte[]> callback);
 
-    @Nullable
-    String asString() throws BridgeException;
+    @Nullable String asString() throws BridgeException;
 
     void asString(@NonNull ResponseConvertCallback<String> callback);
 
@@ -32,23 +30,19 @@ interface AsResultsExceptions {
 
     void asLineStream(@NonNull LineCallback cb, @NonNull Callback callback);
 
-    @Nullable
-    Spanned asHtml() throws BridgeException;
+    @Nullable Spanned asHtml() throws BridgeException;
 
     void asHtml(@NonNull ResponseConvertCallback<Spanned> callback);
 
-    @Nullable
-    Bitmap asBitmap() throws BridgeException;
+    @Nullable Bitmap asBitmap() throws BridgeException;
 
     void asBitmap(@NonNull ResponseConvertCallback<Bitmap> callback);
 
-    @Nullable
-    JSONObject asJsonObject() throws BridgeException;
+    @Nullable JSONObject asJsonObject() throws BridgeException;
 
     void asJsonObject(@NonNull ResponseConvertCallback<JSONObject> callback);
 
-    @Nullable
-    JSONArray asJsonArray() throws BridgeException;
+    @Nullable JSONArray asJsonArray() throws BridgeException;
 
     void asJsonArray(@NonNull ResponseConvertCallback<JSONArray> callback);
 
@@ -56,23 +50,19 @@ interface AsResultsExceptions {
 
     void asFile(@NonNull File destination, @NonNull ResponseConvertCallback<File> callback);
 
-    @Nullable
-    <T> T asClass(@NonNull Class<T> cls) throws BridgeException;
+    @Nullable <T> T asClass(@NonNull Class<T> cls) throws BridgeException;
 
     <T> void asClass(@NonNull Class<T> cls, @NonNull ResponseConvertCallback<T> callback);
 
-    @Nullable
-    <T> T[] asClassArray(@NonNull Class<T> cls) throws BridgeException;
+    @Nullable <T> T[] asClassArray(@NonNull Class<T> cls) throws BridgeException;
 
     <T> void asClassArray(@NonNull Class<T> cls, @NonNull ResponseConvertCallback<T[]> callback);
 
-    @Nullable
-    <T> List<T> asClassList(@NonNull Class<T> cls) throws BridgeException;
+    @Nullable <T> List<T> asClassList(@NonNull Class<T> cls) throws BridgeException;
 
     <T> void asClassList(@NonNull Class<T> cls, @NonNull ResponseConvertCallback<List<T>> callback);
 
-    @Nullable
-    Object asSuggested() throws BridgeException;
+    @Nullable Object asSuggested() throws BridgeException;
 
     void asSuggested(@NonNull ResponseConvertCallback<Object> callback);
 }

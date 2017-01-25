@@ -15,40 +15,40 @@ import java.net.URLConnection;
 /**
  * @author Aidan Follestad (afollestad)
  */
-public final class UriPipe extends Pipe {
+@SuppressWarnings("WeakerAccess") public final class UriPipe extends Pipe {
 
-    private final Context mContext;
-    private final Uri mUri;
-    private InputStream mStream;
-    private String mHash;
+    private final Context context;
+    private final Uri uri;
+    private InputStream inputStream;
+    private String hash;
 
-    protected UriPipe(Context context, Uri uri) {
-        mContext = context;
-        mUri = uri;
+    UriPipe(Context context, Uri uri) {
+        this.context = context;
+        this.uri = uri;
     }
 
     @Override
     public String hash() {
-        if (mHash == null) {
+        if (hash == null) {
             try {
                 getStream();
-                mHash = HashUtil.hash(mUri.toString() + "/" + mStream.available());
+                hash = HashUtil.hash(uri.toString() + "/" + inputStream.available());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
-        return mHash;
+        return hash;
     }
 
     @Override
     public void writeTo(@NonNull OutputStream os, @Nullable ProgressCallback progressCallback) throws IOException {
         try {
-            byte[] buffer = new byte[Bridge.config().mBufferSize];
+            byte[] buffer = new byte[Bridge.config().bufferSize];
             int read;
             int totalRead = 0;
             getStream();
-            final int totalAvailable = mStream.available();
-            while ((read = mStream.read(buffer)) != -1) {
+            final int totalAvailable = inputStream.available();
+            while ((read = inputStream.read(buffer)) != -1) {
                 os.write(buffer, 0, read);
                 totalRead += read;
                 Log2.d(this, "Wrote %d bytes into the destination stream (%d/%d).", read, totalRead, totalAvailable);
@@ -56,7 +56,7 @@ public final class UriPipe extends Pipe {
                     progressCallback.publishProgress(totalRead, totalAvailable);
             }
         } finally {
-            BridgeUtil.closeQuietly(mStream);
+            BridgeUtil.closeQuietly(inputStream);
         }
     }
 
@@ -64,17 +64,17 @@ public final class UriPipe extends Pipe {
     public int contentLength() throws IOException {
         InputStream stream = getStream();
         if (stream == null) return -1;
-        return mStream.available();
+        return inputStream.available();
     }
 
     @Override
     @NonNull
     public String contentType() {
         String type;
-        if (mUri.getScheme() == null || mUri.getScheme().equalsIgnoreCase("file")) {
-            type = URLConnection.guessContentTypeFromName(new File(mUri.getPath()).getName());
+        if (uri.getScheme() == null || uri.getScheme().equalsIgnoreCase("file")) {
+            type = URLConnection.guessContentTypeFromName(new File(uri.getPath()).getName());
         } else {
-            type = mContext.getContentResolver().getType(mUri);
+            type = context.getContentResolver().getType(uri);
         }
         if (type == null || type.trim().isEmpty())
             type = "application/octet-stream";
@@ -82,16 +82,16 @@ public final class UriPipe extends Pipe {
     }
 
     public InputStream getStream() throws IOException {
-        if (mStream == null) {
-            if (mUri.getScheme() == null || mUri.getScheme().equalsIgnoreCase("file"))
-                mStream = new FileInputStream(mUri.getPath());
-            else mStream = mContext.getContentResolver().openInputStream(mUri);
+        if (inputStream == null) {
+            if (uri.getScheme() == null || uri.getScheme().equalsIgnoreCase("file"))
+                inputStream = new FileInputStream(uri.getPath());
+            else inputStream = context.getContentResolver().openInputStream(uri);
         }
-        return mStream;
+        return inputStream;
     }
 
     @Override
     public void close() {
-        BridgeUtil.closeQuietly(mStream);
+        BridgeUtil.closeQuietly(inputStream);
     }
 }

@@ -3,13 +3,13 @@ package com.afollestad.bridge;
 /**
  * @author Aidan Follestad (afollestad)
  */
-public final class Method {
+final class Method {
 
-    protected final static int UNSPECIFIED = -1;
-    public final static int GET = 1;
-    public final static int PUT = 2;
-    public final static int POST = 3;
-    public final static int DELETE = 4;
+    final static int UNSPECIFIED = -1;
+    final static int GET = 1;
+    final static int PUT = 2;
+    final static int POST = 3;
+    final static int DELETE = 4;
 
     public static String name(int methodValue) {
         switch (methodValue) {

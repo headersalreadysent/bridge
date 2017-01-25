@@ -9,9 +9,12 @@ import java.util.List;
 /**
  * @author Aidan Follestad (afollestad)
  */
-public final class Form {
+@SuppressWarnings({"WeakerAccess", "unused"}) public final class Form {
 
-    public static class Entry {
+    private final String encoding;
+    private final List<Entry> entries;
+
+    @SuppressWarnings("WeakerAccess") public static class Entry {
 
         public final String name;
         public final Object value;
@@ -23,33 +26,29 @@ public final class Form {
     }
 
     public Form() {
-        mEntries = new ArrayList<>();
-        mEncoding = "UTF-8";
+        entries = new ArrayList<>();
+        encoding = "UTF-8";
     }
 
     public Form(@NonNull String encoding) {
-        mEntries = new ArrayList<>();
-        mEncoding = encoding;
+        entries = new ArrayList<>();
+        this.encoding = encoding;
     }
 
-    private final String mEncoding;
-    private final List<Entry> mEntries;
-
     public Form add(String name, Object value) {
-        mEntries.add(new Entry(name, value));
+        entries.add(new Entry(name, value));
         return this;
     }
 
-    @Override
-    public String toString() {
+    @Override public String toString() {
         final StringBuilder result = new StringBuilder();
-        for (int i = 0; i < mEntries.size(); i++) {
+        for (int i = 0; i < entries.size(); i++) {
             if (i > 0) result.append("&");
-            final Entry entry = mEntries.get(i);
+            final Entry entry = entries.get(i);
             try {
-                result.append(URLEncoder.encode(entry.name, mEncoding));
+                result.append(URLEncoder.encode(entry.name, encoding));
                 result.append("=");
-                result.append(URLEncoder.encode(entry.value + "", mEncoding));
+                result.append(URLEncoder.encode(entry.value + "", encoding));
             } catch (Exception e) {
                 // This should never happen
                 throw new RuntimeException(e);

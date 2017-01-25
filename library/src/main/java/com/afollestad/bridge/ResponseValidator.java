@@ -7,7 +7,7 @@ import java.io.Serializable;
 /**
  * @author Aidan Follestad (afollestad)
  */
-public abstract class ResponseValidator implements Serializable {
+@SuppressWarnings("WeakerAccess") public abstract class ResponseValidator implements Serializable {
 
     public abstract boolean validate(@NonNull Response response) throws Exception;
 
