@@ -13,12 +13,13 @@ powered by Java/Android's URLConnection classes for maximum compatibility and sp
 2. [Requests](https://github.com/afollestad/bridge#requests)
 	1. [Request Basics](https://github.com/afollestad/bridge#request-basics)
 	2. [Request Headers](https://github.com/afollestad/bridge#request-headers)
-	3. [Request Bodies](https://github.com/afollestad/bridge#request-bodies)
+	4. [Request Authentication](https://github.com/afollestad/bridge#request-authentication)
+	5. [Request Bodies](https://github.com/afollestad/bridge#request-bodies)
 		1. [Plain Bodies](https://github.com/afollestad/bridge#plain-bodies)
 		2. [Form Bodies](https://github.com/afollestad/bridge#plain-bodies)
 		3. [MultipartForm Bodies](https://github.com/afollestad/bridge#plain-bodies)
-	4. [Streaming Bodies](https://github.com/afollestad/bridge#plain-bodies)
-	4. [Info Callbacks](https://github.com/afollestad/bridge#info-callbacks)
+	6. [Streaming Bodies](https://github.com/afollestad/bridge#plain-bodies)
+	7. [Info Callbacks](https://github.com/afollestad/bridge#info-callbacks)
 3. [Responses](https://github.com/afollestad/bridge#responses)
 	1. [Response Basics](https://github.com/afollestad/bridge#response-basics)
 	2. [Response Bodies](https://github.com/afollestad/bridge#response-bodies)
@@ -124,6 +125,21 @@ the `headers(Map<String, Object>)` method.
 
 **Note**: the [Configuration](https://github.com/afollestad/bridge#configuration)
 goes over how you can set default headers for all requests.
+
+### Request Authentication
+
+Out of the box, Bridge supports basic HTTP auth:
+
+```java
+BasicAuthentication auth = BasicAuthentication.create("username", "password");
+
+Request request = Bridge
+	.get("https://www.idk.com/private.html")
+	.authentication(auth)
+	.request();
+```
+
+Any class which implements the `Authentication` interface can be passed through `.authentication()`.
 
 ### Request Bodies
 

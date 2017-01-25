@@ -80,6 +80,15 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
         return header("Content-Type", contentType);
     }
 
+    public RequestBuilder authentication(@NonNull Authentication authentication) {
+        try {
+            authentication.apply(this);
+        } catch (Exception e) {
+            throw new IllegalStateException("Failed to apply authentication " + authentication.getClass().getName(), e);
+        }
+        return this;
+    }
+
     public RequestBuilder connectTimeout(int timeout) {
         if (timeout <= 0)
             throw new IllegalArgumentException("Connect timeout must be greater than 0.");

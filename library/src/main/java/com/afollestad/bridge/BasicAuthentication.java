@@ -7,7 +7,7 @@ import java.util.Locale;
 /**
  * @author Aidan Follestad (afollestad)
  */
-public class BasicAuthentication implements Authentication {
+@SuppressWarnings("WeakerAccess") public class BasicAuthentication implements Authentication {
 
     private final static String HEADER_NAME = "Authorization";
 
