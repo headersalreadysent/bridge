@@ -14,12 +14,13 @@ powered by Java/Android's URLConnection classes for maximum compatibility and sp
 	1. [Request Basics](https://github.com/afollestad/bridge#request-basics)
 	2. [Request Headers](https://github.com/afollestad/bridge#request-headers)
 	4. [Request Authentication](https://github.com/afollestad/bridge#request-authentication)
-	5. [Request Bodies](https://github.com/afollestad/bridge#request-bodies)
+	5. [Request Retries](https://github.com/afollestad/bridge#request-retries)
+	6. [Request Bodies](https://github.com/afollestad/bridge#request-bodies)
 		1. [Plain Bodies](https://github.com/afollestad/bridge#plain-bodies)
 		2. [Form Bodies](https://github.com/afollestad/bridge#plain-bodies)
 		3. [MultipartForm Bodies](https://github.com/afollestad/bridge#plain-bodies)
-	6. [Streaming Bodies](https://github.com/afollestad/bridge#plain-bodies)
-	7. [Info Callbacks](https://github.com/afollestad/bridge#info-callbacks)
+	7. [Streaming Bodies](https://github.com/afollestad/bridge#plain-bodies)
+	8. [Info Callbacks](https://github.com/afollestad/bridge#info-callbacks)
 3. [Responses](https://github.com/afollestad/bridge#responses)
 	1. [Response Basics](https://github.com/afollestad/bridge#response-basics)
 	2. [Response Bodies](https://github.com/afollestad/bridge#response-bodies)
@@ -73,7 +74,7 @@ Add this to your module's `build.gradle` file:
 dependencies {
 	// ... other dependencies
 
-	compile 'com.afollestad:bridge:3.3.0'
+	compile 'com.afollestad:bridge:4.1.0'
 }
 ```
 
@@ -140,6 +141,49 @@ Request request = Bridge
 ```
 
 Any class which implements the `Authentication` interface can be passed through `.authentication()`.
+
+### Request Retries
+
+At a basic level, retries are easy. Just provide a number indicating the max allowed retries, along
+with how long you want to pause between retries.
+
+This will retry up to 5 times, if a request isn't successful for any reason. It will wait 6000
+ milliseconds (6 seconds) between each retry.
+
+```java
+Bridge.get("http://test.com")
+    .throwIfNotSuccess()
+    .retries(5, 6000)
+    .request();
+```
+
+At an advanced level, you can control quite a lot. If you provide a retry callback, you can decide
+whether or not you want to actually retry again (up to the specified amount of total retries) by
+returning true or false. You can see the response of the failed request (if any),
+an Exception representing why the request failed, and a `RequestBuilder` that you can use to modify
+the next retry request before it gets made.
+
+```java
+Bridge.get("http://test.com")
+    .throwIfNotSuccess()
+    .retries(5, 6000, new RetryCallback() {
+        @Override
+        public boolean onWillRetry(@Nullable Response previousResponse, BridgeException problem, RequestBuilder newRequest) {
+            if (previousResponse != null && previousResponse.code() == 500) {
+                // Don't allow retry if there was a 500 Internal Server Error
+                return false;
+            }
+
+            if (previousResponse.code() == 401) {
+                // If we were 401 Unauthorized, set different login credentials before the next retry
+                newRequest.authentication(BasicAuthentication.create("username", "new-password!"));
+            }
+
+            // Allow retry
+            return true;
+        }
+    }).request();
+```
 
 ### Request Bodies
 

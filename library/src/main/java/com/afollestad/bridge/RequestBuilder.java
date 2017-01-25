@@ -33,6 +33,10 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
     Pipe pipe;
     int connectTimeout;
     int readTimeout;
+    int currentRetryCount;
+    int totalRetryCount;
+    int retrySpacingMs;
+    RetryCallback retryCallback;
     private int bufferSize;
     private Request request;
     boolean cancellable = true;
@@ -86,6 +90,16 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
         } catch (Exception e) {
             throw new IllegalStateException("Failed to apply authentication " + authentication.getClass().getName(), e);
         }
+        return this;
+    }
+
+    public RequestBuilder retries(int count, long retrySpacing) {
+        return retries(count, retrySpacing, null);
+    }
+
+    public RequestBuilder retries(int count, long retrySpacing, @Nullable RetryCallback callback) {
+        this.totalRetryCount = count;
+        this.retryCallback = callback;
         return this;
     }
 

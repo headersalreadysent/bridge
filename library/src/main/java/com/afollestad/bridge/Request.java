@@ -59,6 +59,38 @@ import java.util.List;
 
     @WorkerThread Request makeRequest() throws BridgeException {
         try {
+            return performRequest();
+        } catch (BridgeException e) {
+            final Response resp = e.response();
+            if (builder.totalRetryCount > 0 &&
+                    builder.currentRetryCount < builder.totalRetryCount) {
+                // Retry count exists and we haven't reached the max yet
+                if (builder.retryCallback == null ||
+                        builder.retryCallback.onWillRetry(resp, e, builder())) {
+                    // We are allowed to retry again
+                    if (builder.retrySpacingMs > 0) {
+                        // Wait for a user-set interval before retrying
+                        try {
+                            Thread.sleep(builder.retrySpacingMs);
+                        } catch (InterruptedException ignored) {
+                        }
+                    }
+                    builder.currentRetryCount++;
+                    return makeRequest();
+                } else if (resp != null) {
+                    throw new BridgeException(resp, "Max retry count reached!",
+                            BridgeException.REASON_REQUEST_MAX_RETRIES);
+                } else {
+                    throw new BridgeException(e.request(), "Max retry count reached!",
+                            BridgeException.REASON_REQUEST_MAX_RETRIES);
+                }
+            }
+            throw e;
+        }
+    }
+
+    @WorkerThread Request performRequest() throws BridgeException {
+        try {
             URL url = new URL(builder.url);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             int responseCode = -1;

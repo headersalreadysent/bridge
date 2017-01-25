@@ -17,17 +17,18 @@ import java.util.concurrent.TimeoutException;
     public static final int REASON_REQUEST_CANCELLED = 1;
     public static final int REASON_REQUEST_FAILED = 2;
     public static final int REASON_REQUEST_TIMEOUT = 3;
+    public static final int REASON_REQUEST_MAX_RETRIES = 4;
 
-    public static final int REASON_RESPONSE_UNSUCCESSFUL = 4;
-    public static final int REASON_RESPONSE_UNPARSEABLE = 5;
-    public static final int REASON_RESPONSE_IOERROR = 6;
+    public static final int REASON_RESPONSE_UNSUCCESSFUL = 5;
+    public static final int REASON_RESPONSE_UNPARSEABLE = 6;
+    public static final int REASON_RESPONSE_IOERROR = 7;
 
-    public static final int REASON_RESPONSE_VALIDATOR_FALSE = 7;
-    public static final int REASON_RESPONSE_VALIDATOR_ERROR = 8;
+    public static final int REASON_RESPONSE_VALIDATOR_FALSE = 8;
+    public static final int REASON_RESPONSE_VALIDATOR_ERROR = 9;
 
     @IntDef({REASON_REQUEST_CANCELLED, REASON_REQUEST_FAILED, REASON_RESPONSE_UNSUCCESSFUL,
             REASON_REQUEST_TIMEOUT, REASON_RESPONSE_UNPARSEABLE, REASON_RESPONSE_IOERROR,
-            REASON_RESPONSE_VALIDATOR_FALSE, REASON_RESPONSE_VALIDATOR_ERROR})
+            REASON_RESPONSE_VALIDATOR_FALSE, REASON_RESPONSE_VALIDATOR_ERROR, REASON_REQUEST_MAX_RETRIES})
     @Retention(RetentionPolicy.SOURCE)
     public @interface Reason {
     }
