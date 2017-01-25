@@ -59,77 +59,77 @@ import java.util.List;
 
     @WorkerThread Request makeRequest() throws BridgeException {
         try {
-            URL url = new URL(builder.mUrl);
+            URL url = new URL(builder.url);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             int responseCode = -1;
             String responseMessage = "";
             HashMap<String, List<String>> responseHeaders = new HashMap<>();
 
             try {
-                conn.setReadTimeout(builder.mReadTimeout);
-                conn.setConnectTimeout(builder.mConnectTimeout);
-                final String method = Method.name(builder.mMethod);
-                Log2.d(Request.this, "Resolved HTTP method %d to %s", builder.mMethod, method);
+                conn.setReadTimeout(builder.readTimeout);
+                conn.setConnectTimeout(builder.connectTimeout);
+                final String method = Method.name(builder.method);
+                Log2.d(Request.this, "Resolved HTTP method %d to %s", builder.method, method);
                 conn.setRequestMethod(method);
                 conn.setInstanceFollowRedirects(true);
 
-                if (builder.mHeaders != null && builder.mHeaders.size() > 0) {
-                    for (final String key : builder.mHeaders.keySet()) {
-                        final String value = valueToString(builder.mHeaders.get(key));
+                if (builder.headers != null && builder.headers.size() > 0) {
+                    for (final String key : builder.headers.keySet()) {
+                        final String value = valueToString(builder.headers.get(key));
                         conn.setRequestProperty(key, value);
                         Log2.d(this, "HEADER %s = %s", key, value);
                     }
                 }
-                if (builder.mPipe != null) {
-                    Log2.d(this, "HEADER Content-Length = %d", builder.mPipe.contentLength());
-                    conn.setRequestProperty("Content-Length", builder.mPipe.contentLength() + "");
-                } else if (builder.mBody != null) {
-                    Log2.d(this, "HEADER Content-Length = %d", builder.mBody.length);
-                    conn.setRequestProperty("Content-Length", builder.mBody.length + "");
-                    conn.setFixedLengthStreamingMode(builder.mBody.length); // Disable internal buffering to make upload progress work properly
+                if (builder.pipe != null) {
+                    Log2.d(this, "HEADER Content-Length = %d", builder.pipe.contentLength());
+                    conn.setRequestProperty("Content-Length", builder.pipe.contentLength() + "");
+                } else if (builder.body != null) {
+                    Log2.d(this, "HEADER Content-Length = %d", builder.body.length);
+                    conn.setRequestProperty("Content-Length", builder.body.length + "");
+                    conn.setFixedLengthStreamingMode(builder.body.length); // Disable internal buffering to make upload progress work properly
                 }
                 conn.setDoInput(true);
 
                 checkCancelled();
-                if (builder.mPipe != null || builder.mBody != null) {
-                    if (builder.mUploadProgress != null)
-                        builder.mUploadProgress.request = this;
+                if (builder.pipe != null || builder.body != null) {
+                    if (builder.uploadProgress != null)
+                        builder.uploadProgress.request = this;
                     conn.setDoOutput(true);
                     conn.connect();
 
                     Log2.d(this, "Connection established");
-                    if (builder.mInfoCallback != null)
-                        builder.mInfoCallback.onConnected(this);
+                    if (builder.infoCallback != null)
+                        builder.infoCallback.onConnected(this);
 
                     OutputStream os = null;
                     try {
                         os = conn.getOutputStream();
-                        if (builder.mPipe != null) {
-                            Log2.d(this, "Uploading content from Pipe %s", builder.mPipe.getClass().getSimpleName());
-                            builder.mPipe.writeTo(os, builder.mUploadProgress);
+                        if (builder.pipe != null) {
+                            Log2.d(this, "Uploading content from Pipe %s", builder.pipe.getClass().getSimpleName());
+                            builder.pipe.writeTo(os, builder.uploadProgress);
                             Log2.d(Request.this, "Wrote pipe content to %s %s request.",
                                     Method.name(method()), url());
                         } else {
                             Log2.d(this, "Uploading content from raw body.");
-                            writeTo(builder.mBody, os, builder.mUploadProgress);
-                            if (builder.mUploadProgress != null)
-                                builder.mUploadProgress.publishProgress(builder.mBody.length, builder.mBody.length);
+                            writeTo(builder.body, os, builder.uploadProgress);
+                            if (builder.uploadProgress != null)
+                                builder.uploadProgress.publishProgress(builder.body.length, builder.body.length);
                             Log2.d(Request.this, "Wrote %d bytes to %s %s request.",
-                                    builder.mBody.length, Method.name(method()), url());
+                                    builder.body.length, Method.name(method()), url());
                         }
                         os.flush();
-                        if (builder.mInfoCallback != null)
-                            builder.mInfoCallback.onRequestSent(this);
+                        if (builder.infoCallback != null)
+                            builder.infoCallback.onRequestSent(this);
                     } finally {
-                        if (builder.mPipe != null)
-                            builder.mPipe.close();
+                        if (builder.pipe != null)
+                            builder.pipe.close();
                         BridgeUtil.closeQuietly(os);
                     }
                 } else {
                     conn.connect();
                     Log2.d(this, "Connection established");
-                    if (builder.mInfoCallback != null)
-                        builder.mInfoCallback.onConnected(this);
+                    if (builder.infoCallback != null)
+                        builder.infoCallback.onConnected(this);
                 }
 
                 checkCancelled();
@@ -157,14 +157,14 @@ import java.util.List;
                         totalAvailable = is.available();
                     }
 
-                    if (builder.mLineCallback != null) {
+                    if (builder.lineCallback != null) {
                         BufferedReader reader = null;
                         try {
                             reader = new BufferedReader(new InputStreamReader(is));
                             String line;
                             int count = 0;
                             while ((line = reader.readLine()) != null) {
-                                builder.mLineCallback.onLine(line);
+                                builder.lineCallback.onLine(line);
                                 count++;
                             }
                             Log2.d(this, "Read %d lines from the server.", count);
@@ -175,17 +175,17 @@ import java.util.List;
                         bos = new ByteArrayOutputStream();
                         Log2.d(this, "Server reported %d bytes available for download.", totalAvailable);
                         if (totalAvailable != 0)
-                            builder.mContext.fireProgress(Request.this, 0, totalAvailable);
+                            builder.context.fireProgress(Request.this, 0, totalAvailable);
                         while ((read = is.read(buf)) != -1) {
                             checkCancelled();
                             bos.write(buf, 0, read);
                             totalRead += read;
                             if (totalAvailable != 0)
-                                builder.mContext.fireProgress(Request.this, totalRead, totalAvailable);
+                                builder.context.fireProgress(Request.this, totalRead, totalAvailable);
                             Log2.d(this, "Received %d/%d bytes...", totalRead, totalAvailable);
                         }
                         if (totalAvailable == 0)
-                            builder.mContext.fireProgress(Request.this, 100, 100);
+                            builder.context.fireProgress(Request.this, 100, 100);
                         data = bos.toByteArray();
                         Log.d(Request.this, "Read %d bytes from the %s %s response.", data != null ?
                                 data.length : 0, Method.name(method()), url());
@@ -196,8 +196,8 @@ import java.util.List;
                 }
 
                 checkCancelled();
-                response = new Response(data, url(), responseCode, responseMessage, responseHeaders, builder.mDidRedirect);
-                if (builder.mThrowIfNotSuccess)
+                response = new Response(data, url(), responseCode, responseMessage, responseHeaders, builder.didRedirect);
+                if (builder.throwIfNotSuccess)
                     BridgeUtil.throwIfNotSuccess(response);
                 conn.disconnect();
 
@@ -227,11 +227,11 @@ import java.util.List;
                 try {
                     es = conn.getErrorStream();
                     response = new Response(BridgeUtil.readEntireStream(es), url(),
-                            responseCode, responseMessage, responseHeaders, builder.mDidRedirect);
+                            responseCode, responseMessage, responseHeaders, builder.didRedirect);
                 } catch (Throwable e3) {
                     Log.e(Request.this, "Unable to get error stream... %s", e3.getMessage());
                     response = new Response(null, url(), responseCode,
-                            responseMessage, responseHeaders, builder.mDidRedirect);
+                            responseMessage, responseHeaders, builder.didRedirect);
                 } finally {
                     BridgeUtil.closeQuietly(es);
                     conn.disconnect();
@@ -244,8 +244,8 @@ import java.util.List;
             }
             throw new BridgeException(this, e);
         }
-        if (builder.mValidators != null) {
-            for (ResponseValidator val : builder.mValidators) {
+        if (builder.validators != null) {
+            for (ResponseValidator val : builder.validators) {
                 Log2.d(this, "Checking with validator %s...", val.id());
                 try {
                     if (!val.validate(response))
@@ -257,7 +257,7 @@ import java.util.List;
                 }
             }
         }
-        if (builder.mThrowIfNotSuccess)
+        if (builder.throwIfNotSuccess)
             BridgeUtil.throwIfNotSuccess(response);
         return this;
     }
@@ -286,7 +286,7 @@ import java.util.List;
     }
 
     public boolean isCancellable() {
-        return builder().mCancellable;
+        return builder().cancellable;
     }
 
     public void cancel() {
@@ -304,12 +304,12 @@ import java.util.List;
     }
 
     public String url() {
-        return builder.mUrl;
+        return builder.url;
     }
 
     @MethodInt
     public int method() {
-        return builder.mMethod;
+        return builder.method;
     }
 
     @Override

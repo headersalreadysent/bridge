@@ -15,15 +15,15 @@ final class CallbackStack {
     @SuppressLint("DefaultLocale")
     static String createKey(Request req) {
         String key = String.format("%d\0%s\0%s", req.method(), req.url().replace("http://", "").replace("https://", ""),
-                req.builder().mBody != null ? req.builder().mBody.length + "" : "");
-        if (req.builder().mMethod == Method.POST ||
-                req.builder().mMethod == Method.PUT) {
+                req.builder().body != null ? req.builder().body.length + "" : "");
+        if (req.builder().method == Method.POST ||
+                req.builder().method == Method.PUT) {
             final RequestBuilder builder = req.builder();
             String hash = null;
-            if (builder.mPipe != null) {
-                hash = builder.mPipe.hash();
-            } else if (builder.mBody != null) {
-                hash = HashUtil.hash(builder.mBody);
+            if (builder.pipe != null) {
+                hash = builder.pipe.hash();
+            } else if (builder.body != null) {
+                hash = HashUtil.hash(builder.body);
             }
             key += String.format("\0%s\0", hash);
         }
@@ -53,7 +53,7 @@ final class CallbackStack {
             if (callbacks == null)
                 throw new IllegalStateException("This stack has already been fired or cancelled.");
             callback.isCancellable = request.isCancellable();
-            callback.tag = request.builder().mTag;
+            callback.tag = request.builder().tag;
             callbacks.add(callback);
             if (driverRequest == null)
                 driverRequest = request;

@@ -22,57 +22,57 @@ import java.util.Map;
 /**
  * @author Aidan Follestad (afollestad)
  */
+@SuppressWarnings({"WeakerAccess", "unused"})
 public final class RequestBuilder implements AsResultsExceptions, Serializable {
 
-    protected final Bridge mContext;
-    protected String mUrl;
-    @Request.MethodInt
-    protected final int mMethod;
-    protected HashMap<String, Object> mHeaders;
-    protected byte[] mBody;
-    protected Pipe mPipe;
-    protected int mConnectTimeout;
-    protected int mReadTimeout;
-    protected int mBufferSize;
-    private Request mRequest;
-    protected boolean mCancellable = true;
-    protected Object mTag;
-    protected boolean mThrowIfNotSuccess = false;
-    protected ResponseValidator[] mValidators;
-    protected ProgressCallback mUploadProgress;
-    protected InfoCallback mInfoCallback;
-    protected LineCallback mLineCallback;
-    protected boolean mDidRedirect = false;
+    final Bridge context;
+    String url;
+    @Request.MethodInt final int method;
+    HashMap<String, Object> headers;
+    byte[] body;
+    Pipe pipe;
+    int connectTimeout;
+    int readTimeout;
+    private int bufferSize;
+    private Request request;
+    boolean cancellable = true;
+    Object tag;
+    boolean throwIfNotSuccess = false;
+    ResponseValidator[] validators;
+    ProgressCallback uploadProgress;
+    InfoCallback infoCallback;
+    LineCallback lineCallback;
+    boolean didRedirect = false;
 
-    protected void prepareRedirect(String url) {
-        mUrl = url;
-        mDidRedirect = true;
+    void prepareRedirect(String url) {
+        this.url = url;
+        this.didRedirect = true;
     }
 
-    protected RequestBuilder(String url, @Request.MethodInt int method, Bridge context) {
-        mContext = context;
+    RequestBuilder(String url, @Request.MethodInt int method, Bridge context) {
+        this.context = context;
         final Config cf = Bridge.config();
         if (!url.startsWith("http") && cf.host != null)
             url = cf.host + url;
 
         Log.d(this, "%s %s", Method.name(method), url);
-        mUrl = url;
-        mMethod = method;
+        this.url = url;
+        this.method = method;
 
-        mHeaders = cf.defaultHeaders;
-        mConnectTimeout = cf.connectTimeout;
-        mReadTimeout = cf.readTimeout;
-        mBufferSize = cf.bufferSize;
-        mValidators = cf.validators;
+        headers = cf.defaultHeaders;
+        connectTimeout = cf.connectTimeout;
+        readTimeout = cf.readTimeout;
+        bufferSize = cf.bufferSize;
+        validators = cf.validators;
     }
 
     public RequestBuilder header(@NonNull String name, @NonNull Object value) {
-        mHeaders.put(name, value);
+        headers.put(name, value);
         return this;
     }
 
     public RequestBuilder headers(@NonNull Map<String, ? extends Object> headers) {
-        mHeaders.putAll(headers);
+        this.headers.putAll(headers);
         return this;
     }
 
@@ -83,47 +83,47 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
     public RequestBuilder connectTimeout(int timeout) {
         if (timeout <= 0)
             throw new IllegalArgumentException("Connect timeout must be greater than 0.");
-        mConnectTimeout = timeout;
+        connectTimeout = timeout;
         return this;
     }
 
     public RequestBuilder readTimeout(int timeout) {
         if (timeout <= 0)
             throw new IllegalArgumentException("Read timeout must be greater than 0.");
-        mReadTimeout = timeout;
+        readTimeout = timeout;
         return this;
     }
 
     public RequestBuilder bufferSize(int size) {
         if (size <= 0)
             throw new IllegalArgumentException("Buffer size must be greater than 0.");
-        mBufferSize = size;
+        bufferSize = size;
         return this;
     }
 
     public RequestBuilder validators(ResponseValidator... validators) {
-        mValidators = validators;
+        this.validators = validators;
         return this;
     }
 
     public RequestBuilder body(@Nullable byte[] rawBody) {
         if (rawBody == null) {
-            mBody = null;
+            body = null;
             return this;
         }
-        mBody = rawBody;
+        body = rawBody;
         return this;
     }
 
     public RequestBuilder body(@Nullable String textBody) {
         Log.d(this, "Body: %s", textBody);
         if (textBody == null) {
-            mBody = null;
+            body = null;
             return this;
         }
         contentType("text/plain");
         try {
-            mBody = textBody.getBytes("UTF-8");
+            body = textBody.getBytes("UTF-8");
         } catch (UnsupportedEncodingException e) {
             // Should never happen
             throw new RuntimeException(e);
@@ -133,7 +133,7 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
 
     public RequestBuilder body(@Nullable JSONObject json) {
         if (json == null) {
-            mBody = null;
+            body = null;
             return this;
         }
         body(json.toString());
@@ -143,7 +143,7 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
 
     public RequestBuilder body(@Nullable JSONArray json) {
         if (json == null) {
-            mBody = null;
+            body = null;
             return this;
         }
         body(json.toString());
@@ -153,7 +153,7 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
 
     public RequestBuilder body(@Nullable Form form) {
         if (form == null) {
-            mBody = null;
+            body = null;
             return this;
         }
         body(form.toString());
@@ -163,7 +163,7 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
 
     public RequestBuilder body(@Nullable MultipartForm form) {
         if (form == null) {
-            mBody = null;
+            body = null;
             return this;
         }
         body(form.data());
@@ -172,7 +172,7 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
     }
 
     public RequestBuilder body(@NonNull Pipe pipe) {
-        mPipe = pipe;
+        this.pipe = pipe;
         contentType(pipe.contentType());
         return this;
     }
@@ -187,13 +187,13 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
             return body((List) object);
         }
         if (object == null) {
-            mBody = null;
+            body = null;
         } else {
             final long start = System.currentTimeMillis();
-            final String contentType = RequestConverter.getContentType(object.getClass(), mHeaders.get("Content-Type"));
+            final String contentType = RequestConverter.getContentType(object.getClass(), headers.get("Content-Type"));
             contentType(contentType);
             RequestConverter converter = Bridge.config().requestConverter(contentType);
-            mBody = converter.convertObject(object, this);
+            body = converter.convertObject(object, this);
             final long diff = System.currentTimeMillis() - start;
             Log.d(this, "Request conversion took %dms (%d seconds) for object of type %s.",
                     diff, diff / 1000, object.getClass().getName());
@@ -203,13 +203,13 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
 
     public RequestBuilder body(@Nullable Object[] objects) {
         if (objects == null || objects.length == 0) {
-            mBody = null;
+            body = null;
         } else {
             final long start = System.currentTimeMillis();
-            final String contentType = RequestConverter.getContentType(objects[0].getClass(), mHeaders.get("Content-Type"));
+            final String contentType = RequestConverter.getContentType(objects[0].getClass(), headers.get("Content-Type"));
             contentType(contentType);
             RequestConverter converter = Bridge.config().requestConverter(contentType);
-            mBody = converter.convertArray(objects, this);
+            body = converter.convertArray(objects, this);
             final long diff = System.currentTimeMillis() - start;
             Log.d(this, "Request conversion took %dms (%d seconds) for array of %s objects.",
                     diff, diff / 1000, objects[0].getClass().getName());
@@ -219,13 +219,13 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
 
     public RequestBuilder body(@Nullable List<Object> objects) {
         if (objects == null || objects.size() == 0) {
-            mBody = null;
+            body = null;
         } else {
             final long start = System.currentTimeMillis();
-            final String contentType = RequestConverter.getContentType(objects.get(0).getClass(), mHeaders.get("Content-Type"));
+            final String contentType = RequestConverter.getContentType(objects.get(0).getClass(), headers.get("Content-Type"));
             contentType(contentType);
             RequestConverter converter = Bridge.config().requestConverter(contentType);
-            mBody = converter.convertList(objects, this);
+            body = converter.convertList(objects, this);
             final long diff = System.currentTimeMillis() - start;
             Log.d(this, "Request conversion took %dms (%d seconds) for list of %s objects.",
                     diff, diff / 1000, objects.get(0).getClass().getName());
@@ -234,55 +234,53 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
     }
 
     public RequestBuilder uploadProgress(@NonNull ProgressCallback callback) {
-        mUploadProgress = callback;
+        uploadProgress = callback;
         return this;
     }
 
     public RequestBuilder infoCallback(@NonNull InfoCallback callback) {
-        mInfoCallback = callback;
+        infoCallback = callback;
         return this;
     }
 
     public RequestBuilder cancellable(boolean cancelable) {
-        mCancellable = cancelable;
+        cancellable = cancelable;
         return this;
     }
 
     public RequestBuilder tag(@Nullable Object tag) {
-        mTag = tag;
+        this.tag = tag;
         return this;
     }
 
-    @WorkerThread
-    public Request request() throws BridgeException {
+    @WorkerThread public Request request() throws BridgeException {
         return new Request(this).makeRequest();
     }
 
     public RequestBuilder throwIfNotSuccess() {
-        mThrowIfNotSuccess = true;
+        throwIfNotSuccess = true;
         return this;
     }
 
-    @UiThread
-    public Request request(Callback callback) {
-        mRequest = new Request(this);
-        if (mContext.pushCallback(mRequest, callback)) {
+    @UiThread public Request request(Callback callback) {
+        request = new Request(this);
+        if (context.pushCallback(request, callback)) {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
                     try {
-                        mRequest.makeRequest();
-                        if (mRequest.cancelCallbackFired) return;
-                        final Response response = mRequest.response();
-                        mContext.fireCallbacks(mRequest, response, null);
+                        request.makeRequest();
+                        if (request.cancelCallbackFired) return;
+                        final Response response = request.response();
+                        context.fireCallbacks(request, response, null);
                     } catch (final BridgeException e) {
-                        if (mRequest.cancelCallbackFired) return;
-                        mContext.fireCallbacks(mRequest, mRequest.response(), e);
+                        if (request.cancelCallbackFired) return;
+                        context.fireCallbacks(request, request.response(), e);
                     }
                 }
             }).start();
         }
-        return mRequest;
+        return request;
     }
 
     // Shortcut methods
@@ -302,8 +300,7 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
         return response.asBytes();
     }
 
-    @Override
-    public void asBytes(final @NonNull ResponseConvertCallback<byte[]> callback) {
+    @Override public void asBytes(final @NonNull ResponseConvertCallback<byte[]> callback) {
         request(new Callback() {
             @Override
             public void response(@NonNull Request request, Response response, BridgeException e) {
@@ -324,8 +321,7 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
         return response.asString();
     }
 
-    @Override
-    public void asString(final @NonNull ResponseConvertCallback<String> callback) {
+    @Override public void asString(final @NonNull ResponseConvertCallback<String> callback) {
         request(new Callback() {
             @Override
             public void response(@NonNull Request request, Response response, BridgeException e) {
@@ -336,15 +332,13 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
         });
     }
 
-    @Override
-    public Response asLineStream(@NonNull LineCallback cb) throws BridgeException {
-        mLineCallback = cb;
+    @Override public Response asLineStream(@NonNull LineCallback cb) throws BridgeException {
+        lineCallback = cb;
         return response();
     }
 
-    @Override
-    public void asLineStream(@NonNull LineCallback cb, @NonNull Callback callback) {
-        mLineCallback = cb;
+    @Override public void asLineStream(@NonNull LineCallback cb, @NonNull Callback callback) {
+        lineCallback = cb;
         request(callback);
     }
 
@@ -358,8 +352,7 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
         return response.asHtml();
     }
 
-    @Override
-    public void asHtml(final @NonNull ResponseConvertCallback<Spanned> callback) {
+    @Override public void asHtml(final @NonNull ResponseConvertCallback<Spanned> callback) {
         request(new Callback() {
             @Override
             public void response(@NonNull Request request, Response response, BridgeException e) {
@@ -380,8 +373,7 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
         return response.asBitmap();
     }
 
-    @Override
-    public void asBitmap(final @NonNull ResponseConvertCallback<Bitmap> callback) {
+    @Override public void asBitmap(final @NonNull ResponseConvertCallback<Bitmap> callback) {
         request(new Callback() {
             @Override
             public void response(@NonNull Request request, Response response, BridgeException e) {
@@ -428,8 +420,7 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
         return response.asJsonArray();
     }
 
-    @Override
-    public void asJsonArray(final @NonNull ResponseConvertCallback<JSONArray> callback) {
+    @Override public void asJsonArray(final @NonNull ResponseConvertCallback<JSONArray> callback) {
         request(new Callback() {
             @Override
             public void response(@NonNull Request request, Response response, BridgeException e) {
@@ -473,8 +464,7 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
         });
     }
 
-    @WorkerThread
-    public void asFile(@NonNull File destination) throws BridgeException {
+    @WorkerThread public void asFile(@NonNull File destination) throws BridgeException {
         throwIfNotSuccess();
         Response response = response();
         if (response == null)
@@ -565,8 +555,7 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
         return response.asSuggested();
     }
 
-    @Override
-    public void asSuggested(final @NonNull ResponseConvertCallback<Object> callback) {
+    @Override public void asSuggested(final @NonNull ResponseConvertCallback<Object> callback) {
         request(new Callback() {
             @Override
             public void response(@NonNull Request request, Response response, BridgeException e) {
