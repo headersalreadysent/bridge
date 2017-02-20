@@ -54,6 +54,10 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
         this.url = url;
         this.didRedirect = true;
         this.redirectCount++;
+        if (this.redirectCount > Bridge.config().maxRedirects) {
+            throw new IllegalStateException("Max redirect count is " +
+                    Bridge.config().maxRedirects + ", " + url + " tried to redirect more.");
+        }
     }
 
     RequestBuilder(String url, int method, Bridge context) {

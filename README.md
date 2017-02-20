@@ -41,7 +41,8 @@ powered by Java/Android's URLConnection classes for maximum compatibility and sp
 	3. [Timeout Configuration](https://github.com/afollestad/bridge#timeout-configuration)
 	4. [Buffer Size](https://github.com/afollestad/bridge#buffer-size)
 	5. [Logging](https://github.com/afollestad/bridge#logging)
-	6. [Global Validators](https://github.com/afollestad/bridge#global-validators)
+	6. [Redirects](https://github.com/afollestad/bridge#redirects)
+	7. [Global Validators](https://github.com/afollestad/bridge#global-validators)
 9. [Cleanup](https://github.com/afollestad/bridge#cleanup)
 
 ### Conversion
@@ -933,6 +934,23 @@ By default, logging is disabled. You can enable logging to see what the library 
 Bridge.config()
     .logging(true);
 ```
+
+### Redirects
+
+By default, automatically following redirects is enabled. You can however disable this functionality:
+
+```java
+Bridge.config()
+    .autoFollowRedirects(false);
+```
+
+You can also set a maximum number of redirects allowed for a single request, the default is 4:
+
+```java
+Bridge.config()
+    .maxRedirects(4);
+```
+
 
 ### Global Validators
 

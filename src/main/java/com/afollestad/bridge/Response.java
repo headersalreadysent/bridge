@@ -69,8 +69,9 @@ public final class Response implements AsResults, Serializable {
 
     @Nullable public String header(String name) {
         List<String> header = headers.get(name);
-        if (header == null || header.isEmpty())
+        if (header == null || header.isEmpty()) {
             return null;
+        }
         return header.get(0);
     }
 

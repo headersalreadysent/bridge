@@ -38,6 +38,7 @@ import java.util.HashMap;
     private HashMap<String, Class<? extends RequestConverter>> requestConverters;
     private HashMap<String, Class<? extends ResponseConverter>> responseConverters;
     boolean autoFollowRedirects = true;
+    int maxRedirects = 4;
 
     public Config host(@Nullable String host) {
         this.host = host;
@@ -130,6 +131,11 @@ import java.util.HashMap;
 
     public Config autoFollowRedirects(boolean follow) {
         autoFollowRedirects = follow;
+        return this;
+    }
+
+    public Config maxRedirects(int maxRedirects) {
+        this.maxRedirects = maxRedirects;
         return this;
     }
 
