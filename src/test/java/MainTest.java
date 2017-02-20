@@ -1,6 +1,8 @@
 import com.afollestad.ason.Ason;
+import com.afollestad.ason.AsonArray;
 import com.afollestad.ason.AsonName;
 import com.afollestad.bridge.*;
+import com.afollestad.bridge.annotations.ContentType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Before;
@@ -8,6 +10,8 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -45,16 +49,16 @@ public class MainTest {
         }
     };
 
-    private class ConversionTester {
+    @ContentType(value = "application/json") class ConversionTester {
 
         String name;
-        int age;
+        int born;
         @AsonName(name = "data.$id") int id;
-        @AsonName(name = "data.sort") String sort;
+        @AsonName(name = "data.sort") int sort;
 
-        public ConversionTester(String name, int age, int id, String sort) {
+        ConversionTester(String name, int born, int id, int sort) {
             this.name = name;
-            this.age = age;
+            this.born = born;
             this.id = id;
             this.sort = sort;
         }
@@ -162,27 +166,86 @@ public class MainTest {
         assertEquals("Hello, world!", files.get("file"));
     }
 
-    @Test public void test_converter_object_request() {
+    @Test public void test_converter_object_request() throws Exception {
+        ConversionTester object = new ConversionTester(
+                "Aidan", 1995, 1, 2);
+
+        Response response = Bridge.get("/post")
+                .body(object)
+                .throwIfNotSuccess()
+                .response();
+        assertNotNull(response);
+        assertTrue(response.isSuccess());
+        assertEquals("application/json", response.contentType());
+
+        Ason responseJson = response.asAsonObject();
+        assertNotNull(responseJson);
+
+        Ason jsonObj = responseJson.get("json");
+        assertNotNull(jsonObj);
+
+        String expectedJson = "{\"data\":{\"sort\":2,\"$id\":1},\"born\":1995,\"name\":\"Aidan\"}";
+        assertEquals(expectedJson, jsonObj.toString());
+    }
+
+    @Test public void test_converter_array_request() throws Exception {
+        ConversionTester[] objects = new ConversionTester[]{
+                new ConversionTester("Aidan", 1995, 1, 2),
+                new ConversionTester("Waverly", 1997, 2, 1)
+        };
+
+        Response response = Bridge.get("/post")
+                .body(objects)
+                .throwIfNotSuccess()
+                .response();
+        assertNotNull(response);
+        assertTrue(response.isSuccess());
+        assertEquals("application/json", response.contentType());
+
+        Ason responseJson = response.asAsonObject();
+        assertNotNull(responseJson);
+
+        AsonArray jsonObj = responseJson.get("json");
+        assertNotNull(jsonObj);
+
+        String expectedJson = "[{\"data\":{\"sort\":2,\"$id\":1},\"born\":1995,\"name\":\"Aidan\"}," +
+                "{\"data\":{\"sort\":1,\"$id\":2},\"born\":1997,\"name\":\"Waverly\"}]";
+        assertEquals(expectedJson, jsonObj.toString());
+    }
+
+    @Test public void test_converter_list_request() throws Exception {
+        List<ConversionTester> objects = new ArrayList<>(2);
+        objects.add(new ConversionTester("Aidan", 1995, 1, 2));
+        objects.add(new ConversionTester("Waverly", 1997, 2, 1));
+
+        Response response = Bridge.get("/post")
+                .body(objects)
+                .throwIfNotSuccess()
+                .response();
+        assertNotNull(response);
+        assertTrue(response.isSuccess());
+        assertEquals("application/json", response.contentType());
+
+        Ason responseJson = response.asAsonObject();
+        assertNotNull(responseJson);
+
+        AsonArray jsonObj = responseJson.get("json");
+        assertNotNull(jsonObj);
+
+        String expectedJson = "[{\"data\":{\"sort\":2,\"$id\":1},\"born\":1995,\"name\":\"Aidan\"}," +
+                "{\"data\":{\"sort\":1,\"$id\":2},\"born\":1997,\"name\":\"Waverly\"}]";
+        assertEquals(expectedJson, jsonObj.toString());
+    }
+
+    @Test public void test_converter_object_response() throws Exception {
 
     }
 
-    @Test public void test_converter_array_request() {
+    @Test public void test_converter_array_response() throws Exception {
 
     }
 
-    @Test public void test_converter_list_request() {
-
-    }
-
-    @Test public void test_converter_object_response() {
-
-    }
-
-    @Test public void test_converter_array_response() {
-
-    }
-
-    @Test public void test_converter_list_response() {
+    @Test public void test_converter_list_response() throws Exception {
 
     }
 }
