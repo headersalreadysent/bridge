@@ -380,16 +380,6 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
         });
     }
 
-    @Override public Response asLineStream(@NotNull LineCallback cb) throws BridgeException {
-        lineCallback = cb;
-        return response();
-    }
-
-    @Override public void asLineStream(@NotNull LineCallback cb, @NotNull Callback callback) {
-        lineCallback = cb;
-        request(callback);
-    }
-
     @Nullable public Ason asAsonObject() throws BridgeException {
         throwIfNotSuccess();
         Response response = response();

@@ -48,9 +48,9 @@ powered by Java/Android's URLConnection classes for maximum compatibility and sp
 
 ### Conversion
 
-1. [Conversion API](https://github.com/afollestad/bridge#request-conversion)
-	1. [Requests](https://github.com/afollestad/bridge#requests)
-	2. [Responses](https://github.com/afollestad/bridge#responses)
+1. [Conversion API](https://github.com/afollestad/bridge#conversion-api)
+	1. [Requests](https://github.com/afollestad/bridge#requests-1)
+	2. [Responses](https://github.com/afollestad/bridge#responses-1)
 	3. [Dot Notation](https://github.com/afollestad/bridge#dot-notation)
 	4. [Custom Converters](https://github.com/afollestad/bridge#custom-converters)
 
@@ -476,6 +476,8 @@ JSONArray responseJsonArray = response.asJsonArray();
 
 // Save the response content to a File of your choosing
 response.asFile(new File("/sdcard/Download.extension"));
+
+response.asLineStream()
 ```
 
 If you're not interested in using the `Request` or `Response` object during

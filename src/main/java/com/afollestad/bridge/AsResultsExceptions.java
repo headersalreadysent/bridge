@@ -25,10 +25,6 @@ import java.util.List;
 
     void asString(@NotNull ResponseConvertCallback<String> callback);
 
-    Response asLineStream(@NotNull LineCallback cb) throws BridgeException;
-
-    void asLineStream(@NotNull LineCallback cb, @NotNull Callback callback);
-
     @Nullable Ason asAsonObject() throws BridgeException;
 
     void asAsonObject(@NotNull ResponseConvertCallback<Ason> callback);
