@@ -1,5 +1,6 @@
 package com.afollestad.bridge;
 
+import com.afollestad.bridge.annotations.ContentType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -12,7 +13,7 @@ import java.lang.reflect.Constructor;
 /**
  * @author Aidan Follestad (afollestad)
  */
-public class BridgeUtil {
+class BridgeUtil {
 
     static void closeQuietly(@Nullable Closeable c) {
         if (c != null) {
@@ -48,7 +49,7 @@ public class BridgeUtil {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> T newInstance(@NotNull Class<T> cls) {
+    static <T> T newInstance(@NotNull Class<T> cls) {
         final Constructor ctor = getDefaultConstructor(cls);
         try {
             return (T) ctor.newInstance();
@@ -70,6 +71,21 @@ public class BridgeUtil {
             throw new IllegalStateException("No default constructor found for " + cls.getName());
         ctor.setAccessible(true);
         return ctor;
+    }
+
+    @NotNull static String getContentType(
+            @NotNull Class<?> forClass, @Nullable Object defaultType) {
+        ContentType contentTypeAnnotation = forClass.getAnnotation(ContentType.class);
+        if (contentTypeAnnotation != null &&
+                !contentTypeAnnotation.value().trim().isEmpty()) {
+            return contentTypeAnnotation.value();
+        }
+        if (defaultType == null
+                || !(defaultType instanceof String)
+                || ((String) defaultType).trim().isEmpty()) {
+            defaultType = "application/json";
+        }
+        return (String) defaultType;
     }
 
     private BridgeUtil() {

@@ -1,9 +1,7 @@
 package com.afollestad.bridge;
 
-import com.afollestad.bridge.conversion.JsonRequestConverter;
-import com.afollestad.bridge.conversion.JsonResponseConverter;
-import com.afollestad.bridge.conversion.base.RequestConverter;
-import com.afollestad.bridge.conversion.base.ResponseConverter;
+import com.afollestad.bridge.conversion.IConverter;
+import com.afollestad.bridge.conversion.JsonConverter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,13 +17,9 @@ import java.util.HashMap;
         defaultHeaders.put("User-Agent", "afollestad/Bridge");
         defaultHeaders.put("Content-Type", "text/plain");
 
-        requestConverters = new HashMap<>();
-        requestConverters.put("application/json", JsonRequestConverter.class);
-        requestConverters.put("text/plain", JsonRequestConverter.class);
-
-        responseConverters = new HashMap<>();
-        responseConverters.put("application/json", JsonResponseConverter.class);
-        responseConverters.put("text/plain", JsonResponseConverter.class);
+        converters = new HashMap<>();
+        converters.put("application/json", JsonConverter.class);
+        converters.put("text/plain", JsonConverter.class);
     }
 
     String host;
@@ -35,8 +29,7 @@ import java.util.HashMap;
     int bufferSize = 1024 * 4;
     boolean logging = false;
     ResponseValidator[] validators;
-    private HashMap<String, Class<? extends RequestConverter>> requestConverters;
-    private HashMap<String, Class<? extends ResponseConverter>> responseConverters;
+    private HashMap<String, Class<? extends IConverter>> converters;
     boolean autoFollowRedirects = true;
     int maxRedirects = 4;
 
@@ -51,29 +44,34 @@ import java.util.HashMap;
     }
 
     public Config defaultHeader(@NotNull String name, @Nullable Object value) {
-        if (value == null)
+        if (value == null) {
             defaultHeaders.remove(name);
-        else defaultHeaders.put(name, value);
+        } else {
+            defaultHeaders.put(name, value);
+        }
         return this;
     }
 
     public Config connectTimeout(int timeout) {
-        if (timeout <= 0)
+        if (timeout <= 0) {
             throw new IllegalArgumentException("Connect timeout must be greater than 0.");
+        }
         connectTimeout = timeout;
         return this;
     }
 
     public Config readTimeout(int timeout) {
-        if (timeout <= 0)
+        if (timeout <= 0) {
             throw new IllegalArgumentException("Read timeout must be greater than 0.");
+        }
         readTimeout = timeout;
         return this;
     }
 
     public Config bufferSize(int size) {
-        if (size <= 0)
+        if (size <= 0) {
             throw new IllegalArgumentException("The buffer size must be greater than 0.");
+        }
         bufferSize = size;
         return this;
     }
@@ -83,49 +81,28 @@ import java.util.HashMap;
         return this;
     }
 
-    @NotNull public ResponseConverter responseConverter(@Nullable String contentType) {
-        if (contentType == null || contentType.trim().isEmpty())
+    @NotNull public IConverter converter(
+            @Nullable String contentType) {
+        if (contentType == null || contentType.trim().isEmpty()) {
             contentType = "application/json";
-        else if (contentType.contains(";"))
+        } else if (contentType.contains(";")) {
             contentType = contentType.split(";")[0];
-        final Class<? extends ResponseConverter> converterCls = responseConverters.get(contentType);
-        if (converterCls == null)
-            throw new IllegalStateException("No response converter available for content type " + contentType);
+        }
+        final Class<? extends IConverter> converterCls = converters.get(contentType);
+        if (converterCls == null) {
+            throw new IllegalStateException("No converter available for content type: " + contentType);
+        }
         return BridgeUtil.newInstance(converterCls);
     }
 
-    @Deprecated public Config responseConverter(@NotNull String contentType, @Nullable ResponseConverter converter) {
-        return responseConverter(contentType, converter != null ? converter.getClass() : null);
-    }
-
-    public Config responseConverter(@NotNull String contentType, @Nullable Class<? extends ResponseConverter> converter) {
-        if (converter == null)
-            responseConverters.remove(contentType);
-        else
-            responseConverters.put(contentType, converter);
-        return this;
-    }
-
-    @NotNull public RequestConverter requestConverter(@Nullable String contentType) {
-        if (contentType == null || contentType.trim().isEmpty())
-            contentType = "application/json";
-        else if (contentType.contains(";"))
-            contentType = contentType.split(";")[0];
-        final Class<? extends RequestConverter> converterCls = requestConverters.get(contentType);
-        if (converterCls == null)
-            throw new IllegalStateException("No request converter available for content type " + contentType);
-        return BridgeUtil.newInstance(converterCls);
-    }
-
-    @Deprecated public Config requestConverter(@NotNull String contentType, @Nullable RequestConverter converter) {
-        return requestConverter(contentType, converter != null ? converter.getClass() : null);
-    }
-
-    public Config requestConverter(@NotNull String contentType, @Nullable Class<? extends RequestConverter> converter) {
-        if (converter == null)
-            requestConverters.remove(contentType);
-        else
-            requestConverters.put(contentType, converter);
+    public Config converter(
+            @NotNull String contentType,
+            @Nullable Class<? extends IConverter> converter) {
+        if (converter == null) {
+            converters.remove(contentType);
+        } else {
+            converters.put(contentType, converter);
+        }
         return this;
     }
 

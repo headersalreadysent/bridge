@@ -5,11 +5,12 @@ powered by Java/Android's URLConnection classes for maximum compatibility and sp
 
 # Table of Contents
 
-### Traditional
+### Core
 
-1. [Gradle Dependency](https://github.com/afollestad/bridge#gradle-dependency)
-	1. [Repository](https://github.com/afollestad/bridge#repository)
-	2. [Dependency](https://github.com/afollestad/bridge#dependency)
+1. [Dependency](https://github.com/afollestad/bridge#dependency)
+	1. [Gradle (Java)](https://github.com/afollestad/bridge#gradle-java)
+	2. [Gradle (Android)](https://github.com/afollestad/bridge#gradle-android)
+	2. [Maven](https://github.com/afollestad/bridge#maven)
 2. [Requests](https://github.com/afollestad/bridge#requests)
 	1. [Request Basics](https://github.com/afollestad/bridge#request-basics)
 	2. [Request Headers](https://github.com/afollestad/bridge#request-headers)
@@ -47,36 +48,59 @@ powered by Java/Android's URLConnection classes for maximum compatibility and sp
 
 ### Conversion
 
-1. [Request Conversion](https://github.com/afollestad/bridge#request-conversion)
-	1. [JSON Request Conversion](https://github.com/afollestad/bridge#json-request-conversion)
-	2. [Dot Notation](https://github.com/afollestad/bridge#dot-notation)
-	3. [Request Conversion API](https://github.com/afollestad/bridge#request-conversion-api)
-2. [Response Conversion](https://github.com/afollestad/bridge#response-conversion)
-	1. [JSON Response Conversion](https://github.com/afollestad/bridge#json-response-conversion)
-	2. [Dot Notation](https://github.com/afollestad/bridge#dot-notation-1)
-	3. [Response Conversion API](https://github.com/afollestad/bridge#response-conversion-api)
+1. [Conversion API](https://github.com/afollestad/bridge#request-conversion)
+	1. [Requests](https://github.com/afollestad/bridge#requests)
+	2. [Responses](https://github.com/afollestad/bridge#responses)
+	3. [Dot Notation](https://github.com/afollestad/bridge#dot-notation)
+	4. [Custom Converters](https://github.com/afollestad/bridge#custom-converters)
 
 ---
 
-# Gradle Dependency
+# Dependency
 
 [ ![jCenter](https://api.bintray.com/packages/drummer-aidan/maven/bridge/images/download.svg) ](https://bintray.com/drummer-aidan/maven/bridge/_latestVersion)
 [![Build Status](https://travis-ci.org/afollestad/bridge.svg)](https://travis-ci.org/afollestad/bridge)
 [![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg?style=flat-square)](https://www.apache.org/licenses/LICENSE-2.0.html)
 
-The Gradle dependency is available via [jCenter](https://bintray.com/drummer-aidan/maven/bridge/view).
-jCenter is the default Maven repository used by Android Studio.
+The dependency is available via [jCenter](https://bintray.com/drummer-aidan/maven/bridge/view).
+jCenter is the default Maven repository used by Android Studio. It can easily be applied to IntelliJ IDEA also.
 
-### Dependency
+### Gradle (Java)
 
-Add this to your module's `build.gradle` file:
+Add the compile statement to your module's `build.gradle` dependencies:
 
 ```gradle
 dependencies {
-	// ... other dependencies
-
-	compile 'com.afollestad:bridge:4.1.0'
+	...
+	compile 'com.afollestad:bridge:5.0.0'
 }
+```
+
+### Gradle (Android)
+
+Add the compile statement to your module's `build.gradle` dependencies:
+
+```gradle
+dependencies {
+    ...
+	compile('com.afollestad:bridge:5.0.0') {
+	    exclude group: 'org.json', module: 'json'
+    }
+}
+```
+
+The exclusion inside the inner brackets leaves out the `JSONObject`/`JSONArray` classes provided through 
+[Ason](https://github.com/afollestad/ason), since the Android framework includes those classes.
+
+### Maven
+
+```xml
+<dependency>
+  <groupId>com.afollestad</groupId>
+  <artifactId>bridge</artifactId>
+  <version>4.1.0</version>
+  <type>pom</type>
+</dependency>
 ```
 
 ---
@@ -436,12 +460,18 @@ byte[] responseRawData = response.asBytes();
 // Converts asBytes() to a UTF-8 encoded String.
 String responseString = response.asString();
 
-// Cached in the Response object, using this method multiples will reference the same JSONObject.
+// Cached in the Response object, using this method multiples will reference the same Ason.
 // This allows your app to not re-parse the JSON if it's used multiple times.
+Ason responseAsonObject = response.asAsonObject();
+
+// Cached in the Response object, using this method multiples will reference the same AsonArray.
+// This allows your app to not re-parse the JSON if it's used multiple times.
+AsonArray responseAsonArray = response.asAsonArray();
+
+// Same as asAsonObject(), just uses the underlying stock JSONObject instance
 JSONObject responseJsonObject = response.asJsonObject();
 
-// Cached in the Response object, using this method multiples will reference the same JSONArray.
-// This allows your app to not re-parse the JSON if it's used multiple times.
+// Same as asAsonArray(), just uses the underlying stock JSONArray instance
 JSONArray responseJsonArray = response.asJsonArray();
 
 // Save the response content to a File of your choosing
@@ -508,7 +538,7 @@ switch (e.reason()) {
     }
     case BridgeException.REASON_RESPONSE_UNPARSEABLE: {
         Response response = e.response();
-        // Thrown by the response conversion methods (e.g. asJsonObject())
+        // Thrown by the response conversion methods (e.g. asAsonObject(), ...)
         // When the response content can't be successfully returned in the
         // requested format. E.g. a JSON error.
         break;
@@ -788,8 +818,8 @@ Validators allow you to provide consistent checking that certain conditions are 
 ResponseValidator validator = new ResponseValidator() {
     @Override
     public boolean validate(@NonNull Response response) throws Exception {
-        JSONObject json = response.asJsonObject();
-        return json.getBoolean("success");
+        Ason json = response.asAsonObjecte();
+        return json.get("success");
     }
 
     @NonNull
@@ -799,10 +829,10 @@ ResponseValidator validator = new ResponseValidator() {
     }
 };
 try {
-    JSONObject response = Bridge
+    Ason response = Bridge
         .get("http://www.someurl.com/api/test")
         .validators(validator)
-        .asJsonObject();
+        .asAsonObject();
 } catch (BridgeException e) {
     if (e.reason() == BridgeException.REASON_RESPONSE_VALIDATOR_FALSE) {
         String validatorId = e.validatorId();
@@ -826,10 +856,10 @@ ResponseValidator validatorOne = // ...
 ResponseValidator validatorTwo = // ...
 
 try {
-    JSONObject response = Bridge
+    Ason response = Bridge
         .get("http://www.someurl.com/api/test")
         .validators(validatorOne, validatorTwo)
-        .asJsonObject();
+        .asAsonObject();
 } catch (BridgeException e) {
     if (e.reason() == BridgeException.REASON_RESPONSE_VALIDATOR_FALSE) {
         String validatorId = e.validatorId();
@@ -961,7 +991,7 @@ Bridge.config()
     .validators(new ResponseValidator() {
         @Override
         public boolean validate(@NonNull Response response) throws Exception {
-            JSONObject json = response.asJsonObject();
+            Ason json = response.asAsonObject();
             return json.getBoolean("success");
         }
 
@@ -989,12 +1019,14 @@ Bridge.destroy();
 
 ---
 
-# Request Conversion
+# Conversion API
 
-Bridge's request conversion feature allows you to use Java object instances directly as a request body. 
-Objects are serialized directly into a format such as JSON.
+Bridge's conversion feature allows you to use Java object instances/arrays/lists directly as a request bodies, 
+and convert response bodies directly to Java object instances/arrays/lists.
 
-### JSON Request Conversion
+Bridge comes with a built-in JSON converter, which is powered by one of my other libraries, [Ason](https://github.com/afollestad/ason).
+
+### Requests
 
 Take this class for an example:
 
@@ -1013,25 +1045,26 @@ public class Person {
     @Header(name = "Custom-Header")
     public String customHeader;
 
-    @Body(name = "full_name")
+    @AsonName(name = "full_name")
     public String name;
-    @Body
     public int age;
-    @Body
     public Person spouse;   
+    
+    @AsonIgnore
+    public Object idk;
 }
 ```
 
 The `ContentType` annotation is used to lookup what request converter should be used. The annotation's value
-also gets applied as the `Content-Type` header of requests the object is passed in to.
+also gets applied as the `Content-Type` header of requests that the object is passed in to.
 
 The `Header` annotation can be used to apply request header values.
 
-The `Body` annotations indicate fields that are serialized into the response body. The optional name
-parameter can be used if the output name of the field should be different than the actual name of the field.
+The `AsonName` annotations provide custom names for fields that are serialized into the response body.
 
-You can use instances of this class as a request body. Fields not marked with the `Header` or `Body`
-annotation are ignored.
+The `AsonIgnore` annotation tells the library to ignore marked fields during serialization/deserialization.
+
+You can use instances of this class as a request body. 
 
 ```java
 Person person = new Person("Aidan Follestad", 21);
@@ -1055,94 +1088,7 @@ Request request = Bridge
     .request();
 ```
 
-### Dot Notation
-
-I thought this was worthy of its own section. Bridge supports dot notation, which is better explained by example. 
-Take this class:
-
-```java
-@ContentType("application/json")
-public static class Person {
-
-    public Person() {
-    }
-
-    public Person(String name, int age) {
-        this.name = name;
-        this.age = age;
-    }
-
-    @Body(name = "person.name")
-    public String name = "Aidan";
-    @Body(name = "person.age.$t")
-    public int age = 21;
-}
-```
-
-When converted to JSON, it will appear like this:
-
-```json
-{
-    "person": {
-        "name": "Aidan",
-        "age": {
-            "$t": 21
-        }
-    }
-}
-```
-
-The dots in the names of the `Body` annotation parameters indicate a path of objects that it takes
-to reach the value.
-
-### Request Conversion API
-
-Bridge comes stock with a JSON request converter, but the API is extensible for people like you.
-
-See the [JsonRequestConverter](https://github.com/afollestad/bridge/blob/master/library/src/main/java/com/afollestad/bridge/conversion/JsonRequestConverter.java) 
-source code for an example of how a `RequestConverter` is made. It should come off as simple.
-
-When you have a custom converter made, you can register it to a Content-Type:
-
-```java
-Bridge.config()
-    .requestConverter("application/json", new JsonRequestConverter());
-```
-
----
-
-# Response Conversion
-
-Bridge's response conversion feature allows you convert responses directly to Java object instances. Objects
-are de-serialized from a format such as jSON.
-
-### JSON Response Conversion
-
-Take this class for an example (notice that the `ContentType` annotation is not used with response 
-conversion, but it should be left there if you plan on using request conversion):
-
-```java
-public class Person {
-
-    public Person() {
-    }
-
-    public Person(String name, int age) {
-        this.name = name;
-        this.age = age;
-    }
-
-    @Header(name = "Custom-Header")
-    public String customHeader;
-
-    @Body(name = "name")
-    public String name;
-    @Body
-    public int age;
-    @Body
-    public Person spouse;   
-}
-```
+### Responses
 
 Imagine a URL that returns JSON like this:
 
@@ -1189,6 +1135,7 @@ You can even retrieve arrays of JSON:
 ```
 
 ```java
+// Arrays
 Bridge.get("https://www.someurl.com/person_array.json")
     .asClassArray(Person.class, new ResponseConvertCallback<Person[]>() {
         @Override
@@ -1196,23 +1143,99 @@ Bridge.get("https://www.someurl.com/person_array.json")
             // Use response objects
         }
     });
+
+// Lists
+Bridge.get("https://www.someurl.com/person_array.json")
+    .asClassList(Person.class, new ResponseConvertCallback<List<Person>>() {
+        @Override
+        public void onResponse(@NonNull Response response, @Nullable List<Person> objects, @Nullable BridgeException e) {
+            // Use response objects
+        }
+    });
 ```
 
 ### Dot Notation
 
-See [Dot Notation](https://github.com/afollestad/bridge#dot-notation) under the Request Conversion API
- for details. It works the same way here, just in reverse.
+I thought this was worthy of its own section. Bridge supports dot notation through Ason, 
+which is better explained by example. Take this class:
 
-### Response Conversion API
+```java
+@ContentType("application/json")
+public static class Person {
 
-Bridge comes stock with a JSON response converter, but the API is extensible for people like you.
+    public Person() {
+    }
 
-See the [JsonResponseConverter](https://github.com/afollestad/bridge/blob/master/library/src/main/java/com/afollestad/bridge/conversion/JsonResponseConverter.java) 
-source code for an example of how a `ResponseConverter` is made. It should come off as simple.
+    public Person(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
 
-When you have a custom converter made, you can register it to a Content-Type:
+    @AsonName(name = "person.name")
+    public String name = "Aidan";
+    @AsonName(name = "person.age.$t")
+    public int age = 21;
+}
+```
+
+When converted to JSON, it will appear like this:
+
+```json
+{
+    "person": {
+        "name": "Aidan",
+        "age": {
+            "$t": 21
+        }
+    }
+}
+```
+
+The dots in the names of the `AsonName` annotation parameters indicate a path of objects that it takes
+to reach the value. This works with deserialization also.
+
+### Custom Converters
+
+You can create your own converters and assign them to `Content-Type`'s.
+
+This is what the built-in `JsonConverter` looks like:
+
+
+```java
+public class JsonConverter extends IConverter {
+
+    @Override public byte[] serialize(Object object) throws Exception {
+        Ason ason = Ason.serialize(object);
+        return ason.toString().getBytes("UTF-8");
+    }
+
+    @Override public byte[] serializeArray(Object[] objects) throws Exception {
+        AsonArray ason = Ason.serializeArray(objects);
+        return ason.toString().getBytes("UTF-8");
+    }
+
+    @Override public byte[] serializeList(List<Object> objects) throws Exception {
+        AsonArray ason = Ason.serializeList(objects);
+        return ason.toString().getBytes("UTF-8");
+    }
+
+    @Override public <T> T deserialize(Response response, Class<T> cls) throws Exception {
+        return (T) Ason.deserialize(response.asAsonObject(), cls);
+    }
+
+    @Override public <T> T[] deserializeArray(Response response, Class<T> cls) throws Exception {
+        return (T[]) Ason.deserialize(response.asAsonArray(), cls);
+    }
+
+    @Override public <T> List<T> deserializeList(Response response, Class<T> cls) throws Exception {
+        return Ason.deserializeList(response.asAsonArray(), cls);
+    }
+}
+```
+
+It gets registered by the library like this:
 
 ```java
 Bridge.config()
-    .responseConverter("application/json", new JsonResponseConverter());
+    .converter("application/json", JsonConverter.class);
 ```

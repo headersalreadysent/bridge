@@ -1,4 +1,5 @@
 import com.afollestad.ason.Ason;
+import com.afollestad.ason.AsonName;
 import com.afollestad.bridge.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -43,6 +44,21 @@ public class MainTest {
             data = null;
         }
     };
+
+    private class ConversionTester {
+
+        String name;
+        int age;
+        @AsonName(name = "data.$id") int id;
+        @AsonName(name = "data.sort") String sort;
+
+        public ConversionTester(String name, int age, int id, String sort) {
+            this.name = name;
+            this.age = age;
+            this.id = id;
+            this.sort = sort;
+        }
+    }
 
     @Before public void setup() {
         Bridge.config()
@@ -144,5 +160,29 @@ public class MainTest {
         Ason files = responseJson.get("files");
         assertNotNull(files);
         assertEquals("Hello, world!", files.get("file"));
+    }
+
+    @Test public void test_converter_object_request() {
+
+    }
+
+    @Test public void test_converter_array_request() {
+
+    }
+
+    @Test public void test_converter_list_request() {
+
+    }
+
+    @Test public void test_converter_object_response() {
+
+    }
+
+    @Test public void test_converter_array_response() {
+
+    }
+
+    @Test public void test_converter_list_response() {
+
     }
 }

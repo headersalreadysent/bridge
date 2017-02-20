@@ -2,7 +2,7 @@ package com.afollestad.bridge;
 
 import com.afollestad.ason.Ason;
 import com.afollestad.ason.AsonArray;
-import com.afollestad.bridge.conversion.base.RequestConverter;
+import com.afollestad.bridge.conversion.IConverter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
@@ -228,11 +228,15 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
             body = null;
         } else {
             final long start = System.currentTimeMillis();
-            final String contentType = RequestConverter.getContentType(
+            final String contentType = BridgeUtil.getContentType(
                     object.getClass(), headers.get("Content-Type"));
             contentType(contentType);
-            RequestConverter converter = Bridge.config().requestConverter(contentType);
-            body = converter.convertObject(object, this);
+            IConverter converter = Bridge.config().converter(contentType);
+            try {
+                body = converter.serialize(object);
+            } catch (Exception e) {
+                throw new IllegalStateException("Failed to serialize object to body!", e);
+            }
             final long diff = System.currentTimeMillis() - start;
             LogCompat.d(this, "Request conversion took %dms (%d seconds) for object of type %s.",
                     diff, diff / 1000, object.getClass().getName());
@@ -245,11 +249,15 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
             body = null;
         } else {
             final long start = System.currentTimeMillis();
-            final String contentType = RequestConverter.getContentType(
+            final String contentType = BridgeUtil.getContentType(
                     objects[0].getClass(), headers.get("Content-Type"));
             contentType(contentType);
-            RequestConverter converter = Bridge.config().requestConverter(contentType);
-            body = converter.convertArray(objects, this);
+            IConverter converter = Bridge.config().converter(contentType);
+            try {
+                body = converter.serializeArray(objects);
+            } catch (Exception e) {
+                throw new IllegalStateException("Failed to serialize array to body!", e);
+            }
             final long diff = System.currentTimeMillis() - start;
             LogCompat.d(this, "Request conversion took %dms (%d seconds) for array of %s objects.",
                     diff, diff / 1000, objects[0].getClass().getName());
@@ -262,11 +270,15 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
             body = null;
         } else {
             final long start = System.currentTimeMillis();
-            final String contentType = RequestConverter.getContentType(
+            final String contentType = BridgeUtil.getContentType(
                     objects.get(0).getClass(), headers.get("Content-Type"));
             contentType(contentType);
-            RequestConverter converter = Bridge.config().requestConverter(contentType);
-            body = converter.convertList(objects, this);
+            IConverter converter = Bridge.config().converter(contentType);
+            try {
+                body = converter.serializeList(objects);
+            } catch (Exception e) {
+                throw new IllegalStateException("Failed to serialize list to body!", e);
+            }
             final long diff = System.currentTimeMillis() - start;
             LogCompat.d(this, "Request conversion took %dms (%d seconds) for list of %s objects.",
                     diff, diff / 1000, objects.get(0).getClass().getName());

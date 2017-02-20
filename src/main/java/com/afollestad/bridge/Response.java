@@ -9,7 +9,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.*;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
 /**
@@ -194,8 +197,7 @@ public final class Response implements AsResults, Serializable {
         }
     }
 
-    @Nullable public <T> T asClass(@NotNull Class<T> cls) throws BridgeException {
-        String contentType = contentType();
+    private void throwIfNoContentType(@Nullable String contentType) throws BridgeException {
         if (contentType == null) {
             String msg = String.format(Locale.getDefault(),
                     "Response has no Content-Type, cannot determine appropriate response converter. Response status: %d.", code);
@@ -203,29 +205,38 @@ public final class Response implements AsResults, Serializable {
                 msg += String.format(Locale.getDefault(), "\n    %s = %s", key, headers.get(key).get(0));
             throw new BridgeException(this, msg, BridgeException.REASON_RESPONSE_UNPARSEABLE);
         }
+    }
+
+    @Nullable public <T> T asClass(@NotNull Class<T> cls) throws BridgeException {
+        String contentType = contentType();
+        throwIfNoContentType(contentType);
         final long start = System.currentTimeMillis();
-        T result = Bridge.config()
-                .responseConverter(contentType)
-                .convertObject(this, cls);
+        T result;
+        try {
+            result = Bridge.config()
+                    .converter(contentType)
+                    .deserialize(this, cls);
+        } catch (Exception e) {
+            throw new IllegalStateException("Failed to deserialize response to object!", e);
+        }
         final long diff = System.currentTimeMillis() - start;
-        LogCompat.d(this, "Response conversion to class %s took %d milliseconds (%d seconds).",
+        LogCompat.d(this, "Response conversion to object %s took %d milliseconds (%d seconds).",
                 cls.getName(), diff, diff / 1000);
         return result;
     }
 
     @Nullable public <T> T[] asClassArray(@NotNull Class<T> cls) throws BridgeException {
         String contentType = contentType();
-        if (contentType == null) {
-            String msg = String.format(Locale.getDefault(),
-                    "Response has no Content-Type, cannot determine appropriate response converter. Response status: %d.", code);
-            for (String key : headers.keySet())
-                msg += String.format(Locale.getDefault(), "\n    %s = %s", key, headers.get(key).get(0));
-            throw new BridgeException(this, msg, BridgeException.REASON_RESPONSE_UNPARSEABLE);
-        }
+        throwIfNoContentType(contentType);
         final long start = System.currentTimeMillis();
-        T[] result = Bridge.config()
-                .responseConverter(contentType)
-                .convertArray(this, cls);
+        T[] result;
+        try {
+            result = Bridge.config()
+                    .converter(contentType)
+                    .deserializeArray(this, cls);
+        } catch (Exception e) {
+            throw new IllegalStateException("Failed to deserialize response to array!", e);
+        }
         final long diff = System.currentTimeMillis() - start;
         LogCompat.d(this, "Response conversion to array of class %s took %d milliseconds (%d seconds).",
                 cls.getName(), diff, diff / 1000);
@@ -233,8 +244,21 @@ public final class Response implements AsResults, Serializable {
     }
 
     @Nullable public <T> List<T> asClassList(@NotNull Class<T> cls) throws BridgeException {
-        T[] array = asClassArray(cls);
-        return array == null ? null : Arrays.asList(array);
+        String contentType = contentType();
+        throwIfNoContentType(contentType);
+        final long start = System.currentTimeMillis();
+        List<T> result;
+        try {
+            result = Bridge.config()
+                    .converter(contentType)
+                    .deserializeList(this, cls);
+        } catch (Exception e) {
+            throw new IllegalStateException("Failed to deserialize response to list!", e);
+        }
+        final long diff = System.currentTimeMillis() - start;
+        LogCompat.d(this, "Response conversion to list of class %s took %d milliseconds (%d seconds).",
+                cls.getName(), diff, diff / 1000);
+        return result;
     }
 
     @Nullable
