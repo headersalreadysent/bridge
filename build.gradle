@@ -1,5 +1,5 @@
 group 'com.afollestad'
-version '4.1.0'
+version '5.0.0'
 
 apply plugin: 'java'
 apply plugin: 'idea'
@@ -29,6 +29,6 @@ publish {
     userOrg = 'drummer-aidan'
     groupId = 'com.afollestad'
     artifactId = 'bridge'
-    publishVersion = '4.1.0'
+    publishVersion = '5.0.0'
     website = 'https://github.com/afollestad/bridge'
 }
