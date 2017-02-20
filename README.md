@@ -306,20 +306,18 @@ Request request = Bridge
 to the value of the associated header. You can override that by changing the header 
 after the body is set.
 
-`Pipe` has three static convenience methods that create a pre-built `Pipe` instance
+`Pipe` has two static convenience methods that create a pre-built `Pipe` instance
 for certain uses:
 
 ```java
-Pipe uriPipe = Pipe.forUri(this, Uri.parse(
-    "content://com.example.provider/documents/images/1"));
-
 Pipe filePipe = Pipe.forFile(new File("/sdcard/myfile.txt"));
 
 InputStream is = // ...
 Pipe transferPipe = Pipe.forStream(is, "text/plain", "unique-identifier-such-as-file-name");
 ```
 
-They should be mostly self-explanatory.
+They should be mostly self-explanatory. **On Android, if you want to read from a URI such as a content:// URI, you can 
+use `forStream()` with an `InputStream` obtained using a Content Resolver.
 
 ### Info Callbacks
 
@@ -437,9 +435,6 @@ byte[] responseRawData = response.asBytes();
 // Converts asBytes() to a UTF-8 encoded String.
 String responseString = response.asString();
 
-// If you set this to a TextView, it will display HTML formatting
-Spanned responseHtml = response.asHtml();
-
 // Cached in the Response object, using this method multiples will reference the same JSONObject.
 // This allows your app to not re-parse the JSON if it's used multiple times.
 JSONObject responseJsonObject = response.asJsonObject();
@@ -448,17 +443,8 @@ JSONObject responseJsonObject = response.asJsonObject();
 // This allows your app to not re-parse the JSON if it's used multiple times.
 JSONArray responseJsonArray = response.asJsonArray();
 
-// Don't forget to recycle!
-// Once you use this method once, the resulting Bitmap is cached in the Response object,
-// Meaning asBitmap() will always return the same Bitmap from any reference to this response.
-Bitmap responseImage = response.asBitmap();
-
 // Save the response content to a File of your choosing
 response.asFile(new File("/sdcard/Download.extension"));
-
-// Returns String, Spanned (for HTML), JSONObject, JSONArray, Bitmap, or byte[]
-// based on the Content-Type header.
-Object suggested = response.asSuggested();
 ```
 
 If you're not interested in using the `Request` or `Response` object during

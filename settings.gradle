@@ -1,1 +1,1 @@
-include ':sample', ':library'
+rootProject.name = 'bridge'
