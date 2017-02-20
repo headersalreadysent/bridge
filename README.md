@@ -98,7 +98,7 @@ The exclusion inside the inner brackets leaves out the `JSONObject`/`JSONArray` 
 <dependency>
   <groupId>com.afollestad</groupId>
   <artifactId>bridge</artifactId>
-  <version>4.1.0</version>
+  <version>5.0.0</version>
   <type>pom</type>
 </dependency>
 ```
