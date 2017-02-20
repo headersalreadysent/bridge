@@ -1,8 +1,6 @@
 import com.afollestad.ason.Ason;
 import com.afollestad.ason.AsonArray;
-import com.afollestad.ason.AsonName;
 import com.afollestad.bridge.*;
-import com.afollestad.bridge.annotations.ContentType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Before;
@@ -49,26 +47,12 @@ public class MainTest {
         }
     };
 
-    @ContentType(value = "application/json") class ConversionTester {
-
-        String name;
-        int born;
-        @AsonName(name = "data.$id") int id;
-        @AsonName(name = "data.sort") int sort;
-
-        ConversionTester(String name, int born, int id, int sort) {
-            this.name = name;
-            this.born = born;
-            this.id = id;
-            this.sort = sort;
-        }
-    }
-
     @Before public void setup() {
         Bridge.config()
                 .host("https://httpbin.org")
                 .autoFollowRedirects(true)
-                .bufferSize(1024);
+                .bufferSize(1024)
+                .maxRedirects(6);
     }
 
     @Test public void test_get() throws Exception {
@@ -167,7 +151,7 @@ public class MainTest {
     }
 
     @Test public void test_converter_object_request() throws Exception {
-        ConversionTester object = new ConversionTester(
+        RequestConvertTestObj object = new RequestConvertTestObj(
                 "Aidan", 1995, 1, 2);
 
         Response response = Bridge.get("/post")
@@ -189,9 +173,9 @@ public class MainTest {
     }
 
     @Test public void test_converter_array_request() throws Exception {
-        ConversionTester[] objects = new ConversionTester[]{
-                new ConversionTester("Aidan", 1995, 1, 2),
-                new ConversionTester("Waverly", 1997, 2, 1)
+        RequestConvertTestObj[] objects = new RequestConvertTestObj[]{
+                new RequestConvertTestObj("Aidan", 1995, 1, 2),
+                new RequestConvertTestObj("Waverly", 1997, 2, 1)
         };
 
         Response response = Bridge.get("/post")
@@ -214,9 +198,9 @@ public class MainTest {
     }
 
     @Test public void test_converter_list_request() throws Exception {
-        List<ConversionTester> objects = new ArrayList<>(2);
-        objects.add(new ConversionTester("Aidan", 1995, 1, 2));
-        objects.add(new ConversionTester("Waverly", 1997, 2, 1));
+        List<RequestConvertTestObj> objects = new ArrayList<>(2);
+        objects.add(new RequestConvertTestObj("Aidan", 1995, 1, 2));
+        objects.add(new RequestConvertTestObj("Waverly", 1997, 2, 1));
 
         Response response = Bridge.get("/post")
                 .body(objects)
@@ -238,14 +222,22 @@ public class MainTest {
     }
 
     @Test public void test_converter_object_response() throws Exception {
+        RequestConvertTestObj object = new RequestConvertTestObj(
+                "Aidan", 1995, 1, 2);
 
-    }
+        Response response = Bridge.get("/post")
+                .body(object)
+                .throwIfNotSuccess()
+                .response();
+        assertNotNull(response);
+        assertTrue(response.isSuccess());
+        assertEquals("application/json", response.contentType());
 
-    @Test public void test_converter_array_response() throws Exception {
-
-    }
-
-    @Test public void test_converter_list_response() throws Exception {
-
+        ResponseConvertTestObj result = response.asClass(ResponseConvertTestObj.class);
+        assertNotNull(result);
+        assertEquals(object.name, result.name);
+        assertEquals(object.born, result.born);
+        assertEquals(object.id, result.id);
+        assertEquals(object.sort, result.sort);
     }
 }
