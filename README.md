@@ -91,7 +91,8 @@ dependencies {
 ```
 
 The exclusion inside the inner brackets leaves out the `JSONObject`/`JSONArray` classes provided through 
-[Ason](https://github.com/afollestad/ason), since the Android framework includes those classes.
+[Ason](https://github.com/afollestad/ason), since the Android framework includes those classes. *This hasn't worked 
+in some cases, so you may get warnings when building your app.*
 
 ### Maven
 
