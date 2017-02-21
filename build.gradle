@@ -3,6 +3,7 @@ version '5.0.0'
 
 apply plugin: 'java'
 apply plugin: 'idea'
+apply plugin: 'jacoco'
 apply plugin: 'com.novoda.bintray-release'
 
 buildscript {
