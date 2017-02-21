@@ -1,0 +1,8 @@
+title: Bridge
+description: A simple but powerful HTTP networking library for Android. It features a Fluent chainable API, powered by Java/Android's URLConnection classes for maximum compatibility and speed.
+google_analytics: 
+show_downloads: true
+theme: jekyll-theme-slate
+
+gems:
+  - jekyll-mentions
