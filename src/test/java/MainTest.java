@@ -6,8 +6,7 @@ import org.jetbrains.annotations.Nullable;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,9 +46,26 @@ public class MainTest {
         }
     };
 
+    private final ResponseValidator testValidator = new ResponseValidator() {
+
+        @Override public boolean validate(@NotNull Response response) throws Exception {
+            if (!"application/json".equals(response.contentType())) {
+                throw new Exception("Expected application/json");
+            }
+            Ason ason = response.asAsonObject();
+            return ason != null && ason.getBool("data.test");
+        }
+
+        @NotNull
+        @Override
+        public String id() {
+            return "test";
+        }
+    };
+
     @Before public void setup() {
         Bridge.config()
-                .host("https://httpbin.org")
+                .host("https://postman-echo.com")
                 .autoFollowRedirects(true)
                 .bufferSize(1024)
                 .maxRedirects(6);
@@ -61,7 +77,7 @@ public class MainTest {
                 .response();
         assertNotNull(response);
         assertTrue(response.isSuccess());
-        assertEquals("application/json", response.contentType());
+        assertEquals("application/json; charset=utf-8", response.contentType());
 
         Ason responseJson = response.asAsonObject();
         assertNotNull(responseJson);
@@ -71,8 +87,23 @@ public class MainTest {
         assertEquals("Aidan", args.getString("name"));
     }
 
+    @Test public void test_headers() throws Exception {
+        Response response = Bridge.get("/headers")
+                .header("aidan", "follestad")
+                .throwIfNotSuccess()
+                .response();
+        assertNotNull(response);
+        assertTrue(response.isSuccess());
+
+        Ason body = response.asAsonObject();
+        assertNotNull(body);
+        Ason headers = body.get("headers");
+        assertNotNull(headers);
+        assertEquals("follestad", headers.get("aidan"));
+    }
+
     @Test public void test_auto_redirect() throws Exception {
-        Response response = Bridge.get("/redirect-to?url=%s", "https://www.google.com")
+        Response response = Bridge.get("https://httpbin.org/redirect-to?url=%s", "https://www.google.com")
                 .throwIfNotSuccess()
                 .response();
         assertNotNull(response);
@@ -83,7 +114,7 @@ public class MainTest {
     }
 
     @Test public void test_auto_redirect_multi() throws Exception {
-        Response response = Bridge.get("/redirect/%d", 6)
+        Response response = Bridge.get("https://httpbin.org/redirect/%d", 6)
                 .throwIfNotSuccess()
                 .response();
         assertNotNull(response);
@@ -99,14 +130,14 @@ public class MainTest {
                 .response();
         assertNotNull(response);
         assertTrue(response.isSuccess());
-        assertEquals("application/json", response.contentType());
+        assertEquals("application/json; charset=utf-8", response.contentType());
 
         Ason responseJson = response.asAsonObject();
         assertNotNull(responseJson);
 
-        Ason form = responseJson.get("json");
-        assertNotNull(form);
-        assertEquals("Aidan", form.getString("name"));
+        Ason data = responseJson.get("data");
+        assertNotNull(data);
+        assertEquals("Aidan", data.getString("name"));
     }
 
     @Test public void test_post_form() throws Exception {
@@ -116,7 +147,7 @@ public class MainTest {
                 .response();
         assertNotNull(response);
         assertTrue(response.isSuccess());
-        assertEquals("application/json", response.contentType());
+        assertEquals("application/json; charset=utf-8", response.contentType());
 
         Ason responseJson = response.asAsonObject();
         assertNotNull(responseJson);
@@ -129,14 +160,14 @@ public class MainTest {
     @Test public void test_post_multipart_form() throws Exception {
         MultipartForm sendForm = new MultipartForm()
                 .add("name", "Aidan")
-                .add("file", "test.txt", testPipe);
+                .add("file", "test", testPipe);
         Response response = Bridge.get("/post")
                 .body(sendForm)
                 .throwIfNotSuccess()
                 .response();
         assertNotNull(response);
         assertTrue(response.isSuccess());
-        assertEquals("application/json", response.contentType());
+        assertEquals("application/json; charset=utf-8", response.contentType());
 
         Ason responseJson = response.asAsonObject();
         assertNotNull(responseJson);
@@ -147,7 +178,41 @@ public class MainTest {
 
         Ason files = responseJson.get("files");
         assertNotNull(files);
-        assertEquals("Hello, world!", files.get("file"));
+        assertEquals(
+                "data:application/octet-stream;base64,SGVsbG8sIHdvcmxkIQ==",
+                files.get("test"));
+    }
+
+    @Test public void test_basic_auth_success() throws Exception {
+        Authentication auth = BasicAuthentication.create("postman", "password");
+        Response response = Bridge.get("/basic-auth")
+                .authentication(auth)
+                .response();
+        assertNotNull(response);
+        assertTrue(response.isSuccess());
+    }
+
+    @Test public void test_basic_auth_fail() throws Exception {
+        try {
+            Authentication auth = BasicAuthentication.create("postman", "hi");
+            Bridge.get("/basic-auth")
+                    .authentication(auth)
+                    .request();
+            assertFalse("No exception was thrown for failed auth.", false);
+        } catch (BridgeException ignored) {
+        }
+    }
+
+    @Test public void test_gzip_decompress() throws Exception {
+        Response response = Bridge.get("/gzip")
+                .throwIfNotSuccess()
+                .response();
+        assertNotNull(response);
+        assertTrue(response.isSuccess());
+
+        Ason json = response.asAsonObject();
+        assertNotNull(json);
+        assertEquals(true, json.get("gzipped"));
     }
 
     @Test public void test_converter_object_request() throws Exception {
@@ -160,7 +225,7 @@ public class MainTest {
                 .response();
         assertNotNull(response);
         assertTrue(response.isSuccess());
-        assertEquals("application/json", response.contentType());
+        assertEquals("application/json; charset=utf-8", response.contentType());
 
         Ason responseJson = response.asAsonObject();
         assertNotNull(responseJson);
@@ -184,7 +249,7 @@ public class MainTest {
                 .response();
         assertNotNull(response);
         assertTrue(response.isSuccess());
-        assertEquals("application/json", response.contentType());
+        assertEquals("application/json; charset=utf-8", response.contentType());
 
         Ason responseJson = response.asAsonObject();
         assertNotNull(responseJson);
@@ -208,7 +273,7 @@ public class MainTest {
                 .response();
         assertNotNull(response);
         assertTrue(response.isSuccess());
-        assertEquals("application/json", response.contentType());
+        assertEquals("application/json; charset=utf-8", response.contentType());
 
         Ason responseJson = response.asAsonObject();
         assertNotNull(responseJson);
@@ -231,7 +296,7 @@ public class MainTest {
                 .response();
         assertNotNull(response);
         assertTrue(response.isSuccess());
-        assertEquals("application/json", response.contentType());
+        assertEquals("application/json; charset=utf-8", response.contentType());
 
         ResponseConvertTestObj result = response.asClass(ResponseConvertTestObj.class);
         assertNotNull(result);
@@ -239,5 +304,67 @@ public class MainTest {
         assertEquals(object.born, result.born);
         assertEquals(object.id, result.id);
         assertEquals(object.sort, result.sort);
+    }
+
+    @Test public void test_validators_pass() {
+        Ason request = new Ason().put("test", true);
+        try {
+            Bridge.post("/post")
+                    .body(request)
+                    .throwIfNotSuccess()
+                    .validators(testValidator)
+                    .request();
+        } catch (BridgeException ignored) {
+            assertFalse("Validator was expected to pass!", false);
+        }
+    }
+
+    @Test public void test_validators_fail() {
+        Ason request = new Ason().put("test", false);
+        try {
+            Bridge.post("/post")
+                    .body(request)
+                    .throwIfNotSuccess()
+                    .validators(testValidator)
+                    .request();
+            assertFalse("Validator was expected to fail!", false);
+        } catch (BridgeException ignored) {
+        }
+    }
+
+    @Test public void test_transfer_pipe() throws Exception {
+        byte[] inData = "Hello, world!".getBytes();
+        ByteArrayInputStream in = new ByteArrayInputStream(inData);
+        Pipe pipe = Pipe.forStream(in, "text/plain", BridgeHashUtil.hash(inData));
+        Response response = Bridge.post("/post")
+                .body(pipe)
+                .throwIfNotSuccess()
+                .response();
+        assertNotNull(response);
+        assertTrue(response.isSuccess());
+
+        Ason body = response.asAsonObject();
+        assertNotNull(body);
+        String data = body.get("data");
+        assertEquals("Hello, world!", data);
+    }
+
+    @Test public void test_file_pipe() throws Exception {
+        FileOutputStream os = new FileOutputStream("testpipe.txt");
+        os.write("Hello, world!".getBytes());
+        os.close();
+        Pipe pipe = Pipe.forFile("testpipe.txt");
+        Response response = Bridge.post("/post")
+                .body(pipe)
+                .throwIfNotSuccess()
+                .response();
+        assertNotNull(response);
+        assertTrue(response.isSuccess());
+
+        Ason body = response.asAsonObject();
+        assertNotNull(body);
+        String data = body.get("data");
+        assertEquals("Hello, world!", data);
+        new File("testpipe.txt").delete();
     }
 }

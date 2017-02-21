@@ -40,16 +40,16 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
     boolean throwIfNotSuccess = false;
     ResponseValidator[] validators;
     ProgressCallback uploadProgress;
-    InfoCallback infoCallback;
-    LineCallback lineCallback;
     boolean didRedirect = false;
     int redirectCount = 0;
 
     void prepareRedirect(String url) {
         if (!url.startsWith("http://") &&
                 !url.startsWith("https://")) {
-            url = Bridge.config().host +
-                    (url.startsWith("/") ? "" : "/") + url;
+            int startIndex = this.url.indexOf('/');
+            startIndex = this.url.indexOf('/', startIndex + 1);
+            String host = this.url.substring(0, this.url.indexOf("/", startIndex + 1));
+            url = host + (url.startsWith("/") ? "" : "/") + url;
         }
         this.url = url;
         this.didRedirect = true;
@@ -77,7 +77,9 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
         validators = cf.validators;
     }
 
-    public RequestBuilder header(@NotNull String name, @NotNull Object value) {
+    public RequestBuilder header(
+            @NotNull String name,
+            @NotNull Object value) {
         headers.put(name, value);
         return this;
     }
@@ -95,7 +97,8 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
         try {
             authentication.apply(this);
         } catch (Exception e) {
-            throw new IllegalStateException("Failed to apply authentication " + authentication.getClass().getName(), e);
+            throw new IllegalStateException("Failed to apply authentication " +
+                    authentication.getClass().getName(), e);
         }
         return this;
     }
@@ -104,29 +107,38 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
         return retries(count, retrySpacing, null);
     }
 
-    public RequestBuilder retries(int count, long retrySpacing, @Nullable RetryCallback callback) {
+    public RequestBuilder retries(
+            int count,
+            long retrySpacing,
+            @Nullable RetryCallback callback) {
         this.totalRetryCount = count;
         this.retryCallback = callback;
         return this;
     }
 
     public RequestBuilder connectTimeout(int timeout) {
-        if (timeout <= 0)
-            throw new IllegalArgumentException("Connect timeout must be greater than 0.");
+        if (timeout <= 0) {
+            throw new IllegalArgumentException(
+                    "Connect timeout must be greater than 0.");
+        }
         connectTimeout = timeout;
         return this;
     }
 
     public RequestBuilder readTimeout(int timeout) {
-        if (timeout <= 0)
-            throw new IllegalArgumentException("Read timeout must be greater than 0.");
+        if (timeout <= 0) {
+            throw new IllegalArgumentException(
+                    "Read timeout must be greater than 0.");
+        }
         readTimeout = timeout;
         return this;
     }
 
     public RequestBuilder bufferSize(int size) {
-        if (size <= 0)
-            throw new IllegalArgumentException("Buffer size must be greater than 0.");
+        if (size <= 0) {
+            throw new IllegalArgumentException(
+                    "Buffer size must be greater than 0.");
+        }
         bufferSize = size;
         return this;
     }
@@ -162,11 +174,13 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
     }
 
     public RequestBuilder body(@Nullable Ason json) {
-        return body(json != null ? json.toStockJson() : null);
+        return body(json != null ?
+                json.toStockJson() : null);
     }
 
     public RequestBuilder body(@Nullable AsonArray json) {
-        return body(json != null ? json.toStockJson() : null);
+        return body(json != null ?
+                json.toStockJson() : null);
     }
 
     public RequestBuilder body(@Nullable JSONObject json) {
@@ -238,7 +252,8 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
                 throw new IllegalStateException("Failed to serialize object to body!", e);
             }
             final long diff = System.currentTimeMillis() - start;
-            LogCompat.d(this, "Request conversion took %dms (%d seconds) for object of type %s.",
+            LogCompat.d(this, "Request conversion took " +
+                            "%dms (%d seconds) for object of type %s.",
                     diff, diff / 1000, object.getClass().getName());
         }
         return this;
@@ -259,7 +274,8 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
                 throw new IllegalStateException("Failed to serialize array to body!", e);
             }
             final long diff = System.currentTimeMillis() - start;
-            LogCompat.d(this, "Request conversion took %dms (%d seconds) for array of %s objects.",
+            LogCompat.d(this, "Request conversion took " +
+                            "%dms (%d seconds) for array of %s objects.",
                     diff, diff / 1000, objects[0].getClass().getName());
         }
         return this;
@@ -280,7 +296,8 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
                 throw new IllegalStateException("Failed to serialize list to body!", e);
             }
             final long diff = System.currentTimeMillis() - start;
-            LogCompat.d(this, "Request conversion took %dms (%d seconds) for list of %s objects.",
+            LogCompat.d(this, "Request conversion took " +
+                            "%dms (%d seconds) for list of %s objects.",
                     diff, diff / 1000, objects.get(0).getClass().getName());
         }
         return this;
@@ -288,11 +305,6 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
 
     public RequestBuilder uploadProgress(@NotNull ProgressCallback callback) {
         uploadProgress = callback;
-        return this;
-    }
-
-    public RequestBuilder infoCallback(@NotNull InfoCallback callback) {
-        infoCallback = callback;
         return this;
     }
 
@@ -353,9 +365,11 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
         request(new Callback() {
             @Override
             public void response(@NotNull Request request, Response response, BridgeException e) {
-                if (e != null)
+                if (e != null) {
                     callback.onResponse(response, null, e);
-                else callback.onResponse(response, response.asBytes(), null);
+                } else {
+                    callback.onResponse(response, response.asBytes(), null);
+                }
             }
         });
     }
@@ -365,7 +379,9 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
     public String asString() throws BridgeException {
         throwIfNotSuccess();
         Response response = response();
-        if (response == null) return null;
+        if (response == null) {
+            return null;
+        }
         return response.asString();
     }
 
@@ -373,9 +389,11 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
         request(new Callback() {
             @Override
             public void response(@NotNull Request request, Response response, BridgeException e) {
-                if (e != null)
+                if (e != null) {
                     callback.onResponse(response, null, e);
-                else callback.onResponse(response, response.asString(), null);
+                } else {
+                    callback.onResponse(response, response.asString(), null);
+                }
             }
         });
     }
@@ -383,7 +401,9 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
     @Nullable public Ason asAsonObject() throws BridgeException {
         throwIfNotSuccess();
         Response response = response();
-        if (response == null) return null;
+        if (response == null) {
+            return null;
+        }
         return response.asAsonObject();
     }
 
@@ -407,7 +427,9 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
     @Nullable public AsonArray<?> asAsonArray() throws BridgeException {
         throwIfNotSuccess();
         Response response = response();
-        if (response == null) return null;
+        if (response == null) {
+            return null;
+        }
         return response.asAsonArray();
     }
 
@@ -431,11 +453,14 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
     @Nullable public JSONObject asJsonObject() throws BridgeException {
         throwIfNotSuccess();
         Response response = response();
-        if (response == null) return null;
+        if (response == null) {
+            return null;
+        }
         return response.asJsonObject();
     }
 
-    @Override public void asJsonObject(final @NotNull ResponseConvertCallback<JSONObject> callback) {
+    @Override public void asJsonObject(
+            final @NotNull ResponseConvertCallback<JSONObject> callback) {
         request(new Callback() {
             @Override
             public void response(@NotNull Request request, Response response, BridgeException e) {
@@ -455,11 +480,14 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
     @Nullable public JSONArray asJsonArray() throws BridgeException {
         throwIfNotSuccess();
         Response response = response();
-        if (response == null) return null;
+        if (response == null) {
+            return null;
+        }
         return response.asJsonArray();
     }
 
-    @Override public void asJsonArray(final @NotNull ResponseConvertCallback<JSONArray> callback) {
+    @Override public void asJsonArray(
+            final @NotNull ResponseConvertCallback<JSONArray> callback) {
         request(new Callback() {
             @Override
             public void response(@NotNull Request request, Response response, BridgeException e) {
@@ -486,7 +514,8 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
     }
 
     @Override public <T> void asClassList(
-            final @NotNull Class<T> cls, final @NotNull ResponseConvertCallback<List<T>> callback) {
+            final @NotNull Class<T> cls,
+            final @NotNull ResponseConvertCallback<List<T>> callback) {
         request(new Callback() {
             @Override
             public void response(@NotNull Request request, Response response, BridgeException e) {
@@ -507,7 +536,8 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
         throwIfNotSuccess();
         Response response = response();
         if (response == null) {
-            throw new BridgeException(request(), "No response was returned to save into a file.",
+            throw new BridgeException(request(), "No response was " +
+                    "returned to save into a file.",
                     BridgeException.REASON_RESPONSE_UNPARSEABLE);
         }
         response.asFile(destination);
@@ -538,12 +568,13 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
     public <T> T asClass(@NotNull Class<T> cls) throws BridgeException {
         throwIfNotSuccess();
         Response response = response();
-        if (response == null) return null;
+        if (response == null) {
+            return null;
+        }
         return response.asClass(cls);
     }
 
-    @Override
-    public <T> void asClass(
+    @Override public <T> void asClass(
             final @NotNull Class<T> cls,
             final @NotNull ResponseConvertCallback<T> callback) {
         request(new Callback() {
@@ -567,7 +598,9 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
     public <T> T[] asClassArray(@NotNull Class<T> cls) throws BridgeException {
         throwIfNotSuccess();
         Response response = response();
-        if (response == null) return null;
+        if (response == null) {
+            return null;
+        }
         return response.asClassArray(cls);
     }
 

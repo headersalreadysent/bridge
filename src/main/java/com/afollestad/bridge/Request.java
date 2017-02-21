@@ -111,10 +111,6 @@ import java.util.List;
                     conn.setDoOutput(true);
                     conn.connect();
 
-                    if (builder.infoCallback != null) {
-                        builder.infoCallback.onConnected(this);
-                    }
-
                     OutputStream os = null;
                     try {
                         os = conn.getOutputStream();
@@ -127,9 +123,6 @@ import java.util.List;
                             }
                         }
                         os.flush();
-                        if (builder.infoCallback != null) {
-                            builder.infoCallback.onRequestSent(this);
-                        }
                     } finally {
                         if (builder.pipe != null) {
                             builder.pipe.close();
@@ -138,9 +131,6 @@ import java.util.List;
                     }
                 } else {
                     conn.connect();
-                    if (builder.infoCallback != null) {
-                        builder.infoCallback.onConnected(this);
-                    }
                 }
 
                 checkCancelled();
@@ -170,39 +160,24 @@ import java.util.List;
                         totalAvailable = is.available();
                     }
 
-                    if (builder.lineCallback != null) {
-                        BufferedReader reader = null;
-                        try {
-                            reader = new BufferedReader(new InputStreamReader(is));
-                            String line;
-                            int count = 0;
-                            while ((line = reader.readLine()) != null) {
-                                builder.lineCallback.onLine(line);
-                                count++;
-                            }
-                        } finally {
-                            BridgeUtil.closeQuietly(reader);
-                        }
-                    } else {
-                        bos = new ByteArrayOutputStream();
-                        if (totalAvailable != 0) {
-                            builder.context.fireProgress(Request.this, 0, totalAvailable);
-                        }
-                        while ((read = is.read(buf)) != -1) {
-                            checkCancelled();
-                            bos.write(buf, 0, read);
-                            totalRead += read;
-                            if (totalAvailable != 0) {
-                                builder.context.fireProgress(Request.this, totalRead, totalAvailable);
-                            }
-                        }
-                        if (totalAvailable == 0) {
-                            builder.context.fireProgress(Request.this, 100, 100);
-                        }
-                        data = bos.toByteArray();
-                        LogCompat.d(Request.this, "Read %d bytes from the %s %s response.",
-                                data != null ? data.length : 0, Method.name(method()), url());
+                    bos = new ByteArrayOutputStream();
+                    if (totalAvailable != 0) {
+                        builder.context.fireProgress(Request.this, 0, totalAvailable);
                     }
+                    while ((read = is.read(buf)) != -1) {
+                        checkCancelled();
+                        bos.write(buf, 0, read);
+                        totalRead += read;
+                        if (totalAvailable != 0) {
+                            builder.context.fireProgress(Request.this, totalRead, totalAvailable);
+                        }
+                    }
+                    if (totalAvailable == 0) {
+                        builder.context.fireProgress(Request.this, 100, 100);
+                    }
+                    data = bos.toByteArray();
+                    LogCompat.d(Request.this, "Read %d bytes from the %s %s response.",
+                            data != null ? data.length : 0, Method.name(method()), url());
                 } finally {
                     BridgeUtil.closeQuietly(is);
                     BridgeUtil.closeQuietly(bos);

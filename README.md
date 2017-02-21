@@ -1222,7 +1222,7 @@ public class JsonConverter extends IConverter {
     }
 
     @Override public <T> T deserialize(Response response, Class<T> cls) throws Exception {
-        return (T) Ason.deserialize(response.asAsonObject(), cls);
+        return Ason.deserialize(response.asAsonObject(), cls);
     }
 
     @Override public <T> T[] deserializeArray(Response response, Class<T> cls) throws Exception {
