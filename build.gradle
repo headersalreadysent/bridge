@@ -33,3 +33,10 @@ publish {
     publishVersion = '5.1.0'
     website = 'https://github.com/afollestad/bridge'
 }
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+        html.enabled false
+    }
+}
