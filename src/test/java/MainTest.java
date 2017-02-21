@@ -229,12 +229,13 @@ public class MainTest {
 
         Ason responseJson = response.asAsonObject();
         assertNotNull(responseJson);
-
         Ason jsonObj = responseJson.get("json");
         assertNotNull(jsonObj);
 
-        String expectedJson = "{\"data\":{\"sort\":2,\"$id\":1},\"born\":1995,\"name\":\"Aidan\"}";
-        assertEquals(expectedJson, jsonObj.toString());
+        assertEquals(2, jsonObj.getInt("data.sort"));
+        assertEquals(1, jsonObj.getInt("data.$id"));
+        assertEquals(1995, jsonObj.getInt("born"));
+        assertEquals("Aidan", jsonObj.get("name"));
     }
 
     @Test public void test_converter_array_request() throws Exception {
@@ -253,13 +254,20 @@ public class MainTest {
 
         Ason responseJson = response.asAsonObject();
         assertNotNull(responseJson);
+        AsonArray jsonAry = responseJson.get("json");
+        assertNotNull(jsonAry);
 
-        AsonArray jsonObj = responseJson.get("json");
-        assertNotNull(jsonObj);
+        Ason one = jsonAry.getJsonObject(0);
+        assertEquals(2, one.getInt("data.sort"));
+        assertEquals(1, one.getInt("data.$id"));
+        assertEquals(1995, one.getInt("born"));
+        assertEquals("Aidan", one.get("name"));
 
-        String expectedJson = "[{\"data\":{\"sort\":2,\"$id\":1},\"born\":1995,\"name\":\"Aidan\"}," +
-                "{\"data\":{\"sort\":1,\"$id\":2},\"born\":1997,\"name\":\"Waverly\"}]";
-        assertEquals(expectedJson, jsonObj.toString());
+        Ason two = jsonAry.getJsonObject(1);
+        assertEquals(1, two.getInt("data.sort"));
+        assertEquals(2, two.getInt("data.$id"));
+        assertEquals(1997, two.getInt("born"));
+        assertEquals("Waverly", two.get("name"));
     }
 
     @Test public void test_converter_list_request() throws Exception {
@@ -277,13 +285,20 @@ public class MainTest {
 
         Ason responseJson = response.asAsonObject();
         assertNotNull(responseJson);
+        AsonArray jsonAry = responseJson.get("json");
+        assertNotNull(jsonAry);
 
-        AsonArray jsonObj = responseJson.get("json");
-        assertNotNull(jsonObj);
+        Ason one = jsonAry.getJsonObject(0);
+        assertEquals(2, one.getInt("data.sort"));
+        assertEquals(1, one.getInt("data.$id"));
+        assertEquals(1995, one.getInt("born"));
+        assertEquals("Aidan", one.get("name"));
 
-        String expectedJson = "[{\"data\":{\"sort\":2,\"$id\":1},\"born\":1995,\"name\":\"Aidan\"}," +
-                "{\"data\":{\"sort\":1,\"$id\":2},\"born\":1997,\"name\":\"Waverly\"}]";
-        assertEquals(expectedJson, jsonObj.toString());
+        Ason two = jsonAry.getJsonObject(1);
+        assertEquals(1, two.getInt("data.sort"));
+        assertEquals(2, two.getInt("data.$id"));
+        assertEquals(1997, two.getInt("born"));
+        assertEquals("Waverly", two.get("name"));
     }
 
     @Test public void test_converter_object_response() throws Exception {
