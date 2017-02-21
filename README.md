@@ -73,7 +73,7 @@ Add the compile statement to your module's `build.gradle` dependencies:
 ```gradle
 dependencies {
 	...
-	compile 'com.afollestad:bridge:5.0.0'
+	compile 'com.afollestad:bridge:5.1.0'
 }
 ```
 
@@ -84,7 +84,7 @@ Add the compile statement to your module's `build.gradle` dependencies:
 ```gradle
 dependencies {
     ...
-	compile('com.afollestad:bridge:5.0.0') {
+	compile('com.afollestad:bridge:5.1.0') {
 	    exclude group: 'org.json', module: 'json'
     }
 }
@@ -99,7 +99,7 @@ The exclusion inside the inner brackets leaves out the `JSONObject`/`JSONArray` 
 <dependency>
   <groupId>com.afollestad</groupId>
   <artifactId>bridge</artifactId>
-  <version>5.0.0</version>
+  <version>5.1.0</version>
   <type>pom</type>
 </dependency>
 ```
@@ -1159,8 +1159,7 @@ Bridge.get("https://www.someurl.com/person_array.json")
 
 ### Dot Notation
 
-I thought this was worthy of its own section. Bridge supports dot notation through Ason, 
-which is better explained by example. Take this class:
+Bridge supports dot notation through Ason, which is better explained by example. Take this class:
 
 ```java
 @ContentType("application/json")
@@ -1196,6 +1195,19 @@ When converted to JSON, it will appear like this:
 
 The dots in the names of the `AsonName` annotation parameters indicate a path of objects that it takes
 to reach the value. This works with deserialization also.
+
+If your JSON keys actually have periods in them, you can escape periods in your path with a forward slash. For an 
+example, with this JSON:
+
+```java
+{
+    "files": {
+        "test.txt": "Hello, world!"
+    }
+}
+```
+
+You can retrieve the value of `test.txt` using the path `files.test\\.txt`.
 
 ### Custom Converters
 
