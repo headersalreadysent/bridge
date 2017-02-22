@@ -407,7 +407,7 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
         return response.asAsonObject();
     }
 
-    public void asAsonObject(@NotNull ResponseConvertCallback<Ason> callback) {
+    public void asAsonObject(@NotNull final ResponseConvertCallback<Ason> callback) {
         request(new Callback() {
             @Override
             public void response(@NotNull Request request, Response response, BridgeException e) {
@@ -433,7 +433,7 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
         return response.asAsonArray();
     }
 
-    public void asAsonArray(@NotNull ResponseConvertCallback<AsonArray<?>> callback) {
+    public void asAsonArray(@NotNull final ResponseConvertCallback<AsonArray<?>> callback) {
         request(new Callback() {
             @Override
             public void response(@NotNull Request request, Response response, BridgeException e) {

@@ -73,7 +73,7 @@ Add the compile statement to your module's `build.gradle` dependencies:
 ```gradle
 dependencies {
 	...
-	compile 'com.afollestad:bridge:5.1.0'
+	compile 'com.afollestad:bridge:5.1.1'
 }
 ```
 
@@ -84,7 +84,7 @@ Add the compile statement to your module's `build.gradle` dependencies:
 ```gradle
 dependencies {
     ...
-	compile('com.afollestad:bridge:5.1.0') {
+	compile('com.afollestad:bridge:5.1.1') {
 	    exclude group: 'org.json', module: 'json'
     }
 }
@@ -100,7 +100,7 @@ in some cases, so you may get warnings when building your app.*
 <dependency>
   <groupId>com.afollestad</groupId>
   <artifactId>bridge</artifactId>
-  <version>5.1.0</version>
+  <version>5.1.1</version>
   <type>pom</type>
 </dependency>
 ```
