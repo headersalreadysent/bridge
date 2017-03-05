@@ -8,7 +8,7 @@ import com.afollestad.bridge.annotations.ContentType;
 
     @AsonName(name = "json.name") String name;
     @AsonName(name = "json.born") int born;
-    @AsonName(name = "json.data.$id") int id;
+    @AsonName(name = "json.data.id") int id;
     @AsonName(name = "json.data.sort") int sort;
 
     public ResponseConvertTestObj() {
