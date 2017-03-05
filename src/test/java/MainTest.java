@@ -233,7 +233,7 @@ public class MainTest {
         assertNotNull(jsonObj);
 
         assertEquals(2, jsonObj.getInt("data.sort"));
-        assertEquals(1, jsonObj.getInt("data.$id"));
+        assertEquals(1, jsonObj.getInt("data.id"));
         assertEquals(1995, jsonObj.getInt("born"));
         assertEquals("Aidan", jsonObj.get("name"));
     }
@@ -259,13 +259,13 @@ public class MainTest {
 
         Ason one = jsonAry.getJsonObject(0);
         assertEquals(2, one.getInt("data.sort"));
-        assertEquals(1, one.getInt("data.$id"));
+        assertEquals(1, one.getInt("data.id"));
         assertEquals(1995, one.getInt("born"));
         assertEquals("Aidan", one.get("name"));
 
         Ason two = jsonAry.getJsonObject(1);
         assertEquals(1, two.getInt("data.sort"));
-        assertEquals(2, two.getInt("data.$id"));
+        assertEquals(2, two.getInt("data.id"));
         assertEquals(1997, two.getInt("born"));
         assertEquals("Waverly", two.get("name"));
     }
@@ -290,13 +290,13 @@ public class MainTest {
 
         Ason one = jsonAry.getJsonObject(0);
         assertEquals(2, one.getInt("data.sort"));
-        assertEquals(1, one.getInt("data.$id"));
+        assertEquals(1, one.getInt("data.id"));
         assertEquals(1995, one.getInt("born"));
         assertEquals("Aidan", one.get("name"));
 
         Ason two = jsonAry.getJsonObject(1);
         assertEquals(1, two.getInt("data.sort"));
-        assertEquals(2, two.getInt("data.$id"));
+        assertEquals(2, two.getInt("data.id"));
         assertEquals(1997, two.getInt("born"));
         assertEquals("Waverly", two.get("name"));
     }

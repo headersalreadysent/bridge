@@ -8,7 +8,7 @@ import com.afollestad.bridge.annotations.ContentType;
 
     String name;
     int born;
-    @AsonName(name = "data.$id") int id;
+    @AsonName(name = "data.id") int id;
     @AsonName(name = "data.sort") int sort;
 
     RequestConvertTestObj(String name, int born, int id, int sort) {
