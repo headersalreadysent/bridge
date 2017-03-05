@@ -6,54 +6,55 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author Aidan Follestad (afollestad)
- */
-@SuppressWarnings({"WeakerAccess", "unused"}) public final class Form {
+/** @author Aidan Follestad (afollestad) */
+@SuppressWarnings({"WeakerAccess", "unused"})
+public final class Form {
 
-    private final String encoding;
-    private final List<Entry> entries;
+  private final String encoding;
+  private final List<Entry> entries;
 
-    @SuppressWarnings("WeakerAccess") public static class Entry {
+  public Form() {
+    entries = new ArrayList<>();
+    encoding = "UTF-8";
+  }
 
-        public final String name;
-        public final Object value;
+  public Form(@NotNull String encoding) {
+    entries = new ArrayList<>();
+    this.encoding = encoding;
+  }
 
-        public Entry(String name, Object value) {
-            this.name = name;
-            this.value = value;
-        }
+  public Form add(String name, Object value) {
+    entries.add(new Entry(name, value));
+    return this;
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder result = new StringBuilder();
+    for (int i = 0; i < entries.size(); i++) {
+      if (i > 0) result.append("&");
+      final Entry entry = entries.get(i);
+      try {
+        result.append(URLEncoder.encode(entry.name, encoding));
+        result.append("=");
+        result.append(URLEncoder.encode(entry.value + "", encoding));
+      } catch (Exception e) {
+        // This should never happen
+        throw new RuntimeException(e);
+      }
     }
+    return result.toString();
+  }
 
-    public Form() {
-        entries = new ArrayList<>();
-        encoding = "UTF-8";
-    }
+  @SuppressWarnings("WeakerAccess")
+  public static class Entry {
 
-    public Form(@NotNull String encoding) {
-        entries = new ArrayList<>();
-        this.encoding = encoding;
-    }
+    public final String name;
+    public final Object value;
 
-    public Form add(String name, Object value) {
-        entries.add(new Entry(name, value));
-        return this;
+    public Entry(String name, Object value) {
+      this.name = name;
+      this.value = value;
     }
-
-    @Override public String toString() {
-        final StringBuilder result = new StringBuilder();
-        for (int i = 0; i < entries.size(); i++) {
-            if (i > 0) result.append("&");
-            final Entry entry = entries.get(i);
-            try {
-                result.append(URLEncoder.encode(entry.name, encoding));
-                result.append("=");
-                result.append(URLEncoder.encode(entry.value + "", encoding));
-            } catch (Exception e) {
-                // This should never happen
-                throw new RuntimeException(e);
-            }
-        }
-        return result.toString();
-    }
+  }
 }

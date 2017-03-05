@@ -10,28 +10,35 @@ import org.json.JSONObject;
 import java.io.File;
 import java.util.List;
 
-/**
- * @author Aidan Follestad (afollestad)
- */
+/** @author Aidan Follestad (afollestad) */
 interface AsResults {
 
-    @Nullable byte[] asBytes();
+  @Nullable
+  byte[] asBytes();
 
-    @Nullable String asString();
+  @Nullable
+  String asString();
 
-    @Nullable Ason asAsonObject() throws BridgeException;
+  @Nullable
+  Ason asAsonObject() throws BridgeException;
 
-    @Nullable AsonArray<?> asAsonArray() throws BridgeException;
+  @Nullable
+  AsonArray<?> asAsonArray() throws BridgeException;
 
-    @Nullable JSONObject asJsonObject() throws BridgeException;
+  @Nullable
+  JSONObject asJsonObject() throws BridgeException;
 
-    @Nullable JSONArray asJsonArray() throws BridgeException;
+  @Nullable
+  JSONArray asJsonArray() throws BridgeException;
 
-    void asFile(File destination) throws BridgeException;
+  void asFile(File destination) throws BridgeException;
 
-    @Nullable <T> T asClass(Class<T> cls) throws BridgeException;
+  @Nullable
+  <T> T asClass(Class<T> cls) throws BridgeException;
 
-    @Nullable <T> T[] asClassArray(@NotNull Class<T> cls) throws BridgeException;
+  @Nullable
+  <T> T[] asClassArray(@NotNull Class<T> cls) throws BridgeException;
 
-    @Nullable <T> List<T> asClassList(@NotNull Class<T> cls) throws BridgeException;
+  @Nullable
+  <T> List<T> asClassList(@NotNull Class<T> cls) throws BridgeException;
 }
