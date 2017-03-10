@@ -108,6 +108,7 @@ public final class Response implements AsResults, Serializable {
   public String contentType() {
     String contentType = header("Content-Type");
     if (contentType == null) contentType = header("content-type");
+    if (contentType == null) contentType = header("Content-type");
     return contentType;
   }
 
