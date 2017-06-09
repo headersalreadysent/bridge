@@ -1,10 +1,9 @@
 package com.afollestad.bridge;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.io.*;
 import java.net.URLConnection;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /** @author Aidan Follestad (afollestad) */
 @SuppressWarnings("WeakerAccess")

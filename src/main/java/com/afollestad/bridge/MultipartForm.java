@@ -1,11 +1,10 @@
 package com.afollestad.bridge;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.Locale;
+import org.jetbrains.annotations.NotNull;
 
 /** @author Aidan Follestad (afollestad) */
 @SuppressWarnings({"WeakerAccess", "unused"})

@@ -1,14 +1,13 @@
 package com.afollestad.bridge;
 
 import com.afollestad.bridge.annotations.ContentType;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /** @author Aidan Follestad (afollestad) */
 class BridgeUtil {

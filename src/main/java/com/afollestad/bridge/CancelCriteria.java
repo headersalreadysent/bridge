@@ -1,11 +1,10 @@
 package com.afollestad.bridge;
 
-import org.jetbrains.annotations.Nullable;
-
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TimerTask;
 import java.util.regex.Pattern;
+import org.jetbrains.annotations.Nullable;
 
 /** @author Aidan Follestad (afollestad) */
 @SuppressWarnings({"WeakerAccess", "unused"})

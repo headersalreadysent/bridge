@@ -1,10 +1,9 @@
 package com.afollestad.bridge;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+import org.jetbrains.annotations.NotNull;
 
 /** @author Aidan Follestad (afollestad) */
 @SuppressWarnings({"WeakerAccess", "unused"})

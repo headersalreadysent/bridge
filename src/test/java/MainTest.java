@@ -1,16 +1,15 @@
+import static org.junit.Assert.*;
+
 import com.afollestad.ason.Ason;
 import com.afollestad.ason.AsonArray;
 import com.afollestad.bridge.*;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.Assert.*;
 
 /** @author Aidan Follestad (afollestad) */
 public class MainTest {

@@ -1,10 +1,9 @@
 package com.afollestad.bridge;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.net.SocketTimeoutException;
 import java.util.concurrent.TimeoutException;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /** @author Aidan Follestad (afollestad) */
 @SuppressWarnings({"WeakerAccess", "unused"})

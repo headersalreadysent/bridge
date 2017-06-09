@@ -1,12 +1,11 @@
 package com.afollestad.bridge;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.HashMap;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /** @author Aidan Follestad (afollestad) */
 @SuppressWarnings({"WeakerAccess", "unused"})

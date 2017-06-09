@@ -3,7 +3,6 @@ package com.afollestad.bridge.conversion;
 import com.afollestad.ason.Ason;
 import com.afollestad.ason.AsonArray;
 import com.afollestad.bridge.Response;
-
 import java.util.List;
 
 /** @author Aidan Follestad (afollestad) */

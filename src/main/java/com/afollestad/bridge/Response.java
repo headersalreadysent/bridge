@@ -2,18 +2,17 @@ package com.afollestad.bridge;
 
 import com.afollestad.ason.Ason;
 import com.afollestad.ason.AsonArray;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /** @author Aidan Follestad (afollestad) */
 @SuppressWarnings({"WeakerAccess", "unused"})
