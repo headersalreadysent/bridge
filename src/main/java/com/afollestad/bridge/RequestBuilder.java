@@ -28,7 +28,7 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
   int readTimeout;
   int currentRetryCount;
   int totalRetryCount;
-  int retrySpacingMs;
+  long retrySpacingMs;
   RetryCallback retryCallback;
   boolean cancellable = true;
   Object tag;
@@ -106,6 +106,7 @@ public final class RequestBuilder implements AsResultsExceptions, Serializable {
 
   public RequestBuilder retries(int count, long retrySpacing, @Nullable RetryCallback callback) {
     this.totalRetryCount = count;
+    this.retrySpacingMs = retrySpacing;
     this.retryCallback = callback;
     return this;
   }
