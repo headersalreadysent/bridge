@@ -15,6 +15,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.novoda:bintray-release:0.4.0'
+        classpath "com.diffplug.spotless:spotless-plugin-gradle:3.4.0"
     }
 }
 
@@ -41,5 +42,17 @@ jacocoTestReport {
     reports {
         xml.enabled true
         html.enabled false
+    }
+}
+
+apply plugin: "com.diffplug.gradle.spotless"
+
+spotless {
+    java {
+        target "**/*.java"
+        trimTrailingWhitespace()
+        removeUnusedImports()
+        googleJavaFormat()
+        endWithNewline()
     }
 }

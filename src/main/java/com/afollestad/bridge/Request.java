@@ -1,12 +1,11 @@
 package com.afollestad.bridge;
 
-import org.jetbrains.annotations.Nullable;
-
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
+import org.jetbrains.annotations.Nullable;
 
 /** @author Aidan Follestad (afollestad) */
 @SuppressWarnings({"WeakerAccess", "unused"})

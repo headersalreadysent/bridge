@@ -2,10 +2,9 @@ package com.afollestad.bridge;
 
 import com.afollestad.bridge.conversion.IConverter;
 import com.afollestad.bridge.conversion.JsonConverter;
+import java.util.HashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.HashMap;
 
 /** @author Aidan Follestad (afollestad) */
 @SuppressWarnings({"WeakerAccess", "unused"})

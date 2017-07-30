@@ -2,13 +2,12 @@ package com.afollestad.bridge;
 
 import com.afollestad.ason.Ason;
 import com.afollestad.ason.AsonArray;
+import java.io.File;
+import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
-import java.io.File;
-import java.util.List;
 
 /** @author Aidan Follestad (afollestad) */
 interface AsResults {
